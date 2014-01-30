@@ -32,14 +32,14 @@ namespace GeoTimeZone
         private static void WriteLookup()
         {
             var arr = TZ.OrderBy(x => x.Value).Select(x => x.Key).ToArray();
-            File.WriteAllText(@"..\..\..\GeoTimeZone\TZL.txt", string.Join(LineEnding, arr), Encoding.UTF8);
+            File.WriteAllText(@"..\..\..\GeoTimeZone\TZL.dat", string.Join(LineEnding, arr), Encoding.UTF8);
         }
 
         private static void WriteResult(string idFormat)
         {
             var sb = new StringBuilder();
             WriteSwitch(sb, Result, idFormat);
-            File.WriteAllText(@"..\..\..\GeoTimeZone\TZ.txt", sb.ToString(), Encoding.UTF8);
+            File.WriteAllText(@"..\..\..\GeoTimeZone\TZ.dat", sb.ToString(), Encoding.UTF8);
         }
 
         private static void WriteSwitch(StringBuilder sb, Result result, string idFormat, string hash = "")

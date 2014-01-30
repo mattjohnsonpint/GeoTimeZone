@@ -14,7 +14,7 @@ namespace GeoTimeZone
             if (no == 0)
                 return null;
 
-            using (var stream = typeof(TimezoneFileReader).Assembly.GetManifestResourceStream("GeoTimeZone.TZL.txt"))
+            using (var stream = typeof(TimezoneFileReader).Assembly.GetManifestResourceStream("GeoTimeZone.TZL.dat"))
             using (var reader = new StreamReader(stream))
             {
                 string result = null;
@@ -97,7 +97,7 @@ namespace GeoTimeZone
 
         public TimezoneFileReader()
         {
-            _stream = typeof (TimezoneFileReader).Assembly.GetManifestResourceStream("GeoTimeZone.TZ.txt");
+            _stream = typeof (TimezoneFileReader).Assembly.GetManifestResourceStream("GeoTimeZone.TZ.dat");
             Count = _stream.Length / (LineLength + LineEndLength);
         }
 
