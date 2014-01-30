@@ -42,10 +42,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="TZ.txt" />
+    <EmbeddedResource Include="TZ.dat" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="TZL.txt" />
+    <EmbeddedResource Include="TZL.dat" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
