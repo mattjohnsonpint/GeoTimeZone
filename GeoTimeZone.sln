@@ -1,13 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
-MinimumVisualStudioVersion = 10.0.40219.1
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeoTimeZone.Tests", "GeoTimeZone.Tests\GeoTimeZone.Tests.csproj", "{CA246E9E-379D-4D5D-BAD4-DA3557219C0F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeoTimeZone.Net40", "GeoTimeZone.Net40\GeoTimeZone.Net40.csproj", "{CCAF46FC-1726-4435-A982-37742BBBEDC2}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeoTimeZone.PCL", "GeoTimeZone.PCL\GeoTimeZone.PCL.csproj", "{8716F91F-A528-43B3-86AA-B0D24B259466}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeoTimeZone", "GeoTimeZone\GeoTimeZone.csproj", "{8716F91F-A528-43B3-86AA-B0D24B259466}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{6501F009-6C3C-4085-A897-A371E0E7A93A}"
 	ProjectSection(SolutionItems) = preProject
@@ -15,6 +11,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{6501F0
 		.nuget\NuGet.exe = .nuget\NuGet.exe
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeoTimeZone.DataBuilder", "GeoTimeZone.DataBuilder\GeoTimeZone.DataBuilder.csproj", "{D1EC7045-B2DD-42FF-A824-48455A16B000}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,14 +24,14 @@ Global
 		{CA246E9E-379D-4D5D-BAD4-DA3557219C0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CA246E9E-379D-4D5D-BAD4-DA3557219C0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CA246E9E-379D-4D5D-BAD4-DA3557219C0F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CCAF46FC-1726-4435-A982-37742BBBEDC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CCAF46FC-1726-4435-A982-37742BBBEDC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CCAF46FC-1726-4435-A982-37742BBBEDC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CCAF46FC-1726-4435-A982-37742BBBEDC2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8716F91F-A528-43B3-86AA-B0D24B259466}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8716F91F-A528-43B3-86AA-B0D24B259466}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8716F91F-A528-43B3-86AA-B0D24B259466}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8716F91F-A528-43B3-86AA-B0D24B259466}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1EC7045-B2DD-42FF-A824-48455A16B000}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1EC7045-B2DD-42FF-A824-48455A16B000}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1EC7045-B2DD-42FF-A824-48455A16B000}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1EC7045-B2DD-42FF-A824-48455A16B000}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

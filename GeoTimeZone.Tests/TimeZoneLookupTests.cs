@@ -1,15 +1,19 @@
-﻿using NUnit.Framework;
+﻿using System;
+using System.Diagnostics;
+using System.Linq;
+using GeoAPI.Geometries;
+using NUnit.Framework;
 
 namespace GeoTimeZone.Tests
 {
     [TestFixture]
     public class TimeZoneLookupTests
     {
-        [TestFixtureSetUp]
-        public void Setup()
+        [Test]
+        public void Cant_Lookup_TimeZone_Titantic()
         {
-            // initialize this here so id doesn't throw the timings off of the other tests.
-            TimeZoneLookup.Initialize();
+            var tz = TimeZoneLookup.GetTimeZone(41.7325, -49.9469);
+            Assert.AreEqual(null, tz);
         }
 
         [Test]
