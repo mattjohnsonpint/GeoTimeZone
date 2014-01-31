@@ -1,16 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeoTimeZone.Tests", "GeoTimeZone.Tests\GeoTimeZone.Tests.csproj", "{CA246E9E-379D-4D5D-BAD4-DA3557219C0F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeoTimeZone", "GeoTimeZone\GeoTimeZone.csproj", "{8716F91F-A528-43B3-86AA-B0D24B259466}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{6501F009-6C3C-4085-A897-A371E0E7A93A}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\NuGet.Config = .nuget\NuGet.Config
-		.nuget\NuGet.exe = .nuget\NuGet.exe
-		.nuget\NuGet.targets = .nuget\NuGet.targets
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeoTimeZone.DataBuilder", "GeoTimeZone.DataBuilder\GeoTimeZone.DataBuilder.csproj", "{D1EC7045-B2DD-42FF-A824-48455A16B000}"
 EndProject
