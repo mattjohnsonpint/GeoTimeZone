@@ -16,12 +16,9 @@ namespace GeoTimeZone.DataBuilder
     {
         private const string LineEnding = "\n";
         private const int GeohashLength = 5;
-        private static IList<Feature> _features;
-        private static readonly GeohashLevelList Geohashes = new GeohashLevelList();
-
+        
         private static readonly TimeZoneResult Result = new TimeZoneResult();
         private static readonly Dictionary<string, int> TimeZones = new Dictionary<string, int>();
-        private static int _timeZoneCount;
 
         private const string DataFileName = "TZ.dat";
         private const string LookupFileName = "TZL.dat";
@@ -57,11 +54,11 @@ namespace GeoTimeZone.DataBuilder
             }
         }
 
-        private static void AddResult(string geohash, string tz)
+        private static void AddResult(string geohash, string tz, ref int timeZoneCount)
         {
             int id;
             if (!TimeZones.TryGetValue(tz, out id))
-                TimeZones.Add(tz, ++_timeZoneCount);
+                TimeZones.Add(tz, ++timeZoneCount);
 
             var c = geohash.ToCharArray();
             var r = Result;
@@ -89,37 +86,37 @@ namespace GeoTimeZone.DataBuilder
 
         public static void CreateGeohashData(string inputShapefile, string outputPath)
         {
-            _features = ReadShapeFile(inputShapefile).ToList();
+            var features = ReadShapeFile(inputShapefile);
 
-            int f = 0;
-            foreach (var feature in _features)
+            var geohashList = new GeohashLevelList();
+
+            int featuresProcessed = 0;
+            int timeZoneCount = 0;
+            foreach (var feature in features)
             {
-                f++;
+                featuresProcessed++;
 
                 var name = (string)feature.Attributes["TZID"];
 
-                var hashes = GetGeohashes(feature).OrderBy(x => x).ToList();
-                foreach (var hash in hashes)
-                {
-                    AddResult(hash, name);
-                }
+                var hashes = geohashList
+                    .SelectMany(x => GetGeohashes(feature, x))
+                    .OrderBy(x => x)
+                    .ToList();
 
-                Console.WriteLine(f);
+                foreach (var hash in hashes)
+                    AddResult(hash, name, ref timeZoneCount);
+
+                Console.WriteLine(featuresProcessed);
             }
 
             var idFormat = "";
-            for (int i = 0; i < _timeZoneCount.ToString(CultureInfo.InvariantCulture).Length; i++)
+            for (int i = 0; i < timeZoneCount.ToString(CultureInfo.InvariantCulture).Length; i++)
             {
                 idFormat += "0";
             }
 
             WriteResult(idFormat, outputPath);
             WriteLookup(outputPath);
-        }
-
-        private static IEnumerable<string> GetGeohashes(Feature feature)
-        {
-            return Geohashes.SelectMany(x => GetGeohashes(feature, x));
         }
 
         private static IEnumerable<string> GetGeohashes(Feature feature, GeohashLevel level)
