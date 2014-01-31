@@ -16,7 +16,7 @@ namespace GeoTimeZone.DataBuilder
         private const string LineEnding = "\n";
         private const int GeohashLength = 5;
         
-        private static readonly TimeZoneResult Result = new TimeZoneResult();
+        private static readonly TimeZoneTreeNode WorldBoundsTreeNode = new TimeZoneTreeNode();
         private static readonly Dictionary<string, int> TimeZones = new Dictionary<string, int>();
 
         private const string DataFileName = "TZ.dat";
@@ -35,59 +35,57 @@ namespace GeoTimeZone.DataBuilder
             }
         }
 
-        private static void WriteResult(string idFormat, string outputPath)
+        private static void WriteGeohashDataFile(string idFormat, string outputPath)
         {
             var path = Path.Combine(outputPath, DataFileName);
             using (var writer = File.CreateText(path))
             {
                 writer.NewLine = LineEnding;
-                WriteSwitch(writer, Result, idFormat);
+                WriteTreeNode(writer, WorldBoundsTreeNode, idFormat);
             }
         }
 
-        private static void WriteSwitch(StreamWriter writer, TimeZoneResult result, string idFormat, string hash = "")
+        private static void WriteTreeNode(StreamWriter writer, TimeZoneTreeNode node, string idFormat, string hash = "")
         {
-            foreach (var item in result.Results.OrderBy(x => x.Key))
+            foreach (var childNode in node.ChildNodes.OrderBy(x => x.Key))
             {
-                var timeZoneResult = item.Value;
-                if (timeZoneResult.TimeZone != null)
+                if (childNode.Value.TimeZone != null)
                 {
-                    var h = (hash + item.Key).PadRight(GeohashLength, '-');
-                    var p = TimeZones[timeZoneResult.TimeZone].ToString(idFormat);
+                    var h = (hash + childNode.Key).PadRight(GeohashLength, '-');
+                    var p = TimeZones[childNode.Value.TimeZone].ToString(idFormat);
                     writer.WriteLine(h + "|" + p); // we could probably remove the pipe and just rely on width
                 }
-                else if (timeZoneResult.Results.Count > 0)
+                else if (childNode.Value.ChildNodes.Count > 0)
                 {
-                    WriteSwitch(writer, timeZoneResult, idFormat, hash + item.Key);
+                    WriteTreeNode(writer, childNode.Value, idFormat, hash + childNode.Key);
                 }
             }
         }
 
         private static void AddResult(string geohash, string tz, ref int timeZoneCount)
         {
-            int id;
-            if (!TimeZones.TryGetValue(tz, out id))
+            int tzId;
+            if (!TimeZones.TryGetValue(tz, out tzId))
                 TimeZones.Add(tz, ++timeZoneCount);
 
-            var c = geohash.ToCharArray();
-            var r = Result;
+            var currentNode = WorldBoundsTreeNode;
 
-            for (int i = 0; i < c.Length; i++)
+            for (int i = 0; i < geohash.Length; i++)
             {
-                var ch = c[i];
-                TimeZoneResult r2;
-                if (!r.Results.TryGetValue(ch, out r2))
+                var childNodeKey = geohash[i];
+                TimeZoneTreeNode childNode;
+                if (!currentNode.ChildNodes.TryGetValue(childNodeKey, out childNode))
                 {
-                    r2 = r.Results[ch] = new TimeZoneResult();
+                    childNode = currentNode.ChildNodes[childNodeKey] = new TimeZoneTreeNode();
                 }
 
-                r = r2;
+                currentNode = childNode;
 
-                var last = i == c.Length - 1;
+                var last = i == geohash.Length - 1;
 
                 if (last)
                 {
-                    r.TimeZone = tz;
+                    currentNode.TimeZone = tz;
                     break;
                 }
             }
@@ -118,13 +116,9 @@ namespace GeoTimeZone.DataBuilder
                 Console.WriteLine(++featuresProcessed);
             }
 
-            var idFormat = "";
-            for (int i = 0; i < timeZoneCount.ToString(CultureInfo.InvariantCulture).Length; i++)
-            {
-                idFormat += "0";
-            }
+            var idFormat = string.Empty.PadRight(timeZoneCount.ToString(CultureInfo.InvariantCulture).Length, '0');
 
-            WriteResult(idFormat, outputPath);
+            WriteGeohashDataFile(idFormat, outputPath);
             WriteLookup(outputPath);
         }
 
