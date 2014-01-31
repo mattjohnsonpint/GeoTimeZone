@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 using GeoAPI.Geometries;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
@@ -25,31 +24,41 @@ namespace GeoTimeZone.DataBuilder
         
         private static void WriteLookup(string outputPath)
         {
-            var arr = TimeZones.OrderBy(x => x.Value).Select(x => x.Key).ToArray();
             var path = Path.Combine(outputPath, LookupFileName);
-            File.WriteAllText(path, string.Join(LineEnding, arr), Encoding.UTF8);
+            
+            using (var writer = File.CreateText(path))
+            {
+                writer.NewLine = LineEnding;
+                var timeZones = TimeZones.OrderBy(x => x.Value).Select(x => x.Key);
+                foreach (var timeZone in timeZones)
+                    writer.WriteLine(timeZone);
+            }
         }
 
         private static void WriteResult(string idFormat, string outputPath)
         {
-            var sb = new StringBuilder();
-            WriteSwitch(sb, Result, idFormat);
             var path = Path.Combine(outputPath, DataFileName);
-            File.WriteAllText(path, sb.ToString(), Encoding.UTF8);
+            using (var writer = File.CreateText(path))
+            {
+                writer.NewLine = LineEnding;
+                WriteSwitch(writer, Result, idFormat);
+            }
         }
 
-        private static void WriteSwitch(StringBuilder sb, TimeZoneResult result, string idFormat, string hash = "")
+        private static void WriteSwitch(StreamWriter writer, TimeZoneResult result, string idFormat, string hash = "")
         {
-            foreach (var result1 in result.Results.OrderBy(x => x.Key))
+            foreach (var item in result.Results.OrderBy(x => x.Key))
             {
-                if (result1.Value.TimeZone != null)
+                var timeZoneResult = item.Value;
+                if (timeZoneResult.TimeZone != null)
                 {
-                    var h = (hash + result1.Key).PadRight(GeohashLength, '-');
-                    sb.Append(h + "|" + TimeZones[result1.Value.TimeZone].ToString(idFormat) + LineEnding);
+                    var h = (hash + item.Key).PadRight(GeohashLength, '-');
+                    var p = TimeZones[timeZoneResult.TimeZone].ToString(idFormat);
+                    writer.WriteLine(h + "|" + p); // we could probably remove the pipe and just rely on width
                 }
-                else if (result1.Value.Results.Count > 0)
+                else if (timeZoneResult.Results.Count > 0)
                 {
-                    WriteSwitch(sb, result1.Value, idFormat, hash + result1.Key);
+                    WriteSwitch(writer, timeZoneResult, idFormat, hash + item.Key);
                 }
             }
         }
