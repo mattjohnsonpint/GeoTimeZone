@@ -34,6 +34,9 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .NET Framework is automatically included -->
+    <Compile Include="..\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Geohash.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TimeZoneLookup.cs" />
