@@ -97,25 +97,25 @@ namespace GeoTimeZone.DataBuilder
         {
             var features = ReadShapeFile(inputShapefile);
 
-            var geohashList = new GeohashLevelList();
+            var levels = new GeohashLevelList();
 
             int featuresProcessed = 0;
             int timeZoneCount = 0;
             foreach (var feature in features)
             {
-                featuresProcessed++;
-
                 var name = (string)feature.Attributes["TZID"];
 
-                var hashes = geohashList
-                    .SelectMany(x => GetGeohashes(feature, x))
-                    .OrderBy(x => x)
+                var thisFeature = feature;
+                var hashes = levels
+                    .AsParallel()
+                    .SelectMany(level => GetGeohashes(thisFeature, level))
                     .ToList();
+                hashes.Sort(StringComparer.Ordinal);
 
                 foreach (var hash in hashes)
                     AddResult(hash, name, ref timeZoneCount);
 
-                Console.WriteLine(featuresProcessed);
+                Console.WriteLine(++featuresProcessed);
             }
 
             var idFormat = "";
