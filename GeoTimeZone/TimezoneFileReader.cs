@@ -21,7 +21,7 @@ namespace GeoTimeZone
 
         public string GetLine(long line)
         {
-            var index = ((LineLength + LineEndLength)) * (line - 1);
+            var index = (LineLength + LineEndLength) * (line - 1);
 
             _stream.Position = index;
 

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.Linq;
-using GeoAPI.Geometries;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 
 namespace GeoTimeZone.Tests
 {

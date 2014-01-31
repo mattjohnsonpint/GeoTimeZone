@@ -5,55 +5,50 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using GeoAPI.Geometries;
-using GeoTimeZone.DataBuilder;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
 using NetTopologySuite.Simplify;
 
-namespace GeoTimeZone
+namespace GeoTimeZone.DataBuilder
 {
-    public class Result
-    {
-        public string tz;
-        public Dictionary<char, Result> Results = new Dictionary<char, Result>();
-    }
-
     public static class TimeZoneDataBuilder
     {
         private const string LineEnding = "\n";
+        private const int GeohashLength = 5;
         private static IList<Feature> _features;
-        private static readonly GeohashLevelList geohashes = new GeohashLevelList();
+        private static readonly GeohashLevelList Geohashes = new GeohashLevelList();
 
-        private static readonly Result Result = new Result();
-        private static readonly Dictionary<string, int> TZ = new Dictionary<string, int>();
-        private static int TZcount = 0;
+        private static readonly TimeZoneResult Result = new TimeZoneResult();
+        private static readonly Dictionary<string, int> TimeZones = new Dictionary<string, int>();
+        private static int _timeZoneCount;
 
-        private static void WriteLookup()
+        private const string DataFileName = "TZ.dat";
+        private const string LookupFileName = "TZL.dat";
+        
+        private static void WriteLookup(string outputPath)
         {
-            var arr = TZ.OrderBy(x => x.Value).Select(x => x.Key).ToArray();
-            File.WriteAllText(@"..\..\..\GeoTimeZone\TZL.dat", string.Join(LineEnding, arr), Encoding.UTF8);
+            var arr = TimeZones.OrderBy(x => x.Value).Select(x => x.Key).ToArray();
+            var path = Path.Combine(outputPath, LookupFileName);
+            File.WriteAllText(path, string.Join(LineEnding, arr), Encoding.UTF8);
         }
 
-        private static void WriteResult(string idFormat)
+        private static void WriteResult(string idFormat, string outputPath)
         {
             var sb = new StringBuilder();
             WriteSwitch(sb, Result, idFormat);
-            File.WriteAllText(@"..\..\..\GeoTimeZone\TZ.dat", sb.ToString(), Encoding.UTF8);
+            var path = Path.Combine(outputPath, DataFileName);
+            File.WriteAllText(path, sb.ToString(), Encoding.UTF8);
         }
 
-        private static void WriteSwitch(StringBuilder sb, Result result, string idFormat, string hash = "")
+        private static void WriteSwitch(StringBuilder sb, TimeZoneResult result, string idFormat, string hash = "")
         {
             foreach (var result1 in result.Results.OrderBy(x => x.Key))
             {
-                if (result1.Value.tz != null)
+                if (result1.Value.TimeZone != null)
                 {
-                    var h = hash + result1.Key;
-                    while (h.Length < 5)
-                    {
-                        h += "-";
-                    }
-                    sb.Append(h + "|" + TZ[result1.Value.tz].ToString(idFormat) + LineEnding);
+                    var h = (hash + result1.Key).PadRight(GeohashLength, '-');
+                    sb.Append(h + "|" + TimeZones[result1.Value.TimeZone].ToString(idFormat) + LineEnding);
                 }
                 else if (result1.Value.Results.Count > 0)
                 {
@@ -65,8 +60,8 @@ namespace GeoTimeZone
         private static void AddResult(string geohash, string tz)
         {
             int id;
-            if (!TZ.TryGetValue(tz, out id))
-                TZ.Add(tz, ++TZcount);
+            if (!TimeZones.TryGetValue(tz, out id))
+                TimeZones.Add(tz, ++_timeZoneCount);
 
             var c = geohash.ToCharArray();
             var r = Result;
@@ -74,10 +69,10 @@ namespace GeoTimeZone
             for (int i = 0; i < c.Length; i++)
             {
                 var ch = c[i];
-                Result r2;
+                TimeZoneResult r2;
                 if (!r.Results.TryGetValue(ch, out r2))
                 {
-                    r2 = r.Results[ch] = new Result();
+                    r2 = r.Results[ch] = new TimeZoneResult();
                 }
 
                 r = r2;
@@ -86,15 +81,15 @@ namespace GeoTimeZone
 
                 if (last)
                 {
-                    r.tz = tz;
+                    r.TimeZone = tz;
                     break;
                 }
             }
         }
 
-        public static void Geohash()
+        public static void CreateGeohashData(string inputShapefile, string outputPath)
         {
-            _features = ReadShapeFile(@".\Data\tz_world.shp").ToList();
+            _features = ReadShapeFile(inputShapefile).ToList();
 
             int f = 0;
             foreach (var feature in _features)
@@ -103,7 +98,7 @@ namespace GeoTimeZone
 
                 var name = (string)feature.Attributes["TZID"];
 
-                var hashes = Geohashes(feature).OrderBy(x => x).ToList();
+                var hashes = GetGeohashes(feature).OrderBy(x => x).ToList();
                 foreach (var hash in hashes)
                 {
                     AddResult(hash, name);
@@ -113,21 +108,21 @@ namespace GeoTimeZone
             }
 
             var idFormat = "";
-            for (int i = 0; i < TZcount.ToString(CultureInfo.InvariantCulture).Length; i++)
+            for (int i = 0; i < _timeZoneCount.ToString(CultureInfo.InvariantCulture).Length; i++)
             {
                 idFormat += "0";
             }
 
-            WriteResult(idFormat);
-            WriteLookup();
+            WriteResult(idFormat, outputPath);
+            WriteLookup(outputPath);
         }
 
-        private static IEnumerable<string> Geohashes(Feature feature)
+        private static IEnumerable<string> GetGeohashes(Feature feature)
         {
-            return geohashes.SelectMany(x => Geohashes(feature, x));
+            return Geohashes.SelectMany(x => GetGeohashes(feature, x));
         }
 
-        private static IEnumerable<string> Geohashes(Feature feature, GeohashLevel level)
+        private static IEnumerable<string> GetGeohashes(Feature feature, GeohashLevel level)
         {
             var env = level.Geometry;
 
@@ -136,16 +131,18 @@ namespace GeoTimeZone
                 return new[] { level.Geohash };
             }
 
-            if (feature.Geometry.Intersects(env))
+            if (!feature.Geometry.Intersects(env))
             {
-                if (level.Geohash.Length == 5)
-                    return new[] {level.Geohash};
-                else
-                    return level.GetChildren().SelectMany(child => Geohashes(feature, child));
+                return new string[0];
             }
 
-            return new string[0];
-        } 
+            if (level.Geohash.Length == GeohashLength)
+            {
+                return new[] { level.Geohash };
+            }
+                
+            return level.GetChildren().SelectMany(child => GetGeohashes(feature, child));
+        }
 
         private static IEnumerable<Feature> ReadShapeFile(string path)
         {
@@ -164,8 +161,8 @@ namespace GeoTimeZone
                         attributes.AddAttribute(name, value);
                     }
 
-                    // skip uninhabeted areas
-                    var zone = (string) attributes["TZID"];
+                    // skip uninhabited areas
+                    var zone = (string)attributes["TZID"];
                     if (zone.Equals("uninhabited", StringComparison.OrdinalIgnoreCase))
                         continue;
 
@@ -182,15 +179,14 @@ namespace GeoTimeZone
                     {
                         // Simplify the polygon if necessary. Reduce the tolerance incrementally until we have a valid polygon.
                         var tolerance = 0.05;
-                        while (simplified == null || !(simplified is Polygon) || !simplified.IsValid || simplified.IsEmpty)
+                        while (!(simplified is Polygon) || !simplified.IsValid || simplified.IsEmpty)
                         {
                             simplified = TopologyPreservingSimplifier.Simplify(geometry, tolerance);
                             tolerance -= 0.005;
                         }
                     }
 
-                    var feature = new Feature(simplified, attributes);
-                    yield return feature;
+                    yield return new Feature(simplified, attributes);
                 }
             }
         }

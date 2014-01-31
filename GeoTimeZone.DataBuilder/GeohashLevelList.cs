@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using GeoAPI.Geometries;
 
@@ -12,7 +11,7 @@ namespace GeoTimeZone.DataBuilder
             AddRange(GetNextLevel());
         }
 
-        private static char[] chars = new[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'j', 'k', 'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
+        private const string Base32 = "0123456789bcdefghjkmnpqrstuvwxyz";
 
         public static IEnumerable<GeohashLevel> GetNextLevel(string geohash = "", Envelope envelope = null)
         {
@@ -27,7 +26,7 @@ namespace GeoTimeZone.DataBuilder
             return SplitEnvelope2(envelope, even)
                 .SelectMany(x => SplitEnvelope4(x, even))
                 .SelectMany(x => SplitEnvelope4(x, even))
-                .Select((envelope1, index) => new GeohashLevel { Envelope = envelope1, Geohash = geohash + chars[index] });
+                .Select((envelope1, index) => new GeohashLevel { Envelope = envelope1, Geohash = geohash + Base32[index] });
         }
 
         public static IEnumerable<Envelope> SplitEnvelope2(Envelope envelope, bool even)
