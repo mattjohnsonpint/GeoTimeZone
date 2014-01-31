@@ -7,29 +7,19 @@ namespace GeoTimeZone
         public static string GetTimeZone(double latitude, double longitude)
         {
             var hash = Geohash.Encode(latitude, longitude, 5);
-            var no = GetTzLineNumber(hash);
-
-            if (no == 0)
-                return null;
-
-            using (var stream = typeof(TimezoneFileReader).Assembly.GetManifestResourceStream("GeoTimeZone.TZL.dat"))
-            using (var reader = new StreamReader(stream))
-            {
-                string result = null;
-                for (int i = 0; i < no; i++)
-                {
-                    result = reader.ReadLine();
-                }
-                return result;
-            }
-
+            
+            var lineNumber = GetTzDataLineNumber(hash);
+            
+            var timeZone = GetTzFromData(lineNumber);
+            
+            return timeZone;
         }
 
-        private static int GetTzLineNumber(string hash)
+        private static int GetTzDataLineNumber(string hash)
         {
             using (var stream = new TimezoneFileReader())
             {
-                var min = 1l;
+                var min = 1L;
                 var max = stream.Count;
                 var converged = false;
 
@@ -71,18 +61,31 @@ namespace GeoTimeZone
                     if (min == max)
                     {
                         if (converged)
-                        {
                             break;
-                        }
-                        else
-                        {
-                            converged = true;
-                        }
+
+                        converged = true;
                     }
                 }
 
             }
             return 0;
+        }
+
+        private static string GetTzFromData(int lineNumber)
+        {
+            if (lineNumber == 0)
+                return null;
+
+            using (var stream = typeof(TimezoneFileReader).Assembly.GetManifestResourceStream("GeoTimeZone.TZL.dat"))
+            using (var reader = new StreamReader(stream))
+            {
+                string result = null;
+                for (int i = 0; i < lineNumber; i++)
+                {
+                    result = reader.ReadLine();
+                }
+                return result;
+            }
         }
     }
 }
