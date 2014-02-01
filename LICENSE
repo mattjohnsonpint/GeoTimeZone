@@ -59,3 +59,11 @@ commercial/economical (exploration of natural resources) or navigational purpose
 http://www.marineregions.org
 
 -----------------------------------------------------------------------------
+
+Includes time zone location data from the IANA time zone database.
+This data is in the public domain.  Many thanks to Arthur David Olson,
+Paul Eggert, and the countless contributors to the IANA/Olson time zone data.
+
+http://www.iana.org/time-zones
+
+-----------------------------------------------------------------------------
