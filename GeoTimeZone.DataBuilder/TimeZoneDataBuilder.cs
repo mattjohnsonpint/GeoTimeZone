@@ -91,7 +91,7 @@ namespace GeoTimeZone.DataBuilder
             }
         }
 
-        public static void CreateGeohashData(string inputShapefile, string outputPath)
+        public static void CreateGeohashData(ConsoleOutput console, string inputShapefile, string outputPath)
         {
             var features = ReadShapeFile(inputShapefile);
 
@@ -113,7 +113,7 @@ namespace GeoTimeZone.DataBuilder
                 foreach (var hash in hashes)
                     AddResult(hash, name, ref timeZoneCount);
 
-                Console.WriteLine(++featuresProcessed);
+                console.WriteProgress(++featuresProcessed);
             }
 
             var idFormat = string.Empty.PadRight(timeZoneCount.ToString(CultureInfo.InvariantCulture).Length, '0');
