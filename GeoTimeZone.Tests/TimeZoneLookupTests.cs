@@ -6,10 +6,17 @@ namespace GeoTimeZone.Tests
     public class TimeZoneLookupTests
     {
         [Test]
-        public void Cant_Lookup_TimeZone_Titantic()
+        public void Can_Lookup_Offset_Titantic()
         {
             var tz = TimeZoneLookup.GetTimeZone(41.7325, -49.9469);
-            Assert.AreEqual(null, tz);
+            Assert.AreEqual("UTC-3", tz);
+        }
+
+        [Test]
+        public void Can_Lookup_TimeZone_PaigntonPier()
+        {
+            var tz = TimeZoneLookup.GetTimeZone(50.4372, -3.5559);
+            Assert.AreEqual("Europe/London", tz);
         }
 
         [Test]

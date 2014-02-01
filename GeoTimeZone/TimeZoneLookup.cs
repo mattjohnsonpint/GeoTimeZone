@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace GeoTimeZone
 {
@@ -11,6 +12,11 @@ namespace GeoTimeZone
             var lineNumber = GetTzDataLineNumber(hash);
             
             var timeZone = GetTzFromData(lineNumber);
+
+            if (string.IsNullOrWhiteSpace(timeZone))
+            {
+                timeZone = CalculateOffsetFromLongitude(longitude);
+            }
             
             return timeZone;
         }
@@ -85,6 +91,28 @@ namespace GeoTimeZone
                     result = reader.ReadLine();
                 }
                 return result;
+            }
+        }
+
+        private static string CalculateOffsetFromLongitude(double longitude)
+        {
+            var dir = longitude < 0 ? -1 : 1;
+            var posNo = Math.Sqrt(Math.Pow(longitude, 2));
+            if (posNo <= 7.5)
+            {
+                return "UTC";
+            }
+            else
+            {
+                posNo -= 7.5;
+                var offset = posNo / 15;
+                if (posNo % 15 > 0)
+                {
+                    offset++;
+                }
+
+                offset = (int) Math.Floor(offset);
+                return string.Format("UTC{0}{1:00}", dir == 1 ? "+" : "-", offset);
             }
         }
     }
