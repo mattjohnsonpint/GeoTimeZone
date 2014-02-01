@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using GeoAPI.Geometries;
-using NetTopologySuite.Features;
-using NetTopologySuite.Geometries;
-using NetTopologySuite.IO;
-using NetTopologySuite.Simplify;
 
 namespace GeoTimeZone.DataBuilder
 {
@@ -91,9 +86,9 @@ namespace GeoTimeZone.DataBuilder
             }
         }
 
-        public static void CreateGeohashData(ConsoleOutput console, string inputShapefile, string outputPath)
+        public static void CreateGeohashData(ConsoleOutput console, TimeZoneShapeFileReader inputShapefile, string outputPath)
         {
-            var features = ReadShapeFile(inputShapefile);
+            var features = inputShapefile.ReadShapeFile().ToList();
 
             var levels = new GeohashLevelList();
 
@@ -101,17 +96,15 @@ namespace GeoTimeZone.DataBuilder
             int timeZoneCount = 0;
             foreach (var feature in features)
             {
-                var name = (string)feature.Attributes["TZID"];
+                var feature1 = feature;
 
-                var thisFeature = feature;
                 var hashes = levels
                     .AsParallel()
-                    .SelectMany(level => GetGeohashes(thisFeature, level))
+                    .SelectMany(level => GetGeohashes(feature1.Geometry, level))
                     .ToList();
-                hashes.Sort(StringComparer.Ordinal);
 
                 foreach (var hash in hashes)
-                    AddResult(hash, name, ref timeZoneCount);
+                    AddResult(hash, feature.TzName, ref timeZoneCount);
 
                 console.WriteProgress(++featuresProcessed);
             }
@@ -122,16 +115,16 @@ namespace GeoTimeZone.DataBuilder
             WriteLookup(outputPath);
         }
 
-        private static IEnumerable<string> GetGeohashes(Feature feature, GeohashLevel level)
+        private static IEnumerable<string> GetGeohashes(IGeometry feature, GeohashLevel level)
         {
             var env = level.Geometry;
 
-            if (feature.Geometry.Contains(env))
+            if (feature.Contains(env))
             {
                 return new[] { level.Geohash };
             }
 
-            if (!feature.Geometry.Intersects(env))
+            if (!feature.Intersects(env))
             {
                 return new string[0];
             }
@@ -142,53 +135,6 @@ namespace GeoTimeZone.DataBuilder
             }
                 
             return level.GetChildren().SelectMany(child => GetGeohashes(feature, child));
-        }
-
-        private static IEnumerable<Feature> ReadShapeFile(string path)
-        {
-            var factory = new GeometryFactory();
-            using (var reader = new ShapefileDataReader(path, factory))
-            {
-                var header = reader.DbaseHeader;
-
-                while (reader.Read())
-                {
-                    var attributes = new AttributesTable();
-                    for (int i = 0; i < header.NumFields; i++)
-                    {
-                        var name = header.Fields[i].Name;
-                        var value = reader.GetValue(i);
-                        attributes.AddAttribute(name, value);
-                    }
-
-                    // skip uninhabited areas
-                    var zone = (string)attributes["TZID"];
-                    if (zone.Equals("uninhabited", StringComparison.OrdinalIgnoreCase))
-                        continue;
-
-                    var geometry = reader.Geometry;
-
-                    // Simplify the geometry.
-                    IGeometry simplified = null;
-                    if (geometry.Area < 0.1)
-                    {
-                        // For very small regions, use a convex hull.
-                        simplified = geometry.ConvexHull();
-                    }
-                    else
-                    {
-                        // Simplify the polygon if necessary. Reduce the tolerance incrementally until we have a valid polygon.
-                        var tolerance = 0.05;
-                        while (!(simplified is Polygon) || !simplified.IsValid || simplified.IsEmpty)
-                        {
-                            simplified = TopologyPreservingSimplifier.Simplify(geometry, tolerance);
-                            tolerance -= 0.005;
-                        }
-                    }
-
-                    yield return new Feature(simplified, attributes);
-                }
-            }
         }
     }
 }

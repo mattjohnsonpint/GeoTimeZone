@@ -70,10 +70,15 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TimeZoneDataBuilder.cs" />
+    <Compile Include="TimeZoneShapeFileReader.cs" />
     <Compile Include="TimeZoneTreeNode.cs" />
+    <Compile Include="TimeZoneFeature.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <Content Include="Data\countries.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Data\tz_world.dbf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
