@@ -2,6 +2,10 @@ GeoTimeZone
 Copyright (c) 2014 Matt Johnson & Simon Bartlett
 https://github.com/mj1856/GeoTimeZone
 
+While we certainly hope this software is useful, none of the authors or
+contributors place any guarantees as to the accuracy of the data or the
+results returned by querying it using this library.
+
 Contains code from Geohash-net
 Copyright (c) 2011 Sharon Lourduraj
 https://github.com/sharonjl/geohash-net
@@ -10,7 +14,7 @@ Geohash-net is a port of Geohash-js
 Copyright (c) 2008 David Troy
 https://github.com/davetroy/geohash-js
 
-All code is distributed under the MIT License:
+GeoTimeZone, Geohash-net and Geohash-js are distributed under the MIT License:
 
 -----------------------------------------------------------------------------
 The MIT License (MIT)
@@ -33,10 +37,25 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 -----------------------------------------------------------------------------
 
-Time zone data is provided by Eric Muller, who has waived all copyright and
-related or neighboring rights to this data.  This work is in the public domain.
+Time zone boundary data is provided by Eric Muller, who has waived all copyright
+and related or neighboring rights to this data.  This work is in the public domain.
+
 http://efele.net/maps/tz/
 
-While we certainly hope this software is useful, none of the authors or
-contributors place any guarantees as to the accuracy of the data or the
-results returned by querying it using this library.
+-----------------------------------------------------------------------------
+
+Marine Exclusive Economic Zone (EZ) boundary data is provided by the
+Flanders Marine Institute, and is intended for use solely with this project,
+as permitted for a "Value-Added Software Application".  The following disclaimer
+applies to the MarineRegions data:
+
+The data is provided "as is", and no warranty express, implied or otherwise is
+offered as to the data's accuracy. The developers do not imply any opinion
+concerning the legal status of any country, territory or area, or concerning the
+delimitation of its frontiers or boundaries. The data can be used for educational,
+scientific or research purposes but should not be used for legal,
+commercial/economical (exploration of natural resources) or navigational purposes.
+
+http://www.marineregions.org
+
+-----------------------------------------------------------------------------
