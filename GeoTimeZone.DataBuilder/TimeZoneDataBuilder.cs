@@ -49,7 +49,7 @@ namespace GeoTimeZone.DataBuilder
                 {
                     var h = (hash + childNode.Key).PadRight(GeohashLength, '-');
                     var p = TimeZones[childNode.Value.TimeZone].ToString("D3");
-                    writer.WriteLine(h + "|" + p); // we could probably remove the pipe and just rely on width
+                    writer.WriteLine(h + p);
                 }
                 else if (childNode.Value.ChildNodes.Count > 0)
                 {

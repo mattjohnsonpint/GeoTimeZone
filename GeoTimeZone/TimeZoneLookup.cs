@@ -38,7 +38,7 @@ namespace GeoTimeZone
                     {
                         if (midLine[i] == '-')
                         {
-                            return int.Parse(midLine.Split('|')[1]);
+                            return int.Parse(midLine.Substring(5));
                         }
 
                         if (midLine[i] > hash[i])
@@ -54,7 +54,7 @@ namespace GeoTimeZone
 
                         if (i == 4)
                         {
-                            return int.Parse(midLine.Split('|')[1]);
+                            return int.Parse(midLine.Substring(5));
                         }
 
                         if (min == mid)

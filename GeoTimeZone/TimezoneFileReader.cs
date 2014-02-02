@@ -6,7 +6,7 @@ namespace GeoTimeZone
 {
     internal class TimezoneFileReader : IDisposable
     {
-        private const int LineLength = 9;
+        private const int LineLength = 8;
         private const int LineEndLength = 1;
 
         private readonly Stream _stream;
