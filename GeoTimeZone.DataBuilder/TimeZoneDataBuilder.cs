@@ -139,15 +139,15 @@ namespace GeoTimeZone.DataBuilder
                 return geometry.ConvexHull();
             }
 
-            // Simplify the polygon if necessary. Reduce the tolerance incrementally until we have a valid polygon.
+            // Simplify the polygon.
             var tolerance = 0.05;
-            var result = geometry;
             while (true)
             {
+                var result = TopologyPreservingSimplifier.Simplify(geometry, tolerance);
                 if (result is Polygon && result.IsValid && !result.IsEmpty)
                     return result;
 
-                result = TopologyPreservingSimplifier.Simplify(geometry, tolerance);
+                // Reduce the tolerance incrementally until we have a valid polygon.
                 tolerance -= 0.005;
             }
         }
