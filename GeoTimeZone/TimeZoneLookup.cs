@@ -9,21 +9,19 @@ namespace GeoTimeZone
     {
         public static TimeZoneResult GetTimeZone(double latitude, double longitude)
         {
-            var hash = Geohash.Encode(latitude, longitude, 5);
+            var geohash = Geohash.Encode(latitude, longitude, 5);
 
-            var lineNumber = GetTzDataLineNumbers(hash);
+            var lineNumber = GetTzDataLineNumbers(geohash);
 
-            var timeZones = GetTzsFromData(lineNumber);
+            var timeZones = GetTzsFromData(lineNumber).Select(GetTimeZoneDetails).ToList();
 
-            var details = timeZones.Select(GetTimeZoneDetails).ToList();
-
-            if (details.Count == 1)
+            if (timeZones.Count == 1)
             {
-                return new TimeZoneResult {Result = details[0]};
+                return new TimeZoneResult { Result = timeZones[0] };
             }
-            else if (details.Count > 1)
+            else if (timeZones.Count > 1)
             {
-                return new TimeZoneResult { Result = details[0], AlternativeResults = details.Skip(1).ToList() };
+                return new TimeZoneResult { Result = timeZones[0], AlternativeResults = timeZones.Skip(1).ToList() };
             }
             else
             {
@@ -32,21 +30,21 @@ namespace GeoTimeZone
             }
         }
 
-        private static List<long> GetTzDataLineNumbers(string hash)
+        private static List<long> GetTzDataLineNumbers(string geohash)
         {
             using (var reader = new TimezoneFileReader())
             {
-                var seeked = SeekTimeZoneFile(reader, hash);
+                var seeked = SeekTimeZoneFile(reader, geohash);
                 if (seeked == 0)
                     return new List<long>();
 
                 long min = seeked, max = seeked;
-                var geohash = reader.GetLine(seeked).Substring(0, 5);
+                var seekedGeohash = reader.GetLine(seeked).Substring(0, 5);
 
                 while (true)
                 {
-                    var hash2 = reader.GetLine(min - 1).Substring(0, 5);
-                    if (geohash == hash2)
+                    var prevGeohash = reader.GetLine(min - 1).Substring(0, 5);
+                    if (seekedGeohash == prevGeohash)
                         min--;
                     else
                         break;
@@ -54,21 +52,21 @@ namespace GeoTimeZone
 
                 while (true)
                 {
-                    var hash2 = reader.GetLine(max + 1).Substring(0, 5);
-                    if (geohash == hash2)
+                    var nextGeohash = reader.GetLine(max + 1).Substring(0, 5);
+                    if (seekedGeohash == nextGeohash)
                         max++;
                     else
                         break;
                 }
 
-                var lines = new List<long>();
+                var lineNumbers = new List<long>();
                 for (var i = min; i <= max; i++)
                 {
-                    var l = int.Parse(reader.GetLine(i).Substring(5));
-                    lines.Add(l);
+                    var lineNumber = int.Parse(reader.GetLine(i).Substring(5));
+                    lineNumbers.Add(lineNumber);
                 }
 
-                return lines;
+                return lineNumbers;
             }
         }
 
@@ -87,23 +85,29 @@ namespace GeoTimeZone
                 {
                     if (midLine[i] == '-')
                     {
-                        return mid; int.Parse(midLine.Substring(5));
+                        return mid;
                     }
 
                     if (midLine[i] > hash[i])
                     {
-                        max = mid;
+                        if (max == mid)
+                            max = min; // make sure we don't get stuck in a loop
+                        else
+                            max = mid;
                         break;
                     }
                     if (midLine[i] < hash[i])
                     {
-                        min = mid;
+                        if (min == mid)
+                            min = max; // make sure we don't get stuck in a loop
+                        else
+                            min = mid;
                         break;
                     }
 
                     if (i == 4)
                     {
-                        return mid; int.Parse(midLine.Substring(5));
+                        return mid;
                     }
 
                     if (min == mid)
@@ -136,10 +140,10 @@ namespace GeoTimeZone
             {
                 var results = new List<string>();
 
-                for (long line = 1; line <= lineNumbers[lineNumbers.Count - 1]; line++)
+                for (long lineNo = 1; lineNo <= lineNumbers[lineNumbers.Count - 1]; lineNo++)
                 {
                     var text = reader.ReadLine();
-                    if (lineNumbers.Contains(line))
+                    if (lineNumbers.Contains(lineNo))
                     {
                         results.Add(text);
                     }
