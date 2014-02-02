@@ -58,12 +58,8 @@ namespace GeoTimeZone.DataBuilder
             }
         }
 
-        private static void AddResult(string geohash, string tz, ref int timeZoneCount)
+        private static void AddResult(string geohash, string tz)
         {
-            int tzId;
-            if (!TimeZones.TryGetValue(tz, out tzId))
-                TimeZones.Add(tz, ++timeZoneCount);
-
             var currentNode = WorldBoundsTreeNode;
 
             for (int i = 0; i < geohash.Length; i++)
@@ -91,10 +87,11 @@ namespace GeoTimeZone.DataBuilder
         {
             var features = inputShapefile.ReadShapeFile().ToList();
 
+            PreLoadTimeZones(features);
+
             var levels = new GeohashLevelList();
 
             int featuresProcessed = 0;
-            int timeZoneCount = 0;
             foreach (var feature in features)
             {
                 var geometry = feature.Geometry.Simplify();
@@ -105,7 +102,7 @@ namespace GeoTimeZone.DataBuilder
                     .ToList();
 
                 foreach (var hash in hashes)
-                    AddResult(hash, feature.TzName, ref timeZoneCount);
+                    AddResult(hash, feature.TzName);
 
                 console.WriteProgress(++featuresProcessed);
             }
@@ -156,6 +153,15 @@ namespace GeoTimeZone.DataBuilder
                 result = TopologyPreservingSimplifier.Simplify(geometry, tolerance);
                 tolerance -= 0.005;
             }
+        }
+
+        private static void PreLoadTimeZones(IEnumerable<TimeZoneFeature> features)
+        {
+            var zones = features.Select(x => x.TzName).OrderBy(x => x).Distinct();
+
+            int i = 0;
+            foreach (var zone in zones)
+                TimeZones.Add(zone, ++i);
         }
     }
 }
