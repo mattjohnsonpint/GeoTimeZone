@@ -51,6 +51,7 @@
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="GeohashListTests.cs" />
+    <Compile Include="NauticalTimeZoneLookupTests.cs" />
     <Compile Include="TimeZoneLookupTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
