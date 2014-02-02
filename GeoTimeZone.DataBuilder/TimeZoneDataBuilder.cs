@@ -9,9 +9,6 @@ namespace GeoTimeZone.DataBuilder
 {
     public static class TimeZoneDataBuilder
     {
-        private const string LineEnding = "\n";
-        private const int GeohashLength = 5;
-        
         private static readonly TimeZoneTreeNode WorldBoundsTreeNode = new TimeZoneTreeNode();
         private static readonly Dictionary<string, int> TimeZones = new Dictionary<string, int>();
 
@@ -24,7 +21,7 @@ namespace GeoTimeZone.DataBuilder
             
             using (var writer = File.CreateText(path))
             {
-                writer.NewLine = LineEnding;
+                writer.NewLine = "\n";
                 var timeZones = TimeZones.OrderBy(x => x.Value).Select(x => x.Key);
                 foreach (var timeZone in timeZones)
                     writer.WriteLine(timeZone);
@@ -36,7 +33,7 @@ namespace GeoTimeZone.DataBuilder
             var path = Path.Combine(outputPath, DataFileName);
             using (var writer = File.CreateText(path))
             {
-                writer.NewLine = LineEnding;
+                writer.NewLine = "\n";
                 WriteTreeNode(writer, WorldBoundsTreeNode);
             }
         }
@@ -47,7 +44,7 @@ namespace GeoTimeZone.DataBuilder
             {
                 if (childNode.Value.TimeZone != null)
                 {
-                    var h = (hash + childNode.Key).PadRight(GeohashLength, '-');
+                    var h = (hash + childNode.Key).PadRight(5, '-');
                     var p = TimeZones[childNode.Value.TimeZone].ToString("D3");
                     writer.WriteLine(h + p);
                 }
@@ -125,7 +122,7 @@ namespace GeoTimeZone.DataBuilder
                 return new string[0];
             }
 
-            if (level.Geohash.Length == GeohashLength)
+            if (level.Geohash.Length == 5)
             {
                 return new[] { level.Geohash };
             }
