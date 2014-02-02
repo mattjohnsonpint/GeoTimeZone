@@ -42,9 +42,7 @@
     <Compile Include="TimeZoneDetails.cs" />
     <Compile Include="TimezoneFileReader.cs" />
     <Compile Include="TimeZoneLookup.cs" />
-    <Compile Include="Index\*.cs">
-      <Link>Index\%(FileName)</Link>
-    </Compile>
+    <Compile Include="TimeZoneResult.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="TZ.dat" />

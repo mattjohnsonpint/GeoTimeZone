@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using GeoAPI.Geometries;
@@ -42,11 +43,14 @@ namespace GeoTimeZone.DataBuilder
         {
             foreach (var childNode in node.ChildNodes.OrderBy(x => x.Key))
             {
-                if (childNode.Value.TimeZone != null)
+                if (childNode.Value.TimeZones.Count > 0)
                 {
                     var h = (hash + childNode.Key).PadRight(5, '-');
-                    var p = TimeZones[childNode.Value.TimeZone].ToString("D3");
-                    writer.WriteLine(h + p);
+                    foreach (var timeZone in childNode.Value.TimeZones.OrderByDescending(x => x.Value))
+                    {
+                        var p = TimeZones[timeZone.Key].ToString("D3");
+                        writer.WriteLine(h + p);
+                    }
                 }
                 else if (childNode.Value.ChildNodes.Count > 0)
                 {
@@ -55,13 +59,15 @@ namespace GeoTimeZone.DataBuilder
             }
         }
 
-        private static void AddResult(string geohash, string tz)
+        private static void AddResult(Tuple<string, double> geohash, string tz)
         {
             var currentNode = WorldBoundsTreeNode;
 
-            for (int i = 0; i < geohash.Length; i++)
+            var hash = geohash.Item1;
+
+            for (int i = 0; i < hash.Length; i++)
             {
-                var childNodeKey = geohash[i];
+                var childNodeKey = hash[i];
                 TimeZoneTreeNode childNode;
                 if (!currentNode.ChildNodes.TryGetValue(childNodeKey, out childNode))
                 {
@@ -70,11 +76,11 @@ namespace GeoTimeZone.DataBuilder
 
                 currentNode = childNode;
 
-                var last = i == geohash.Length - 1;
+                var last = i == hash.Length - 1;
 
                 if (last)
                 {
-                    currentNode.TimeZone = tz;
+                    currentNode.TimeZones[tz] = geohash.Item2;
                     break;
                 }
             }
@@ -108,23 +114,25 @@ namespace GeoTimeZone.DataBuilder
             WriteLookup(outputPath);
         }
 
-        private static IEnumerable<string> GetGeohashes(IGeometry geometry, GeohashLevel level)
+        private static IEnumerable<Tuple<string, double>> GetGeohashes(IGeometry geometry, GeohashLevel level)
         {
             var env = level.Geometry;
 
             if (geometry.Contains(env))
             {
-                return new[] { level.Geohash };
+                return new[] { new Tuple<string, double>(level.Geohash, 1) };
             }
 
             if (!geometry.Intersects(env))
             {
-                return new string[0];
+                return new Tuple<string, double>[0];
             }
 
             if (level.Geohash.Length == 5)
             {
-                return new[] { level.Geohash };
+                var intersection = geometry.Intersection(env);
+                var accuracy = intersection.Area/env.Area;
+                return new[] { new Tuple<string, double>(level.Geohash, accuracy) };
             }
                 
             return level.GetChildren().SelectMany(child => GetGeohashes(geometry, child));

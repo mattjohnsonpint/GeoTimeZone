@@ -1,94 +1,150 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace GeoTimeZone
 {
     public static class TimeZoneLookup
     {
-        public static TimeZoneDetails GetTimeZone(double latitude, double longitude)
+        public static TimeZoneResult GetTimeZone(double latitude, double longitude)
         {
             var hash = Geohash.Encode(latitude, longitude, 5);
 
-            var lineNumber = GetTzDataLineNumber(hash);
+            var lineNumber = GetTzDataLineNumbers(hash);
 
-            var timeZone = GetTzFromData(lineNumber);
-            if (timeZone != null)
-                return GetTimeZoneDetails(timeZone);
+            var timeZones = GetTzsFromData(lineNumber);
 
-            var offsetHours = CalculateOffsetHoursFromLongitude(longitude);
-            return GetTimeZoneDetails(offsetHours);
+            var details = timeZones.Select(GetTimeZoneDetails).ToList();
+
+            if (details.Count == 1)
+            {
+                return new TimeZoneResult {Result = details[0]};
+            }
+            else if (details.Count > 1)
+            {
+                return new TimeZoneResult { Result = details[0], AlternativeResults = details.Skip(1).ToList() };
+            }
+            else
+            {
+                var offsetHours = CalculateOffsetHoursFromLongitude(longitude);
+                return new TimeZoneResult { Result = GetTimeZoneDetails(offsetHours) };
+            }
         }
 
-        private static int GetTzDataLineNumber(string hash)
+        private static List<long> GetTzDataLineNumbers(string hash)
         {
-            using (var stream = new TimezoneFileReader())
+            using (var reader = new TimezoneFileReader())
             {
-                var min = 1L;
-                var max = stream.Count;
-                var converged = false;
+                var seeked = SeekTimeZoneFile(reader, hash);
+                if (seeked == 0)
+                    return new List<long>();
+
+                long min = seeked, max = seeked;
+                var geohash = reader.GetLine(seeked).Substring(0, 5);
 
                 while (true)
                 {
-                    var mid = ((max - min) / 2) + min;
-                    var midLine = stream.GetLine(mid);
+                    var hash2 = reader.GetLine(min - 1).Substring(0, 5);
+                    if (geohash == hash2)
+                        min--;
+                    else
+                        break;
+                }
 
-                    for (int i = 0; i < hash.Length; i++)
+                while (true)
+                {
+                    var hash2 = reader.GetLine(max + 1).Substring(0, 5);
+                    if (geohash == hash2)
+                        max++;
+                    else
+                        break;
+                }
+
+                var lines = new List<long>();
+                for (var i = min; i <= max; i++)
+                {
+                    var l = int.Parse(reader.GetLine(i).Substring(5));
+                    lines.Add(l);
+                }
+
+                return lines;
+            }
+        }
+
+        private static long SeekTimeZoneFile(TimezoneFileReader reader, string hash)
+        {
+            var min = 1L;
+            var max = reader.Count;
+            var converged = false;
+
+            while (true)
+            {
+                var mid = ((max - min) / 2) + min;
+                var midLine = reader.GetLine(mid);
+
+                for (int i = 0; i < hash.Length; i++)
+                {
+                    if (midLine[i] == '-')
                     {
-                        if (midLine[i] == '-')
-                        {
-                            return int.Parse(midLine.Substring(5));
-                        }
-
-                        if (midLine[i] > hash[i])
-                        {
-                            max = mid;
-                            break;
-                        }
-                        if (midLine[i] < hash[i])
-                        {
-                            min = mid;
-                            break;
-                        }
-
-                        if (i == 4)
-                        {
-                            return int.Parse(midLine.Substring(5));
-                        }
-
-                        if (min == mid)
-                        {
-                            min = max;
-                            break;
-                        }
+                        return mid; int.Parse(midLine.Substring(5));
                     }
 
-                    if (min == max)
+                    if (midLine[i] > hash[i])
                     {
-                        if (converged)
-                            break;
+                        max = mid;
+                        break;
+                    }
+                    if (midLine[i] < hash[i])
+                    {
+                        min = mid;
+                        break;
+                    }
 
-                        converged = true;
+                    if (i == 4)
+                    {
+                        return mid; int.Parse(midLine.Substring(5));
+                    }
+
+                    if (min == mid)
+                    {
+                        min = max;
+                        break;
                     }
                 }
 
+                if (min == max)
+                {
+                    if (converged)
+                        break;
+
+                    converged = true;
+                }
             }
             return 0;
         }
 
-        private static string GetTzFromData(int lineNumber)
+        private static List<string> GetTzsFromData(List<long> lineNumbers)
         {
-            if (lineNumber == 0)
-                return null;
+            if (lineNumbers.Count == 0)
+                return new List<string>();
+
+            lineNumbers.Sort();
 
             using (var stream = typeof(TimezoneFileReader).Assembly.GetManifestResourceStream("GeoTimeZone.TZL.dat"))
             using (var reader = new StreamReader(stream))
             {
-                string result = null;
-                for (int i = 0; i < lineNumber; i++)
+                var results = new List<string>();
+
+                for (long line = 1; line <= lineNumbers[lineNumbers.Count - 1]; line++)
                 {
-                    result = reader.ReadLine();
+                    var text = reader.ReadLine();
+                    if (lineNumbers.Contains(line))
+                    {
+                        results.Add(text);
+                    }
                 }
-                return result;
+                return results;
             }
         }
 
