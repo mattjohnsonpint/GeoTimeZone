@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System;
+using NUnit.Framework;
 
 namespace GeoTimeZone.Tests
 {
@@ -9,100 +10,115 @@ namespace GeoTimeZone.Tests
         public void Can_Lookup_Offset_TitanticWreck()
         {
             var tz = TimeZoneLookup.GetTimeZone(41.7325, -49.9469);
-            Assert.AreEqual("UTC-03", tz);
+            Assert.AreEqual("Etc/GMT+3", tz.IanaTimeZoneId);
+            Assert.AreEqual("UTC-3", tz.StandardAbbreviation);
+            Assert.AreEqual(TimeSpan.FromHours(-3), tz.StandardOffset);
         }
 
         [Test]
         public void Can_Lookup_Offset_SsFortLeeWreck()
         {
             var tz = TimeZoneLookup.GetTimeZone(-27.583333, 83.183333);
-            Assert.AreEqual("UTC+06", tz);
+            Assert.AreEqual("Etc/GMT-6", tz.IanaTimeZoneId);
+            Assert.AreEqual("UTC+6", tz.StandardAbbreviation);
+            Assert.AreEqual(TimeSpan.FromHours(6), tz.StandardOffset);
         }
 
         [Test]
         public void Can_Lookup_Offset_SsLulworthHillWreck()
         {
             var tz = TimeZoneLookup.GetTimeZone(-10.166667, 1);
-            Assert.AreEqual("UTC", tz);
+            Assert.AreEqual("UTC", tz.IanaTimeZoneId);
+            Assert.AreEqual("UTC", tz.StandardAbbreviation);
+            Assert.AreEqual(TimeSpan.FromHours(0), tz.StandardOffset);
         }
 
         [Test]
-        public void Can_Lookup_Offset_Extremes()
+        public void Can_Lookup_Offset_Extreme_East()
         {
-            var tz1 = TimeZoneLookup.GetTimeZone(80, 179);
-            var tz2 = TimeZoneLookup.GetTimeZone(80, -179);
-            Assert.AreEqual("UTC+12", tz1);
-            Assert.AreEqual("UTC-12", tz2);
+            var tz = TimeZoneLookup.GetTimeZone(80, 179);
+            Assert.AreEqual("Etc/GMT-12", tz.IanaTimeZoneId);
+            Assert.AreEqual("UTC+12", tz.StandardAbbreviation);
+            Assert.AreEqual(TimeSpan.FromHours(12), tz.StandardOffset);
+        }
+
+        [Test]
+        public void Can_Lookup_Offset_Extreme_West()
+        {
+            var tz = TimeZoneLookup.GetTimeZone(80, -179);
+            Assert.AreEqual("Etc/GMT+12", tz.IanaTimeZoneId);
+            Assert.AreEqual("UTC-12", tz.StandardAbbreviation);
+            Assert.AreEqual(TimeSpan.FromHours(-12), tz.StandardOffset);
         }
 
         [Test]
         public void Can_Lookup_TimeZone_PaigntonPier()
         {
             var tz = TimeZoneLookup.GetTimeZone(50.4372, -3.5559);
-            Assert.AreEqual("Europe/London", tz);
+            Assert.AreEqual("Europe/London", tz.IanaTimeZoneId);
         }
 
         [Test]
         public void Can_Lookup_TimeZone_Phoenix()
         {
             var tz = TimeZoneLookup.GetTimeZone(33.45, -112.0667);
-            Assert.AreEqual("America/Phoenix", tz);
+            Assert.AreEqual("America/Phoenix", tz.IanaTimeZoneId);
         }
 
         [Test]
         public void Can_Lookup_TimeZone_NewYork()
         {
             var tz = TimeZoneLookup.GetTimeZone(40.67, -73.94);
-            Assert.AreEqual("America/New_York", tz);
+            Assert.AreEqual("America/New_York", tz.IanaTimeZoneId);
         }
 
         [Test]
         public void Can_Lookup_TimeZone_LosAngeles()
         {
             var tz = TimeZoneLookup.GetTimeZone(34.0500, -118.25);
-            Assert.AreEqual("America/Los_Angeles", tz);
+            Assert.AreEqual("America/Los_Angeles", tz.IanaTimeZoneId);
         }
 
         [Test]
         public void Can_Lookup_TimeZone_Honolulu()
         {
             var tz = TimeZoneLookup.GetTimeZone(21.3, -157.8167);
-            Assert.AreEqual("Pacific/Honolulu", tz);
+            Assert.AreEqual("Pacific/Honolulu", tz.IanaTimeZoneId);
         }
 
         [Test]
         public void Can_Lookup_TimeZone_London()
         {
             var tz = TimeZoneLookup.GetTimeZone(51.5072, -0.1275);
-            Assert.AreEqual("Europe/London", tz);
+            Assert.AreEqual("Europe/London", tz.IanaTimeZoneId);
         }
 
         [Test]
         public void Can_Lookup_TimeZone_SaoPaulo()
         {
             var tz = TimeZoneLookup.GetTimeZone(-23.55, -46.6333);
-            Assert.AreEqual("America/Sao_Paulo", tz);
+            Assert.AreEqual("America/Sao_Paulo", tz.IanaTimeZoneId);
         }
 
         [Test]
         public void Can_Lookup_TimeZone_Sydney()
         {
             var tz = TimeZoneLookup.GetTimeZone(-33.86, 151.2111);
-            Assert.AreEqual("Australia/Sydney", tz);
+            Assert.AreEqual("Australia/Sydney", tz.IanaTimeZoneId);
         }
 
         [Test]
         public void Can_Lookup_TimeZone_LordHoweIsland()
         {
             var tz = TimeZoneLookup.GetTimeZone(-31.55, 159.0833);
-            Assert.AreEqual("Australia/Lord_Howe", tz);
+            Assert.AreEqual("Australia/Lord_Howe", tz.IanaTimeZoneId);
         }
 
         [Test]
         public void Can_Lookup_TimeZone_Mazatlan()
         {
             var tz = TimeZoneLookup.GetTimeZone(23.22, -106.42);
-            Assert.AreEqual("America/Mazatlan", tz);
+            Assert.AreEqual("America/Mazatlan", tz.IanaTimeZoneId);
         }
     }
 }

@@ -39,6 +39,7 @@
     </Compile>
     <Compile Include="Geohash.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TimeZoneDetails.cs" />
     <Compile Include="TimezoneFileReader.cs" />
     <Compile Include="TimeZoneLookup.cs" />
     <Compile Include="Index\*.cs">
