@@ -52,8 +52,8 @@ namespace GeoTimeZone.DataBuilder
 
         public IEnumerable<TimeZoneFeature> ReadShapeFile()
         {
-            var countries = ReadCountries().ToDictionary(x => x[1], x => x[2]);
-            var zoneTab = ReadZoneTab().ToList();
+            var countries = ReadCountries().ToDictionary(x => x[1], x => x);
+            var zoneTab = ReadZoneTab().ToDictionary(x => x[2], x => x);
 
             var factory = new GeometryFactory();
             using (var reader = new ShapefileDataReader(_shapeFile, factory))
@@ -85,13 +85,13 @@ namespace GeoTimeZone.DataBuilder
                     }
                     else
                     {
-                        var zT = zoneTab.SingleOrDefault(x => x[2] == zone);
-                        if (zT == null)
+                        if (!zoneTab.ContainsKey(zone))
                         {
                             throw new Exception("Could not find " + zone + " in zone.tab");
                         }
-                        country2 = zT[0];
-                        country3 = countries[country2];
+
+                        country2 = zoneTab[zone][0];
+                        country3 = countries[country2][2];
                     }
 
                     yield return new TimeZoneFeature
