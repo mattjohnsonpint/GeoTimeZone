@@ -3,6 +3,8 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using GeoAPI.Geometries;
+using NetTopologySuite.Geometries;
+using NetTopologySuite.Simplify;
 
 namespace GeoTimeZone.DataBuilder
 {
@@ -96,11 +98,11 @@ namespace GeoTimeZone.DataBuilder
             int timeZoneCount = 0;
             foreach (var feature in features)
             {
-                var feature1 = feature;
+                var geometry = feature.Geometry.Simplify();
 
                 var hashes = levels
                     .AsParallel()
-                    .SelectMany(level => GetGeohashes(feature1.Geometry, level))
+                    .SelectMany(level => GetGeohashes(geometry, level))
                     .ToList();
 
                 foreach (var hash in hashes)
@@ -115,16 +117,16 @@ namespace GeoTimeZone.DataBuilder
             WriteLookup(outputPath);
         }
 
-        private static IEnumerable<string> GetGeohashes(IGeometry feature, GeohashLevel level)
+        private static IEnumerable<string> GetGeohashes(IGeometry geometry, GeohashLevel level)
         {
             var env = level.Geometry;
 
-            if (feature.Contains(env))
+            if (geometry.Contains(env))
             {
                 return new[] { level.Geohash };
             }
 
-            if (!feature.Intersects(env))
+            if (!geometry.Intersects(env))
             {
                 return new string[0];
             }
@@ -134,7 +136,29 @@ namespace GeoTimeZone.DataBuilder
                 return new[] { level.Geohash };
             }
                 
-            return level.GetChildren().SelectMany(child => GetGeohashes(feature, child));
+            return level.GetChildren().SelectMany(child => GetGeohashes(geometry, child));
+        }
+
+        private static IGeometry Simplify(this IGeometry geometry)
+        {
+            // Simplify the geometry.
+            if (geometry.Area < 0.1)
+            {
+                // For very small regions, use a convex hull.
+                return geometry.ConvexHull();
+            }
+
+            // Simplify the polygon if necessary. Reduce the tolerance incrementally until we have a valid polygon.
+            var tolerance = 0.05;
+            var result = geometry;
+            while (true)
+            {
+                if (result is Polygon && result.IsValid && !result.IsEmpty)
+                    return result;
+
+                result = TopologyPreservingSimplifier.Simplify(geometry, tolerance);
+                tolerance -= 0.005;
+            }
         }
     }
 }

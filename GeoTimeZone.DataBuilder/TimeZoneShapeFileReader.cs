@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using GeoAPI.Geometries;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
-using NetTopologySuite.Simplify;
 
 namespace GeoTimeZone.DataBuilder
 {
@@ -27,7 +25,9 @@ namespace GeoTimeZone.DataBuilder
         {
             using (var reader = new StreamReader(_countryFile))
             {
-                string line = reader.ReadLine(); // skip first line
+                reader.ReadLine(); // skip first line
+
+                string line;
                 while ((line = reader.ReadLine()) != null)
                 {
                     yield return line.Split(';');
@@ -39,7 +39,7 @@ namespace GeoTimeZone.DataBuilder
         {
             using (var reader = new StreamReader(_zoneTabFile))
             {
-                string line = null;
+                string line;
                 while ((line = reader.ReadLine()) != null)
                 {
                     if (!string.IsNullOrWhiteSpace(line) && !line.StartsWith("#"))
@@ -52,7 +52,7 @@ namespace GeoTimeZone.DataBuilder
 
         public IEnumerable<TimeZoneFeature> ReadShapeFile()
         {
-            var countries = ReadCountries().ToList();
+            var countries = ReadCountries().ToDictionary(x => x[1], x => x[2]);
             var zoneTab = ReadZoneTab().ToList();
 
             var factory = new GeometryFactory();
@@ -91,35 +91,13 @@ namespace GeoTimeZone.DataBuilder
                             throw new Exception("Could not find " + zone + " in zone.tab");
                         }
                         country2 = zT[0];
-                        country3 = countries.Single(x => x[1] == country2)[2];
-                    }
-
-
-
-                    var geometry = reader.Geometry;
-
-                    // Simplify the geometry.
-                    IGeometry simplified = null;
-                    if (geometry.Area < 0.1)
-                    {
-                        // For very small regions, use a convex hull.
-                        simplified = geometry.ConvexHull();
-                    }
-                    else
-                    {
-                        // Simplify the polygon if necessary. Reduce the tolerance incrementally until we have a valid polygon.
-                        var tolerance = 0.05;
-                        while (!(simplified is Polygon) || !simplified.IsValid || simplified.IsEmpty)
-                        {
-                            simplified = TopologyPreservingSimplifier.Simplify(geometry, tolerance);
-                            tolerance -= 0.005;
-                        }
+                        country3 = countries[country2];
                     }
 
                     yield return new TimeZoneFeature
                         {
                             TzName = zone,
-                            Geometry = simplified,
+                            Geometry = reader.Geometry,
                             ThreeLetterIsoCountryCode = country3,
                             TwoLetterIsoCountryCode = country2
                         };
