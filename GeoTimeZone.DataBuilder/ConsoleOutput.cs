@@ -24,8 +24,9 @@ namespace GeoTimeZone.DataBuilder
         {
             var polygons = progress.ToString(CultureInfo.InvariantCulture).PadLeft(5);
 
-            Console.SetCursorPosition(0, 0);
+            var line = Console.CursorTop;
             Console.WriteLine("{0} polygons completed. {1:c}", polygons, _sw.Elapsed);
+            Console.SetCursorPosition(0, line);
         }
     }
 }
