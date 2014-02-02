@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using GeoAPI.Geometries;
@@ -32,29 +31,29 @@ namespace GeoTimeZone.DataBuilder
             }
         }
 
-        private static void WriteGeohashDataFile(string idFormat, string outputPath)
+        private static void WriteGeohashDataFile(string outputPath)
         {
             var path = Path.Combine(outputPath, DataFileName);
             using (var writer = File.CreateText(path))
             {
                 writer.NewLine = LineEnding;
-                WriteTreeNode(writer, WorldBoundsTreeNode, idFormat);
+                WriteTreeNode(writer, WorldBoundsTreeNode);
             }
         }
 
-        private static void WriteTreeNode(StreamWriter writer, TimeZoneTreeNode node, string idFormat, string hash = "")
+        private static void WriteTreeNode(StreamWriter writer, TimeZoneTreeNode node, string hash = "")
         {
             foreach (var childNode in node.ChildNodes.OrderBy(x => x.Key))
             {
                 if (childNode.Value.TimeZone != null)
                 {
                     var h = (hash + childNode.Key).PadRight(GeohashLength, '-');
-                    var p = TimeZones[childNode.Value.TimeZone].ToString(idFormat);
+                    var p = TimeZones[childNode.Value.TimeZone].ToString("D3");
                     writer.WriteLine(h + "|" + p); // we could probably remove the pipe and just rely on width
                 }
                 else if (childNode.Value.ChildNodes.Count > 0)
                 {
-                    WriteTreeNode(writer, childNode.Value, idFormat, hash + childNode.Key);
+                    WriteTreeNode(writer, childNode.Value, hash + childNode.Key);
                 }
             }
         }
@@ -111,9 +110,7 @@ namespace GeoTimeZone.DataBuilder
                 console.WriteProgress(++featuresProcessed);
             }
 
-            var idFormat = string.Empty.PadRight(timeZoneCount.ToString(CultureInfo.InvariantCulture).Length, '0');
-
-            WriteGeohashDataFile(idFormat, outputPath);
+            WriteGeohashDataFile(outputPath);
             WriteLookup(outputPath);
         }
 
