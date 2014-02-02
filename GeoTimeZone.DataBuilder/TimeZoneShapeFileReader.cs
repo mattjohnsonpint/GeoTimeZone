@@ -75,29 +75,29 @@ namespace GeoTimeZone.DataBuilder
                     if (zone.Equals("uninhabited", StringComparison.OrdinalIgnoreCase))
                         continue;
 
-                    string country2, country3;
+                    var geometry = reader.Geometry;
 
-                    if (zone == "America/Montreal" || zone == "America/Coral_Harbour")
+                    string country2;
+                    if (zoneTab.ContainsKey(zone))
+                    {
+                        country2 = zoneTab[zone][0];
+                    }
+                    else if (zone == "America/Montreal" || zone == "America/Coral_Harbour")
                     {
                         // these timezones are not listed in zone.tab
                         country2 = "CA";
-                        country3 = "CAN";
                     }
                     else
                     {
-                        if (!zoneTab.ContainsKey(zone))
-                        {
-                            throw new Exception("Could not find " + zone + " in zone.tab");
-                        }
-
-                        country2 = zoneTab[zone][0];
-                        country3 = countries[country2][2];
+                        throw new Exception("Could not find " + zone + " in zone.tab");
                     }
+
+                    var country3 = countries[country2][2];
 
                     yield return new TimeZoneFeature
                         {
                             TzName = zone,
-                            Geometry = reader.Geometry,
+                            Geometry = geometry,
                             ThreeLetterIsoCountryCode = country3,
                             TwoLetterIsoCountryCode = country2
                         };
