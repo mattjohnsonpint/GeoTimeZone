@@ -16,6 +16,7 @@ namespace GeoTimeZone.DataBuilder
         public void Stop()
         {
             _sw.Stop();
+            Console.WriteLine();
             Console.WriteLine("Work completed. Hit any key to exit.");
             Console.ReadKey();
         }
