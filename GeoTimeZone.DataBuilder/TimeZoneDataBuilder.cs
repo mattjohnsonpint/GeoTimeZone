@@ -80,7 +80,9 @@ namespace GeoTimeZone.DataBuilder
 
                 if (last)
                 {
-                    currentNode.TimeZones[tz] = geohash.Item2;
+                    double result;
+                    currentNode.TimeZones.TryGetValue(tz, out result);
+                    currentNode.TimeZones[tz] = result + geohash.Item2;
                     break;
                 }
             }
