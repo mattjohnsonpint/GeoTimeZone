@@ -31,31 +31,34 @@ namespace GeoTimeZone.DataBuilder
 
         private static void ConsolidateChildrenNodes(TimeZoneTreeNode node)
         {
+            foreach (var child in node.ChildNodes)
+            {
+                if (child.Value.ChildNodes.Count > 0)
+                    ConsolidateChildrenNodes(child.Value);
+            }
+
             var tzs = node.ChildNodes
                         .SelectMany(x => x.Value.TimeZones.Select(c => c.TzName).Distinct().ToList())
                         .GroupBy(x => x)
                         .ToList();
 
-            foreach (var tz in tzs)
+            if (tzs.Count == 1)
             {
-                if (tz.Count() == 32)
+                foreach (var tz in tzs)
                 {
-                    foreach (var childNode in node.ChildNodes)
+                    if (tz.Count() == 32)
                     {
-                        var ts = childNode.Value.TimeZones.Where(x => x.TzName == tz.Key).ToList();
-                        foreach (var timeZoneFeature in ts)
+                        foreach (var childNode in node.ChildNodes)
                         {
-                            node.TimeZones.Add(timeZoneFeature);
+                            var ts = childNode.Value.TimeZones.Where(x => x.TzName == tz.Key).ToList();
+                            foreach (var timeZoneFeature in ts)
+                            {
+                                node.TimeZones.Add(timeZoneFeature);
+                            }
+                            childNode.Value.TimeZones.RemoveWhere(x => x.TzName == tz.Key);
                         }
-                        childNode.Value.TimeZones.RemoveWhere(x => x.TzName == tz.Key);
                     }
                 }
-            }
-
-            foreach (var child in node.ChildNodes)
-            {
-                if (child.Value.ChildNodes.Count > 0)
-                    ConsolidateChildrenNodes(child.Value);
             }
         }
 
