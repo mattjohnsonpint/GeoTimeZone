@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using GeoAPI.Geometries;
@@ -10,6 +9,7 @@ namespace GeoTimeZone.DataBuilder
 {
     public static class TimeZoneDataBuilder
     {
+        private static readonly GeohashTree GeohashTree = new GeohashTree();
         private static readonly TimeZoneTreeNode WorldBoundsTreeNode = new TimeZoneTreeNode();
         private static readonly Dictionary<string, int> TimeZones = new Dictionary<string, int>();
 
@@ -39,50 +39,78 @@ namespace GeoTimeZone.DataBuilder
             }
         }
 
-        private static void WriteTreeNode(StreamWriter writer, TimeZoneTreeNode node, string hash = "")
+        private static void WriteGeohash(StreamWriter writer, string tz, string geohash)
+        {
+            var h = geohash.PadRight(5, '-');
+            var p = TimeZones[tz].ToString("D3");
+            writer.WriteLine(h + p);
+        }
+
+        private static void WriteTreeNode(StreamWriter writer, TimeZoneTreeNode node, string geohash = "")
         {
             foreach (var childNode in node.ChildNodes.OrderBy(x => x.Key))
             {
+                var childHash = geohash + childNode.Key;
+
                 if (childNode.Value.TimeZones.Count > 0)
                 {
-                    var h = (hash + childNode.Key).PadRight(5, '-');
-                    foreach (var timeZone in childNode.Value.TimeZones.OrderByDescending(x => x.Value))
+                    var groupedTimeZones = childNode.Value.TimeZones.GroupBy(x => x.TzName).ToList();
+
+                    if (childHash.Length == 5 && groupedTimeZones.Count > 1) // TODO: Remove childHash.Length == 5?
                     {
-                        var p = TimeZones[timeZone.Key].ToString("D3");
-                        writer.WriteLine(h + p);
+                        var env = GeohashTree.GetTreeNode(childHash).Geometry;
+
+                        var tzs = groupedTimeZones.Select(x => new
+                        {
+                            TimeZone = x.Key,
+                            Area = x.Sum(c =>
+                            {
+                                var intersection = c.Geometry.Intersection(env);
+                                return intersection.Area / env.Area;
+                            })
+                        })
+                            .OrderByDescending(x => x.Area);
+
+                        foreach (var timeZone in tzs)
+                        {
+                            WriteGeohash(writer, timeZone.TimeZone, childHash);
+                        }
+                    }
+                    else
+                    {
+                        foreach (var timeZone in groupedTimeZones)
+                        {
+                            WriteGeohash(writer, timeZone.Key, childHash);
+                        }
                     }
                 }
                 else if (childNode.Value.ChildNodes.Count > 0)
                 {
-                    WriteTreeNode(writer, childNode.Value, hash + childNode.Key);
+                    WriteTreeNode(writer, childNode.Value, childHash);
                 }
             }
         }
 
-        private static void AddResult(Tuple<string, double> geohash, string tz)
+        private static void AddResult(string geohash, TimeZoneFeature tz)
         {
             var currentNode = WorldBoundsTreeNode;
 
-            var hash = geohash.Item1;
-
-            for (int i = 0; i < hash.Length; i++)
+            for (int i = 0; i < geohash.Length; i++)
             {
-                var childNodeKey = hash[i];
+                var geohashChar = geohash[i];
                 TimeZoneTreeNode childNode;
-                if (!currentNode.ChildNodes.TryGetValue(childNodeKey, out childNode))
+                if (!currentNode.ChildNodes.TryGetValue(geohashChar, out childNode))
                 {
-                    childNode = currentNode.ChildNodes[childNodeKey] = new TimeZoneTreeNode();
+                    childNode = currentNode.ChildNodes[geohashChar] = new TimeZoneTreeNode();
                 }
 
                 currentNode = childNode;
 
-                var last = i == hash.Length - 1;
+                var last = i == geohash.Length - 1;
 
                 if (last)
                 {
-                    double result;
-                    currentNode.TimeZones.TryGetValue(tz, out result);
-                    currentNode.TimeZones[tz] = result + geohash.Item2;
+                    currentNode.TimeZones.Add(tz);
                     break;
                 }
             }
@@ -90,54 +118,39 @@ namespace GeoTimeZone.DataBuilder
 
         public static void CreateGeohashData(ConsoleOutput console, TimeZoneShapeFileReader inputShapefile, string outputPath)
         {
-            var features = inputShapefile.ReadShapeFile().ToList();
+            var features = inputShapefile.ReadShapeFile().AsParallel()
+                .Select(x =>
+                {
+                    x.Geometry = x.Geometry.Simplify();
+                    return x;
+                })
+                .ToList();
 
             PreLoadTimeZones(features);
 
-            var levels = new GeohashLevelList();
+            console.WriteMessage("Polygons loaded and simplified");
 
-            int featuresProcessed = 0;
-            foreach (var feature in features)
-            {
-                var geometry = feature.Geometry.Simplify();
+            var geohashes = features.AsParallel()
+                .Select(x => new
+                {
+                    TimeZone = x,
+                    Geohashes = GeohashTree.GetGeohashes(x.Geometry)
+                })
+                .ToList();
 
-                var hashes = levels
-                    .AsParallel()
-                    .SelectMany(level => GetGeohashes(geometry, level))
-                    .ToList();
+            console.WriteMessage("Geohashes generated for polygons");
 
-                foreach (var hash in hashes)
-                    AddResult(hash, feature.TzName);
+            foreach (var hash in geohashes)
+            foreach (var g in hash.Geohashes)
+                AddResult(g, hash.TimeZone);
 
-                console.WriteProgress(++featuresProcessed);
-            }
+            console.WriteMessage("Geohashes ready for writing to data file");
 
             WriteGeohashDataFile(outputPath);
+            console.WriteMessage("Data file written");
+
             WriteLookup(outputPath);
-        }
-
-        private static IEnumerable<Tuple<string, double>> GetGeohashes(IGeometry geometry, GeohashLevel level)
-        {
-            var env = level.Geometry;
-
-            if (geometry.Contains(env))
-            {
-                return new[] { new Tuple<string, double>(level.Geohash, 1) };
-            }
-
-            if (!geometry.Intersects(env))
-            {
-                return new Tuple<string, double>[0];
-            }
-
-            if (level.Geohash.Length == 5)
-            {
-                var intersection = geometry.Intersection(env);
-                var accuracy = intersection.Area/env.Area;
-                return new[] { new Tuple<string, double>(level.Geohash, accuracy) };
-            }
-                
-            return level.GetChildren().SelectMany(child => GetGeohashes(geometry, child));
+            console.WriteMessage("Lookup file written");
         }
 
         private static IGeometry Simplify(this IGeometry geometry)

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Globalization;
 
 namespace GeoTimeZone.DataBuilder
 {
@@ -11,23 +10,24 @@ namespace GeoTimeZone.DataBuilder
         public void Start()
         {
             _sw.Start();
+            Console.WriteLine("Started at: {0:g}", DateTime.Now.TimeOfDay);
+            Console.WriteLine();
         }
 
         public void Stop()
         {
             _sw.Stop();
             Console.WriteLine();
-            Console.WriteLine("Work completed. Hit any key to exit.");
+            Console.WriteLine("Finished at: {0:g}", DateTime.Now.TimeOfDay);
+            Console.WriteLine("Total time: {0:c}", _sw.Elapsed);
+            Console.WriteLine();
+            Console.WriteLine("Hit any key to exit.");
             Console.ReadKey();
         }
 
-        public void WriteProgress(int progress)
+        public void WriteMessage(string message)
         {
-            var polygons = progress.ToString(CultureInfo.InvariantCulture).PadLeft(5);
-
-            var line = Console.CursorTop;
-            Console.WriteLine("{0} polygons completed. {1:c}", polygons, _sw.Elapsed);
-            Console.SetCursorPosition(0, line);
+            Console.WriteLine("{0:c} - {1}", _sw.Elapsed, message);
         }
     }
 }

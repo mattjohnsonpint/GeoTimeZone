@@ -4,7 +4,7 @@ namespace GeoTimeZone.DataBuilder
 {
     public class TimeZoneTreeNode
     {
-        public readonly Dictionary<string, double> TimeZones = new Dictionary<string, double>(); 
+        public readonly HashSet<TimeZoneFeature> TimeZones = new HashSet<TimeZoneFeature>(); 
         public readonly Dictionary<char, TimeZoneTreeNode> ChildNodes = new Dictionary<char, TimeZoneTreeNode>();
     }
 }

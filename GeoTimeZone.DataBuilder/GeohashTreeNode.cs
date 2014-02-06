@@ -5,7 +5,7 @@ using NetTopologySuite.Geometries;
 
 namespace GeoTimeZone.DataBuilder
 {
-    public class GeohashLevel
+    public class GeohashTreeNode
     {
         public string Geohash { get; set; }
 
@@ -14,10 +14,10 @@ namespace GeoTimeZone.DataBuilder
         private IGeometry _geometry;
         public IGeometry Geometry { get { return _geometry ?? (_geometry = GeometryFactory.Default.ToGeometry(Envelope));  } }
 
-        private List<GeohashLevel> _children; 
-        public IEnumerable<GeohashLevel> GetChildren()
+        private List<GeohashTreeNode> _children; 
+        public List<GeohashTreeNode> GetChildren()
         {
-            return _children ?? (_children = GeohashLevelList.GetNextLevel(Geohash, Envelope).ToList());
+            return _children ?? (_children = GeohashTree.GetNextLevel(Geohash, Envelope).ToList());
         }
     }
 }

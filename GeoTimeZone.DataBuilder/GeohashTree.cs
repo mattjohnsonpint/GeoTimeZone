@@ -4,16 +4,65 @@ using GeoAPI.Geometries;
 
 namespace GeoTimeZone.DataBuilder
 {
-    public class GeohashLevelList : List<GeohashLevel>
+    public class GeohashTree : List<GeohashTreeNode>
     {
-        public GeohashLevelList()
+        public GeohashTree()
         {
             AddRange(GetNextLevel());
         }
 
+        public string[] GetGeohashes(IGeometry geometry)
+        {
+            return this.SelectMany(level => GetGeohashes(geometry, level)).ToArray();
+        }
+
+        private static IEnumerable<string> GetGeohashes(IGeometry geometry, GeohashTreeNode level)
+        {
+            var env = level.Geometry;
+
+            if (geometry.Contains(env))
+            {
+                return new[] { level.Geohash };
+            }
+
+            if (!geometry.Intersects(env))
+            {
+                return new string[0];
+            }
+
+            if (level.Geohash.Length == 5)
+            {
+                return new[] { level.Geohash };
+            }
+
+            return level.GetChildren().SelectMany(child => GetGeohashes(geometry, child));
+        }
+
+        public GeohashTreeNode GetTreeNode(string geohash)
+        {
+            GeohashTreeNode result = null;
+            if (!string.IsNullOrWhiteSpace(geohash))
+            {
+                for (var i = 0; i < geohash.Length; i++)
+                {
+                    var c = geohash[i];
+
+                    if (c == '-')
+                        return result;
+
+                    var index = Base32.IndexOf(c);
+                    if (i == 0)
+                        result = this[index];
+                    else
+                        result = result.GetChildren()[index];
+                }
+            }
+            return result;
+        }
+
         private const string Base32 = "0123456789bcdefghjkmnpqrstuvwxyz";
 
-        public static IEnumerable<GeohashLevel> GetNextLevel(string geohash = "", Envelope envelope = null)
+        public static IEnumerable<GeohashTreeNode> GetNextLevel(string geohash = "", Envelope envelope = null)
         {
             if (geohash == string.Empty || envelope == null)
             {
@@ -26,7 +75,7 @@ namespace GeoTimeZone.DataBuilder
             return SplitEnvelope2(envelope, even)
                 .SelectMany(x => SplitEnvelope4(x, even))
                 .SelectMany(x => SplitEnvelope4(x, even))
-                .Select((envelope1, index) => new GeohashLevel { Envelope = envelope1, Geohash = geohash + Base32[index] });
+                .Select((envelope1, index) => new GeohashTreeNode { Envelope = envelope1, Geohash = geohash + Base32[index] });
         }
 
         public static IEnumerable<Envelope> SplitEnvelope2(Envelope envelope, bool even)
