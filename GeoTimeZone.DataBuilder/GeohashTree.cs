@@ -6,6 +6,8 @@ namespace GeoTimeZone.DataBuilder
 {
     public class GeohashTree : List<GeohashTreeNode>
     {
+        public const string Base32 = "0123456789bcdefghjkmnpqrstuvwxyz";
+
         public GeohashTree()
         {
             AddRange(GetNextLevel());
@@ -59,8 +61,6 @@ namespace GeoTimeZone.DataBuilder
             }
             return result;
         }
-
-        private const string Base32 = "0123456789bcdefghjkmnpqrstuvwxyz";
 
         public static IEnumerable<GeohashTreeNode> GetNextLevel(string geohash = "", Envelope envelope = null)
         {

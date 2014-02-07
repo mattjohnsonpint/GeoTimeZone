@@ -56,7 +56,7 @@ namespace GeoTimeZone.DataBuilder
                 {
                     var groupedTimeZones = childNode.Value.TimeZones.GroupBy(x => x.TzName).ToList();
 
-                    if (childHash.Length == 5 && groupedTimeZones.Count > 1) // TODO: Remove childHash.Length == 5?
+                    if (groupedTimeZones.Count > 1)
                     {
                         var env = GeohashTree.GetTreeNode(childHash).Geometry;
 
@@ -146,9 +146,9 @@ namespace GeoTimeZone.DataBuilder
 
             console.WriteMessage("Geohash tree built");
 
-            WorldBoundsTreeNode.RollTimeZonesUp();
+            WorldBoundsTreeNode.PrepareForOutput();
 
-            console.WriteMessage("Geohash rollup performed on tree");
+            console.WriteMessage("Geohash tree preparing for output");
 
             WriteGeohashDataFile(outputPath);
             console.WriteMessage("Data file written");
