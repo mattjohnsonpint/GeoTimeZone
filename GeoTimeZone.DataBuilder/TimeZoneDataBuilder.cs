@@ -29,39 +29,6 @@ namespace GeoTimeZone.DataBuilder
             }
         }
 
-        private static void ConsolidateChildrenNodes(TimeZoneTreeNode node)
-        {
-            foreach (var child in node.ChildNodes)
-            {
-                if (child.Value.ChildNodes.Count > 0)
-                    ConsolidateChildrenNodes(child.Value);
-            }
-
-            var tzs = node.ChildNodes
-                        .SelectMany(x => x.Value.TimeZones.Select(c => c.TzName).Distinct().ToList())
-                        .GroupBy(x => x)
-                        .ToList();
-
-            if (tzs.Count == 1)
-            {
-                foreach (var tz in tzs)
-                {
-                    if (tz.Count() == 32)
-                    {
-                        foreach (var childNode in node.ChildNodes)
-                        {
-                            var ts = childNode.Value.TimeZones.Where(x => x.TzName == tz.Key).ToList();
-                            foreach (var timeZoneFeature in ts)
-                            {
-                                node.TimeZones.Add(timeZoneFeature);
-                            }
-                            childNode.Value.TimeZones.RemoveWhere(x => x.TzName == tz.Key);
-                        }
-                    }
-                }
-            }
-        }
-
         private static void WriteGeohashDataFile(string outputPath)
         {
             var path = Path.Combine(outputPath, DataFileName);
@@ -177,9 +144,9 @@ namespace GeoTimeZone.DataBuilder
             foreach (var g in hash.Geohashes)
                 AddResult(g, hash.TimeZone);
 
-            console.WriteMessage("Geohashes ready for writing to data file");
+            console.WriteMessage("Geohash tree built");
 
-            ConsolidateChildrenNodes(WorldBoundsTreeNode);
+            WorldBoundsTreeNode.RollTimeZonesUp();
 
             console.WriteMessage("Geohash rollup performed on tree");
 
