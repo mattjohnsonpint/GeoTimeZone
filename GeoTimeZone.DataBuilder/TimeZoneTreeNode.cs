@@ -18,8 +18,8 @@ namespace GeoTimeZone.DataBuilder
         
         public void PrepareForOutput()
         {
-            RollUpTimeZones();
             RollDownTimeZones();
+            RollUpTimeZones();
         }
 
         private bool RollUpTimeZones()
