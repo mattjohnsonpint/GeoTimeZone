@@ -176,11 +176,11 @@ namespace GeoTimeZone
                 IanaTimeZoneId = parts[0],
 
                 // TODO: Extend the TZL.dat file to include these fields
-                WindowsTimeZoneId = string.IsNullOrEmpty(parts[1]) ? null : parts[1],
+                WindowsTimeZoneId = string.IsNullOrEmpty(parts[3]) ? null : parts[3],
                 StandardOffset = TimeSpan.Zero,
                 DaylightOffset = null,
-                TwoLetterIsoCountryCode = null,
-                ThreeLetterIsoCountryCode = null,
+                TwoLetterIsoCountryCode = parts[1],
+                ThreeLetterIsoCountryCode = parts[2],
                 GeneralEnglishName = null,
                 StandardEnglishName = null,
                 DaylightEnglishName = null,

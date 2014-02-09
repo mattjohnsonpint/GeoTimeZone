@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using GeoAPI.Geometries;
@@ -11,29 +12,24 @@ namespace GeoTimeZone.DataBuilder
     {
         private static readonly GeohashTree GeohashTree = new GeohashTree();
         private static readonly TimeZoneTreeNode WorldBoundsTreeNode = new TimeZoneTreeNode();
-        private static readonly Dictionary<string, int> TimeZones = new Dictionary<string, int>();
+        private static readonly Dictionary<string, TimeZoneMeta> TimeZones = new Dictionary<string, TimeZoneMeta>();
+
 
         private const string DataFileName = "TZ.dat";
         private const string LookupFileName = "TZL.dat";
         
         private static void WriteLookup(string outputPath)
         {
-            var winZones = new WindowsTimeZoneFileReader(@".\Data\windowsZones.xml").Read();
 
             var path = Path.Combine(outputPath, LookupFileName);
             
             using (var writer = File.CreateText(path))
             {
                 writer.NewLine = "\n";
-                var timeZones = TimeZones.OrderBy(x => x.Value).Select(x => x.Key);
+                var timeZones = TimeZones.Values.OrderBy(x => x.LineNumber);
                 foreach (var timeZone in timeZones)
                 {
-                    string winZone;
-                    if (!winZones.TryGetValue(timeZone, out winZone))
-                    {
-                        winZone = string.Empty;
-                    }
-                    writer.WriteLine(timeZone + "|" + winZone);
+                    writer.WriteLine(timeZone.ToString());
                 }
             }
         }
@@ -51,7 +47,7 @@ namespace GeoTimeZone.DataBuilder
         private static void WriteGeohash(StreamWriter writer, string tz, string geohash)
         {
             var h = geohash.PadRight(5, '-');
-            var p = TimeZones[tz].ToString("D3");
+            var p = TimeZones[tz].LineNumber.ToString("D3");
             writer.WriteLine(h + p);
         }
 
@@ -150,8 +146,8 @@ namespace GeoTimeZone.DataBuilder
             console.WriteMessage("Geohashes generated for polygons");
 
             foreach (var hash in geohashes)
-            foreach (var g in hash.Geohashes)
-                AddResult(g, hash.TimeZone);
+                foreach (var g in hash.Geohashes)
+                    AddResult(g, hash.TimeZone);
 
             console.WriteMessage("Geohash tree built");
 
@@ -190,11 +186,26 @@ namespace GeoTimeZone.DataBuilder
 
         private static void PreLoadTimeZones(IEnumerable<TimeZoneFeature> features)
         {
-            var zones = features.Select(x => x.TzName).OrderBy(x => x).Distinct();
+            var zones = features.GroupBy(x => x.TzName).Select(x => x.First()).OrderBy(x => x.TzName).Distinct();
+            
+            var winZones = new WindowsTimeZoneFileReader(@".\Data\windowsZones.xml").Read();
 
             int i = 0;
             foreach (var zone in zones)
-                TimeZones.Add(zone, ++i);
+            {
+                string winZone;
+                if (!winZones.TryGetValue(zone.TzName, out winZone))
+                    winZone = string.Empty;
+
+                TimeZones.Add(zone.TzName, new TimeZoneMeta
+                    {
+                        LineNumber = ++i,
+                        IanaTimeZoneId = zone.TzName,
+                        WindowsTimeZoneId = string.IsNullOrEmpty(winZone) ? null : winZone,
+                        ThreeLetterIsoCountryCode = zone.ThreeLetterIsoCountryCode,
+                        TwoLetterIsoCountryCode = zone.TwoLetterIsoCountryCode
+                    });
+            }
         }
     }
 }
