@@ -22,7 +22,7 @@ namespace GeoTimeZone.DataBuilder
 				{ "America/Miquelon", "" },
 				{ "Asia/Gaza", "" },
 				{ "Asia/Hebron", "" },
-				{ "Asia/Ho_Chi_Minh", "SE Asia Standard Time" },
+				{ "Asia/Ho_Chi_Minh", "" },
 				{ "Atlantic/Faroe", "W. Europe Standard Time" },
 				{ "Australia/Eucla", "" },
 				{ "Australia/Lord_Howe", "" },
