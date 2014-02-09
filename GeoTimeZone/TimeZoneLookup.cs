@@ -169,12 +169,14 @@ namespace GeoTimeZone
 
         private static TimeZoneDetails GetTimeZoneDetails(string timeZone)
         {
+            var parts = timeZone.Split('|');
+
             return new TimeZoneDetails
             {
-                IanaTimeZoneId = timeZone,
+                IanaTimeZoneId = parts[0],
 
                 // TODO: Extend the TZL.dat file to include these fields
-                WindowsTimeZoneId = null,
+                WindowsTimeZoneId = string.IsNullOrEmpty(parts[1]) ? null : parts[1],
                 StandardOffset = TimeSpan.Zero,
                 DaylightOffset = null,
                 TwoLetterIsoCountryCode = null,

@@ -96,7 +96,7 @@ namespace GeoTimeZone.DataBuilder
 
                     yield return new TimeZoneFeature
                         {
-                            TzName = zone,
+                            TzName = Helpers.CleanseTimeZoneName(zone),
                             Geometry = geometry,
                             ThreeLetterIsoCountryCode = country3,
                             TwoLetterIsoCountryCode = country2

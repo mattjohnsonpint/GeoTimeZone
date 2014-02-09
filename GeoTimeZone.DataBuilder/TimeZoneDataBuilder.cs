@@ -18,6 +18,8 @@ namespace GeoTimeZone.DataBuilder
         
         private static void WriteLookup(string outputPath)
         {
+            var winZones = new WindowsTimeZoneFileReader(@".\Data\windowsZones.xml").Read();
+
             var path = Path.Combine(outputPath, LookupFileName);
             
             using (var writer = File.CreateText(path))
@@ -25,7 +27,14 @@ namespace GeoTimeZone.DataBuilder
                 writer.NewLine = "\n";
                 var timeZones = TimeZones.OrderBy(x => x.Value).Select(x => x.Key);
                 foreach (var timeZone in timeZones)
-                    writer.WriteLine(timeZone);
+                {
+                    string winZone;
+                    if (!winZones.TryGetValue(timeZone, out winZone))
+                    {
+                        winZone = string.Empty;
+                    }
+                    writer.WriteLine(timeZone + "|" + winZone);
+                }
             }
         }
 
