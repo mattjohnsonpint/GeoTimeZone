@@ -1,40 +1,57 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using Ionic.Zlib;
 
 namespace GeoTimeZone
 {
-    internal class TimezoneFileReader : IDisposable
+    internal static class TimezoneFileReader
     {
         private const int LineLength = 8;
         private const int LineEndLength = 1;
 
-        private readonly Stream _stream;
+        private static readonly object Locker = new object();
+        private static readonly Lazy<MemoryStream> LazyData = new Lazy<MemoryStream>(LoadData);
+        private static readonly Lazy<long> LazyCount = new Lazy<long>(GetCount);
 
-        public TimezoneFileReader()
+        private static MemoryStream LoadData()
         {
-            _stream = typeof (TimezoneFileReader).Assembly.GetManifestResourceStream("GeoTimeZone.TZ.dat");
-            Count = _stream.Length / (LineLength + LineEndLength);
+            var ms = new MemoryStream();
+
+            using (var stream = typeof(TimezoneFileReader).Assembly.GetManifestResourceStream("GeoTimeZone.TZ.dat.gz"))
+            using (var gzip = new GZipStream(stream, CompressionMode.Decompress))
+            {
+                gzip.CopyTo(ms);
+            }
+
+            return ms;
         }
 
-        public long Count { get; private set; }
+        private static long GetCount()
+        {
+            var ms = LazyData.Value;
+            return ms.Length/(LineLength + LineEndLength);
+        }
 
-        public string GetLine(long line)
+        public static long Count
+        {
+            get { return LazyCount.Value; }
+        }
+
+        public static string GetLine(long line)
         {
             var index = (LineLength + LineEndLength) * (line - 1);
 
-            _stream.Position = index;
-
             var buffer = new byte[LineLength];
 
-            _stream.Read(buffer, 0, buffer.Length);
+            lock (Locker)
+            {
+                var stream = LazyData.Value;
+                stream.Position = index;
+                stream.Read(buffer, 0, LineLength);
+            }
 
-            return Encoding.UTF8.GetString(buffer, 0 , buffer.Length);
-        }
-
-        public void Dispose()
-        {
-            _stream.Dispose();
+            return Encoding.UTF8.GetString(buffer, 0, buffer.Length);
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Ionic.Zlib;
 
 namespace GeoTimeZone
 {
@@ -30,56 +31,53 @@ namespace GeoTimeZone
             }
         }
 
-        private static List<long> GetTzDataLineNumbers(string geohash)
+        private static List<int> GetTzDataLineNumbers(string geohash)
         {
-            using (var reader = new TimezoneFileReader())
+            var seeked = SeekTimeZoneFile(geohash);
+            if (seeked == 0)
+                return new List<int>();
+
+            long min = seeked, max = seeked;
+            var seekedGeohash = TimezoneFileReader.GetLine(seeked).Substring(0, 5);
+
+            while (true)
             {
-                var seeked = SeekTimeZoneFile(reader, geohash);
-                if (seeked == 0)
-                    return new List<long>();
-
-                long min = seeked, max = seeked;
-                var seekedGeohash = reader.GetLine(seeked).Substring(0, 5);
-
-                while (true)
-                {
-                    var prevGeohash = reader.GetLine(min - 1).Substring(0, 5);
-                    if (seekedGeohash == prevGeohash)
-                        min--;
-                    else
-                        break;
-                }
-
-                while (true)
-                {
-                    var nextGeohash = reader.GetLine(max + 1).Substring(0, 5);
-                    if (seekedGeohash == nextGeohash)
-                        max++;
-                    else
-                        break;
-                }
-
-                var lineNumbers = new List<long>();
-                for (var i = min; i <= max; i++)
-                {
-                    var lineNumber = int.Parse(reader.GetLine(i).Substring(5));
-                    lineNumbers.Add(lineNumber);
-                }
-
-                return lineNumbers;
+                var prevGeohash = TimezoneFileReader.GetLine(min - 1).Substring(0, 5);
+                if (seekedGeohash == prevGeohash)
+                    min--;
+                else
+                    break;
             }
+
+            while (true)
+            {
+                var nextGeohash = TimezoneFileReader.GetLine(max + 1).Substring(0, 5);
+                if (seekedGeohash == nextGeohash)
+                    max++;
+                else
+                    break;
+            }
+
+            var lineNumbers = new List<int>();
+            for (var i = min; i <= max; i++)
+            {
+                var lineNumber = int.Parse(TimezoneFileReader.GetLine(i).Substring(5));
+                lineNumbers.Add(lineNumber);
+            }
+
+            return lineNumbers;
         }
 
-        private static long SeekTimeZoneFile(TimezoneFileReader reader, string hash)
+        private static long SeekTimeZoneFile(string hash)
         {
             var min = 1L;
-            var max = reader.Count;
+            var max = TimezoneFileReader.Count;
             var converged = false;
 
             while (true)
             {
                 var mid = ((max - min) / 2) + min;
-                var midLine = reader.GetLine(mid);
+                var midLine = TimezoneFileReader.GetLine(mid);
 
                 for (int i = 0; i < hash.Length; i++)
                 {
@@ -128,28 +126,35 @@ namespace GeoTimeZone
             return 0;
         }
 
-        private static List<string> GetTzsFromData(List<long> lineNumbers)
+        private static readonly Lazy<List<string>> LookupData = new Lazy<List<string>>(LoadLookupData);
+
+        private static List<string> LoadLookupData()
+        {
+            using (var stream = typeof(TimezoneFileReader).Assembly.GetManifestResourceStream("GeoTimeZone.TZL.dat.gz"))
+            using (var gzip = new GZipStream(stream, CompressionMode.Decompress))
+            using (var reader = new StreamReader(gzip))
+            {
+                var list = new List<string>();
+                
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    list.Add(line);
+                }
+
+                return list;
+            }
+        }
+
+        private static List<string> GetTzsFromData(List<int> lineNumbers)
         {
             if (lineNumbers.Count == 0)
                 return new List<string>();
 
             lineNumbers.Sort();
 
-            using (var stream = typeof(TimezoneFileReader).Assembly.GetManifestResourceStream("GeoTimeZone.TZL.dat"))
-            using (var reader = new StreamReader(stream))
-            {
-                var results = new List<string>();
-
-                for (long lineNo = 1; lineNo <= lineNumbers[lineNumbers.Count - 1]; lineNo++)
-                {
-                    var text = reader.ReadLine();
-                    if (lineNumbers.Contains(lineNo))
-                    {
-                        results.Add(text);
-                    }
-                }
-                return results;
-            }
+            var lookupData = LookupData.Value;
+            return lineNumbers.Where(x => x > 0).Select(x => lookupData[x - 1]).ToList();
         }
 
         private static int CalculateOffsetHoursFromLongitude(double longitude)

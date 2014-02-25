@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using GeoAPI.Geometries;
 using NetTopologySuite.Geometries;
@@ -15,15 +16,17 @@ namespace GeoTimeZone.DataBuilder
         private static readonly Dictionary<string, TimeZoneMeta> TimeZones = new Dictionary<string, TimeZoneMeta>();
 
 
-        private const string DataFileName = "TZ.dat";
-        private const string LookupFileName = "TZL.dat";
+        private const string DataFileName = "TZ.dat.gz";
+        private const string LookupFileName = "TZL.dat.gz";
         
         private static void WriteLookup(string outputPath)
         {
 
             var path = Path.Combine(outputPath, LookupFileName);
-            
-            using (var writer = File.CreateText(path))
+
+            using (var fileStream = File.Create(path))
+            using (var gzipStream = new GZipStream(fileStream, CompressionLevel.Optimal))
+            using (var writer = new StreamWriter(gzipStream))
             {
                 writer.NewLine = "\n";
                 var timeZones = TimeZones.Values.OrderBy(x => x.LineNumber);
@@ -37,7 +40,10 @@ namespace GeoTimeZone.DataBuilder
         private static void WriteGeohashDataFile(string outputPath)
         {
             var path = Path.Combine(outputPath, DataFileName);
-            using (var writer = File.CreateText(path))
+
+            using (var fileStream = File.Create(path))
+            using (var gzipStream = new GZipStream(fileStream, CompressionLevel.Optimal))
+            using (var writer = new StreamWriter(gzipStream))
             {
                 writer.NewLine = "\n";
                 WriteTreeNode(writer, WorldBoundsTreeNode);

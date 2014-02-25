@@ -45,10 +45,16 @@
     <Compile Include="TimeZoneResult.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="TZ.dat" />
+    <EmbeddedResource Include="TZ.dat.gz" />
+    <EmbeddedResource Include="TZL.dat.gz" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="TZL.dat" />
+    <Reference Include="Zlib.Portable">
+      <HintPath>..\packages\Zlib.Portable.1.9.2\lib\portable-net4+sl4+wp71+win8\Zlib.Portable.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
