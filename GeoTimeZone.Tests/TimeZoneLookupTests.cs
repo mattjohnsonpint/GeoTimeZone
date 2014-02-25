@@ -13,8 +13,8 @@ namespace GeoTimeZone.Tests
             Assert.AreEqual("Europe/Zurich", france.AlternativeResults[0].IanaTimeZoneId);
 
             var switzerland = TimeZoneLookup.GetTimeZone(47.58735, 7.588967);
-            Assert.AreEqual("Europe/Paris", switzerland.Result.IanaTimeZoneId);
-            Assert.AreEqual("Europe/Zurich", switzerland.AlternativeResults[0].IanaTimeZoneId);
+            Assert.AreEqual("Europe/Zurich", switzerland.Result.IanaTimeZoneId);
+            Assert.AreEqual("Europe/Paris", switzerland.AlternativeResults[0].IanaTimeZoneId);
         }
 
         [Test]
