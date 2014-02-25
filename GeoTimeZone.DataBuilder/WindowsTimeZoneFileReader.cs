@@ -16,30 +16,32 @@ namespace GeoTimeZone.DataBuilder
 
         static readonly Dictionary<string, string> Fixes = new Dictionary<string, string>
             {
-				{ "America/Adak", "Hawaiian Standard Time" },
-				{ "America/Atikokan", "Eastern Standard Time" },
-				{ "America/Metlakatla", "Pacific Standard Time" },
-				{ "America/Miquelon", "" },
-				{ "Asia/Gaza", "" },
-				{ "Asia/Hebron", "" },
-				{ "Asia/Ho_Chi_Minh", "" },
-				{ "Atlantic/Faroe", "W. Europe Standard Time" },
-				{ "Australia/Eucla", "" },
-				{ "Australia/Lord_Howe", "" },
-				{ "Pacific/Chatham", "" },
-				{ "Pacific/Chuuk", "" },
-				{ "Pacific/Easter", "" },
-				{ "Pacific/Gambier", "" },
-				{ "Pacific/Kiritimati", "" },
-				{ "Pacific/Marquesas", "" },
-				{ "Pacific/Norfolk", "" },
-				{ "Pacific/Pitcairn", "" },
-				{ "Pacific/Pohnpei", "" },
+                { "America/Adak", "Hawaiian Standard Time" },
+                { "America/Atikokan", "Eastern Standard Time" },
+                { "America/Metlakatla", "Pacific Standard Time" },
+                { "America/Miquelon", "" },
+                { "Asia/Gaza", "" },
+                { "Asia/Hebron", "" },
+                { "Asia/Ho_Chi_Minh", "" },
+                { "Atlantic/Faroe", "W. Europe Standard Time" },
+                { "Australia/Eucla", "" },
+                { "Australia/Lord_Howe", "" },
+                { "Pacific/Chatham", "" },
+                { "Pacific/Chuuk", "" },
+                { "Pacific/Easter", "" },
+                { "Pacific/Gambier", "" },
+                { "Pacific/Kiritimati", "" },
+                { "Pacific/Marquesas", "" },
+                { "Pacific/Norfolk", "" },
+                { "Pacific/Pitcairn", "" },
+                { "Pacific/Pohnpei", "" },
             };  
 
         public Dictionary<string, string> Read()
         {
             var doc = XDocument.Load(_cdlrFilePath);
+            if (doc.Root == null)
+                return null;
 
             var tzs = doc.Root.Descendants("windowsZones").Single().Descendants("mapTimezones").Single().Descendants();
 

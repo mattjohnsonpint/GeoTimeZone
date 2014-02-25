@@ -17,7 +17,7 @@
                     IanaTimeZoneId,
                     TwoLetterIsoCountryCode,
                     ThreeLetterIsoCountryCode,
-                    WindowsTimeZoneId  ?? string.Empty,
+                    WindowsTimeZoneId  ?? string.Empty
                 });
         }
     }

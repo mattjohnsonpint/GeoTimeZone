@@ -20,18 +20,17 @@ namespace GeoTimeZone
             {
                 return new TimeZoneResult { Result = timeZones[0] };
             }
-            else if (timeZones.Count > 1)
+            
+            if (timeZones.Count > 1)
             {
                 return new TimeZoneResult { Result = timeZones[0], AlternativeResults = timeZones.Skip(1).ToList() };
             }
-            else
-            {
-                var offsetHours = CalculateOffsetHoursFromLongitude(longitude);
-                return new TimeZoneResult { Result = GetTimeZoneDetails(offsetHours) };
-            }
+            
+            var offsetHours = CalculateOffsetHoursFromLongitude(longitude);
+            return new TimeZoneResult { Result = GetTimeZoneDetails(offsetHours) };
         }
 
-        private static List<int> GetTzDataLineNumbers(string geohash)
+        private static IEnumerable<int> GetTzDataLineNumbers(string geohash)
         {
             var seeked = SeekTimeZoneFile(geohash);
             if (seeked == 0)
@@ -88,18 +87,12 @@ namespace GeoTimeZone
 
                     if (midLine[i] > hash[i])
                     {
-                        if (max == mid)
-                            max = min; // make sure we don't get stuck in a loop
-                        else
-                            max = mid;
+                        max = mid == max ? min : mid;
                         break;
                     }
                     if (midLine[i] < hash[i])
                     {
-                        if (min == mid)
-                            min = max; // make sure we don't get stuck in a loop
-                        else
-                            min = mid;
+                        min = mid == min ? max : mid;
                         break;
                     }
 
@@ -126,9 +119,9 @@ namespace GeoTimeZone
             return 0;
         }
 
-        private static readonly Lazy<List<string>> LookupData = new Lazy<List<string>>(LoadLookupData);
+        private static readonly Lazy<IList<string>> LookupData = new Lazy<IList<string>>(LoadLookupData);
 
-        private static List<string> LoadLookupData()
+        private static IList<string> LoadLookupData()
         {
             using (var stream = typeof(TimezoneFileReader).Assembly.GetManifestResourceStream("GeoTimeZone.TZL.dat.gz"))
             using (var gzip = new GZipStream(stream, CompressionMode.Decompress))
@@ -146,15 +139,10 @@ namespace GeoTimeZone
             }
         }
 
-        private static List<string> GetTzsFromData(List<int> lineNumbers)
+        private static IEnumerable<string> GetTzsFromData(IEnumerable<int> lineNumbers)
         {
-            if (lineNumbers.Count == 0)
-                return new List<string>();
-
-            lineNumbers.Sort();
-
             var lookupData = LookupData.Value;
-            return lineNumbers.Where(x => x > 0).Select(x => lookupData[x - 1]).ToList();
+            return lineNumbers.OrderBy(x => x).Select(x => lookupData[x - 1]);
         }
 
         private static int CalculateOffsetHoursFromLongitude(double longitude)

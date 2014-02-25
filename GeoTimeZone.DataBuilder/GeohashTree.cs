@@ -42,23 +42,23 @@ namespace GeoTimeZone.DataBuilder
 
         public GeohashTreeNode GetTreeNode(string geohash)
         {
-            GeohashTreeNode result = null;
-            if (!string.IsNullOrWhiteSpace(geohash))
+            if (string.IsNullOrWhiteSpace(geohash))
             {
-                for (var i = 0; i < geohash.Length; i++)
-                {
-                    var c = geohash[i];
-
-                    if (c == '-')
-                        return result;
-
-                    var index = Base32.IndexOf(c);
-                    if (i == 0)
-                        result = this[index];
-                    else
-                        result = result.GetChildren()[index];
-                }
+                return null;
             }
+
+            GeohashTreeNode result = null;
+            foreach (var c in geohash)
+            {
+                if (c == '-')
+                {
+                    return result;
+                }
+
+                var index = Base32.IndexOf(c);
+                result = result == null ? this[index] : result.GetChildren()[index];
+            }
+
             return result;
         }
 
@@ -106,22 +106,26 @@ namespace GeoTimeZone.DataBuilder
             if (even)
             {
                 for (int y = 0; y < 2; y++)
+                {
                     for (int x = 0; x < 2; x++)
                     {
                         var x1 = minX + (stepX * x);
                         var y1 = minY + (stepY * y);
                         yield return new Envelope(x1, x1 + stepX, y1, y1 + stepY);
                     }
+                }
             }
             else
             {
                 for (int x = 0; x < 2; x++)
+                {
                     for (int y = 0; y < 2; y++)
                     {
                         var x1 = minX + (stepX * x);
                         var y1 = minY + (stepY * y);
                         yield return new Envelope(x1, x1 + stepX, y1, y1 + stepY);
                     }
+                }
             }
         }
     }
