@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Ionic.Zlib;
+using GeoTimeZone.Imports.Ionic.Zlib;
 
 namespace GeoTimeZone
 {

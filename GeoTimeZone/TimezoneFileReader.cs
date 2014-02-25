@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
-using Ionic.Zlib;
+using GeoTimeZone.Imports.Ionic.Zlib;
 
 namespace GeoTimeZone
 {
