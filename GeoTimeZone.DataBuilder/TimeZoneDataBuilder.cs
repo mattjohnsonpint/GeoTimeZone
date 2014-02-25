@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using GeoAPI.Geometries;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Simplify;
+using NodaTime;
 
 namespace GeoTimeZone.DataBuilder
 {
@@ -195,6 +197,10 @@ namespace GeoTimeZone.DataBuilder
             
             var winZones = new WindowsTimeZoneFileReader(@".\Data\windowsZones.xml").Read();
 
+            var currentYear = DateTime.UtcNow.Year;
+            var janInstant = Instant.FromUtc(currentYear, 1, 1, 0, 0);
+            var julInstant = Instant.FromUtc(currentYear, 7, 1, 0, 0);
+
             int i = 0;
             foreach (var zone in zones)
             {
@@ -202,14 +208,46 @@ namespace GeoTimeZone.DataBuilder
                 if (!winZones.TryGetValue(zone.TzName, out winZone))
                     winZone = string.Empty;
 
+                var tz = DateTimeZoneProviders.Tzdb[zone.TzName];
+                var janOffset = tz.GetUtcOffset(janInstant);
+                var julOffset = tz.GetUtcOffset(julInstant);
+                var stdOffset = janOffset < julOffset ? janOffset : julOffset;
+                var dltOffset = janOffset > julOffset ? janOffset : julOffset;
+                var stdInstant = janOffset < julOffset ? janInstant : julInstant;
+                var dltInstant = janOffset > julOffset ? janInstant : julInstant;
+                var stdInterval = tz.GetZoneInterval(stdInstant);
+                var dltInterval = tz.GetZoneInterval(dltInstant);
+                var hasDST = stdOffset != dltOffset;
+
+                var standardAbbreviation = stdInterval.Name;
+                var daylightAbbreviation = hasDST ? dltInterval.Name : null;
+
+                // TODO: We'll need more CLDR data to properly deliver these
+                var generalAbbreviation = standardAbbreviation;
+                var generalEnglishName = standardAbbreviation;
+                var standardEnglishName = standardAbbreviation;
+                var daylightEnglishName = standardAbbreviation;
+                
                 TimeZones.Add(zone.TzName, new TimeZoneMeta
-                    {
-                        LineNumber = ++i,
-                        IanaTimeZoneId = zone.TzName,
-                        WindowsTimeZoneId = string.IsNullOrEmpty(winZone) ? null : winZone,
-                        ThreeLetterIsoCountryCode = zone.ThreeLetterIsoCountryCode,
-                        TwoLetterIsoCountryCode = zone.TwoLetterIsoCountryCode
-                    });
+                {
+                    LineNumber = ++i,
+
+                    IanaTimeZoneId = zone.TzName,
+                    WindowsTimeZoneId = winZone,
+
+                    ThreeLetterIsoCountryCode = zone.ThreeLetterIsoCountryCode,
+                    TwoLetterIsoCountryCode = zone.TwoLetterIsoCountryCode,
+
+                    StandardOffset = stdOffset.ToTimeSpan(),
+                    DaylightOffset = hasDST ? dltOffset.ToTimeSpan() : (TimeSpan?) null,
+
+                    GeneralAbbreviation = generalAbbreviation,
+                    GeneralEnglishName = generalEnglishName,
+                    StandardAbbreviation = standardAbbreviation,
+                    StandardEnglishName = standardEnglishName,
+                    DaylightAbbreviation = daylightAbbreviation,
+                    DaylightEnglishName = daylightEnglishName
+                });
             }
         }
     }

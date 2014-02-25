@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using GeoTimeZone.Imports.Ionic.Zlib;
@@ -20,12 +21,12 @@ namespace GeoTimeZone
             {
                 return new TimeZoneResult { Result = timeZones[0] };
             }
-            
+
             if (timeZones.Count > 1)
             {
                 return new TimeZoneResult { Result = timeZones[0], AlternativeResults = timeZones.Skip(1).ToList() };
             }
-            
+
             var offsetHours = CalculateOffsetHoursFromLongitude(longitude);
             return new TimeZoneResult { Result = GetTimeZoneDetails(offsetHours) };
         }
@@ -128,7 +129,7 @@ namespace GeoTimeZone
             using (var reader = new StreamReader(gzip))
             {
                 var list = new List<string>();
-                
+
                 string line;
                 while ((line = reader.ReadLine()) != null)
                 {
@@ -167,20 +168,34 @@ namespace GeoTimeZone
             return new TimeZoneDetails
             {
                 IanaTimeZoneId = parts[0],
-
-                // TODO: Extend the TZL.dat file to include these fields
-                WindowsTimeZoneId = string.IsNullOrEmpty(parts[3]) ? null : parts[3],
-                StandardOffset = TimeSpan.Zero,
-                DaylightOffset = null,
+                
                 TwoLetterIsoCountryCode = parts[1],
                 ThreeLetterIsoCountryCode = parts[2],
-                GeneralEnglishName = null,
-                StandardEnglishName = null,
-                DaylightEnglishName = null,
-                GeneralAbbreviation = null,
-                StandardAbbreviation = null,
-                DaylightAbbreviation = null
+                
+                StandardOffset = ParseTimeSpan(parts[3]).GetValueOrDefault(),
+                DaylightOffset = ParseTimeSpan(parts[4]),
+                
+                WindowsTimeZoneId = parts[5].Length == 0 ? null : parts[5],
+                
+                GeneralAbbreviation = parts[6],
+                StandardAbbreviation = parts[7],
+                DaylightAbbreviation = parts[8],
+
+                GeneralEnglishName = parts[9],
+                StandardEnglishName = parts[10],
+                DaylightEnglishName = parts[11]
             };
+        }
+
+        private static TimeSpan? ParseTimeSpan(string s)
+        {
+            if (s.Length == 0)
+                return null;
+
+            var negative = s[0] == '-';
+            if (negative) s = s.Substring(1);
+            var ts = TimeSpan.ParseExact(s, "hhmm", CultureInfo.InvariantCulture);
+            return negative ? TimeSpan.FromTicks(ts.Ticks * -1) : ts;
         }
 
         private static TimeZoneDetails GetTimeZoneDetails(int offsetHours)
