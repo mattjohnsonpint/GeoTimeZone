@@ -6,10 +6,10 @@ namespace GeoTimeZone
     {
         public TimeZoneResult()
         {
-            AlternativeResults = new List<TimeZoneDetails>();
+            AlternativeResults = new List<string>();
         }
 
-        public TimeZoneDetails Result { get; set; }
-        public List<TimeZoneDetails> AlternativeResults { get; set; }
+        public string Result { get; set; }
+        public List<string> AlternativeResults { get; set; }
     }
 }

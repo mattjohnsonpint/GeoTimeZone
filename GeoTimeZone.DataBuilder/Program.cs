@@ -7,7 +7,7 @@
             var console = new ConsoleOutput();
             console.Start();
 
-            var tzShapeReader = new TimeZoneShapeFileReader(@".\Data\countries.txt", @".\Data\zone.tab", @".\Data\tz_world.shp");
+            var tzShapeReader = new TimeZoneShapeFileReader(@".\Data\tz_world.shp");
 
             TimeZoneDataBuilder.CreateGeohashData(console, tzShapeReader, @"..\..\..\GeoTimeZone\");
             

@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using GeoAPI.Geometries;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Simplify;
-using NodaTime;
 
 namespace GeoTimeZone.DataBuilder
 {
@@ -17,8 +14,8 @@ namespace GeoTimeZone.DataBuilder
         private static readonly Dictionary<string, TimeZoneMeta> TimeZones = new Dictionary<string, TimeZoneMeta>();
 
 
-        private const string DataFileName = "TZ.dat.gz";
-        private const string LookupFileName = "TZL.dat.gz";
+        private const string DataFileName = "TZ.dat";
+        private const string LookupFileName = "TZL.dat";
         
         private static void WriteLookup(string outputPath)
         {
@@ -26,14 +23,13 @@ namespace GeoTimeZone.DataBuilder
             var path = Path.Combine(outputPath, LookupFileName);
 
             using (var fileStream = File.Create(path))
-            using (var gzipStream = new GZipStream(fileStream, CompressionLevel.Optimal))
-            using (var writer = new StreamWriter(gzipStream))
+            using (var writer = new StreamWriter(fileStream))
             {
                 writer.NewLine = "\n";
                 var timeZones = TimeZones.Values.OrderBy(x => x.LineNumber);
                 foreach (var timeZone in timeZones)
                 {
-                    writer.WriteLine(timeZone.ToString());
+                    writer.WriteLine(timeZone.IanaTimeZoneId);
                 }
             }
         }
@@ -43,8 +39,7 @@ namespace GeoTimeZone.DataBuilder
             var path = Path.Combine(outputPath, DataFileName);
 
             using (var fileStream = File.Create(path))
-            using (var gzipStream = new GZipStream(fileStream, CompressionLevel.Optimal))
-            using (var writer = new StreamWriter(gzipStream))
+            using (var writer = new StreamWriter(fileStream))
             {
                 writer.NewLine = "\n";
                 WriteTreeNode(writer, WorldBoundsTreeNode);
@@ -195,58 +190,14 @@ namespace GeoTimeZone.DataBuilder
         {
             var zones = features.GroupBy(x => x.TzName).Select(x => x.First()).OrderBy(x => x.TzName).Distinct();
             
-            var winZones = new WindowsTimeZoneFileReader(@".\Data\windowsZones.xml").Read();
-
-            var currentYear = DateTime.UtcNow.Year;
-            var janInstant = Instant.FromUtc(currentYear, 1, 1, 0, 0);
-            var julInstant = Instant.FromUtc(currentYear, 7, 1, 0, 0);
-
             int i = 0;
             foreach (var zone in zones)
             {
-                string winZone;
-                if (!winZones.TryGetValue(zone.TzName, out winZone))
-                    winZone = string.Empty;
-
-                var tz = DateTimeZoneProviders.Tzdb[zone.TzName];
-                var janOffset = tz.GetUtcOffset(janInstant);
-                var julOffset = tz.GetUtcOffset(julInstant);
-                var stdOffset = janOffset < julOffset ? janOffset : julOffset;
-                var dltOffset = janOffset > julOffset ? janOffset : julOffset;
-                var stdInstant = janOffset < julOffset ? janInstant : julInstant;
-                var dltInstant = janOffset > julOffset ? janInstant : julInstant;
-                var stdInterval = tz.GetZoneInterval(stdInstant);
-                var dltInterval = tz.GetZoneInterval(dltInstant);
-                var hasDST = stdOffset != dltOffset;
-
-                var standardAbbreviation = stdInterval.Name;
-                var daylightAbbreviation = hasDST ? dltInterval.Name : null;
-
-                // TODO: We'll need more CLDR data to properly deliver these
-                var generalAbbreviation = standardAbbreviation;
-                var generalEnglishName = standardAbbreviation;
-                var standardEnglishName = standardAbbreviation;
-                var daylightEnglishName = standardAbbreviation;
-                
-                TimeZones.Add(zone.TzName, new TimeZoneMeta
+               TimeZones.Add(zone.TzName, new TimeZoneMeta
                 {
                     LineNumber = ++i,
 
                     IanaTimeZoneId = zone.TzName,
-                    WindowsTimeZoneId = winZone,
-
-                    ThreeLetterIsoCountryCode = zone.ThreeLetterIsoCountryCode,
-                    TwoLetterIsoCountryCode = zone.TwoLetterIsoCountryCode,
-
-                    StandardOffset = stdOffset.ToTimeSpan(),
-                    DaylightOffset = hasDST ? dltOffset.ToTimeSpan() : (TimeSpan?) null,
-
-                    GeneralAbbreviation = generalAbbreviation,
-                    GeneralEnglishName = generalEnglishName,
-                    StandardAbbreviation = standardAbbreviation,
-                    StandardEnglishName = standardEnglishName,
-                    DaylightAbbreviation = daylightAbbreviation,
-                    DaylightEnglishName = daylightEnglishName
                 });
             }
         }

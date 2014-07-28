@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using GeoTimeZone.Imports.Ionic.Zlib;
 
 namespace GeoTimeZone
 {
@@ -15,7 +13,7 @@ namespace GeoTimeZone
 
             var lineNumber = GetTzDataLineNumbers(geohash);
 
-            var timeZones = GetTzsFromData(lineNumber).Select(GetTimeZoneDetails).ToList();
+            var timeZones = GetTzsFromData(lineNumber).ToList();
 
             if (timeZones.Count == 1)
             {
@@ -28,7 +26,7 @@ namespace GeoTimeZone
             }
 
             var offsetHours = CalculateOffsetHoursFromLongitude(longitude);
-            return new TimeZoneResult { Result = GetTimeZoneDetails(offsetHours) };
+            return new TimeZoneResult { Result = GetTimeZoneId(offsetHours) };
         }
 
         private static IEnumerable<int> GetTzDataLineNumbers(string geohash)
@@ -124,19 +122,24 @@ namespace GeoTimeZone
 
         private static IList<string> LoadLookupData()
         {
-            using (var stream = typeof(TimezoneFileReader).Assembly.GetManifestResourceStream("GeoTimeZone.TZL.dat.gz"))
-            using (var gzip = new GZipStream(stream, CompressionMode.Decompress))
-            using (var reader = new StreamReader(gzip))
+            var assembly = typeof(TimezoneFileReader).Assembly;
+            using (var stream = assembly.GetManifestResourceStream("GeoTimeZone.TZL.dat"))
             {
-                var list = new List<string>();
+                if (stream == null)
+                    throw new InvalidOperationException();
 
-                string line;
-                while ((line = reader.ReadLine()) != null)
+                using (var reader = new StreamReader(stream))
                 {
-                    list.Add(line);
-                }
+                    var list = new List<string>();
 
-                return list;
+                    string line;
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        list.Add(line);
+                    }
+
+                    return list;
+                }
             }
         }
 
@@ -161,85 +164,13 @@ namespace GeoTimeZone
             return dir * (int)Math.Floor(offset);
         }
 
-        private static TimeZoneDetails GetTimeZoneDetails(string timeZone)
-        {
-            var parts = timeZone.Split('|');
-
-            return new TimeZoneDetails
-            {
-                IanaTimeZoneId = parts[0],
-                
-                TwoLetterIsoCountryCode = parts[1],
-                ThreeLetterIsoCountryCode = parts[2],
-                
-                StandardOffset = ParseTimeSpan(parts[3]).GetValueOrDefault(),
-                DaylightOffset = ParseTimeSpan(parts[4]),
-                
-                WindowsTimeZoneId = parts[5].Length == 0 ? null : parts[5],
-                
-                GeneralAbbreviation = parts[6],
-                StandardAbbreviation = parts[7],
-                DaylightAbbreviation = parts[8],
-
-                GeneralEnglishName = parts[9],
-                StandardEnglishName = parts[10],
-                DaylightEnglishName = parts[11]
-            };
-        }
-
-        private static TimeSpan? ParseTimeSpan(string s)
-        {
-            if (s.Length == 0)
-                return null;
-
-            var negative = s[0] == '-';
-            if (negative) s = s.Substring(1);
-            var ts = TimeSpan.ParseExact(s, "hhmm", CultureInfo.InvariantCulture);
-            return negative ? TimeSpan.FromTicks(ts.Ticks * -1) : ts;
-        }
-
-        private static TimeZoneDetails GetTimeZoneDetails(int offsetHours)
+        private static string GetTimeZoneId(int offsetHours)
         {
             if (offsetHours == 0)
-                return GetTimeZoneDetailsForUtc();
+                return "UTC";
 
-            var normal = (offsetHours >= 0 ? "+" : "-") + Math.Abs(offsetHours);
             var reversed = (offsetHours >= 0 ? "-" : "+") + Math.Abs(offsetHours);
-
-            return new TimeZoneDetails
-            {
-                IanaTimeZoneId = "Etc/GMT" + reversed,
-                WindowsTimeZoneId = null,
-                StandardOffset = TimeSpan.FromHours(offsetHours),
-                DaylightOffset = null,
-                TwoLetterIsoCountryCode = "ZZ",
-                ThreeLetterIsoCountryCode = "ZZZ",
-                GeneralEnglishName = "UTC" + normal,
-                StandardEnglishName = "UTC" + normal,
-                DaylightEnglishName = null,
-                GeneralAbbreviation = "UTC" + normal,
-                StandardAbbreviation = "UTC" + normal,
-                DaylightAbbreviation = null
-            };
-        }
-
-        private static TimeZoneDetails GetTimeZoneDetailsForUtc()
-        {
-            return new TimeZoneDetails
-            {
-                IanaTimeZoneId = "UTC",
-                WindowsTimeZoneId = "UTC",
-                StandardOffset = TimeSpan.Zero,
-                DaylightOffset = null,
-                TwoLetterIsoCountryCode = "ZZ",
-                ThreeLetterIsoCountryCode = "ZZZ",
-                GeneralEnglishName = "Universal Coordinated Time",
-                StandardEnglishName = "Universal Coordinated Time",
-                DaylightEnglishName = null,
-                GeneralAbbreviation = "UTC",
-                StandardAbbreviation = "UTC",
-                DaylightAbbreviation = null
-            };
+            return "Etc/GMT" + reversed;
         }
     }
 }

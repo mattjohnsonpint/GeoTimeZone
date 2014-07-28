@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Text;
-using GeoTimeZone.Imports.Ionic.Zlib;
 
 namespace GeoTimeZone
 {
@@ -18,10 +17,13 @@ namespace GeoTimeZone
         {
             var ms = new MemoryStream();
 
-            using (var stream = typeof(TimezoneFileReader).Assembly.GetManifestResourceStream("GeoTimeZone.TZ.dat.gz"))
-            using (var gzip = new GZipStream(stream, CompressionMode.Decompress))
+            var assembly = typeof(TimezoneFileReader).Assembly;
+            using (var stream = assembly.GetManifestResourceStream("GeoTimeZone.TZ.dat"))
             {
-                gzip.CopyTo(ms);
+                if (stream == null)
+                    throw new InvalidOperationException();
+
+                stream.CopyTo(ms);
             }
 
             return ms;
