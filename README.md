@@ -3,13 +3,13 @@ GeoTimeZone
 
 Provides an IANA time zone identifier from latitude and longitude coordinates.
 
-```
+```powershell
 PM> Install-Package GeoTimeZone
 ```
 
 Example:
 
-```javascript
+```csharp
 string tz = TimeZoneLookup.GetTimeZone(50.4372, -3.5559).Result;  // "Europe/London"
 ```
 
