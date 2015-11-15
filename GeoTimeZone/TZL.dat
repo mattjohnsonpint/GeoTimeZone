@@ -101,6 +101,7 @@ America/Dominica
 America/Edmonton
 America/Eirunepe
 America/El_Salvador
+America/Fort_Nelson
 America/Fortaleza
 America/Glace_Bay
 America/Godthab
@@ -214,6 +215,7 @@ Asia/Bangkok
 Asia/Beirut
 Asia/Bishkek
 Asia/Brunei
+Asia/Chita
 Asia/Choibalsan
 Asia/Chongqing
 Asia/Colombo
@@ -265,6 +267,7 @@ Asia/Samarkand
 Asia/Seoul
 Asia/Shanghai
 Asia/Singapore
+Asia/Srednekolymsk
 Asia/Taipei
 Asia/Tashkent
 Asia/Tbilisi
@@ -369,6 +372,7 @@ Indian/Mayotte
 Indian/Reunion
 Pacific/Apia
 Pacific/Auckland
+Pacific/Bougainville
 Pacific/Chatham
 Pacific/Chuuk
 Pacific/Easter
@@ -405,3 +409,4 @@ Pacific/Tarawa
 Pacific/Tongatapu
 Pacific/Wake
 Pacific/Wallis
+Pacific/Yap
