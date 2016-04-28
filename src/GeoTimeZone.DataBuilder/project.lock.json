@@ -1,0 +1,595 @@
+{
+  "locked": false,
+  "version": 2,
+  "targets": {
+    "DNX,Version=v4.5.1": {
+      "GeoAPI/1.7.4": {
+        "type": "package",
+        "compile": {
+          "lib/net45/GeoAPI.dll": {}
+        },
+        "runtime": {
+          "lib/net45/GeoAPI.dll": {}
+        }
+      },
+      "NetTopologySuite/1.14.0": {
+        "type": "package",
+        "dependencies": {
+          "GeoAPI": "[1.7.4, 1.8.0)"
+        },
+        "frameworkAssemblies": [
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/net45/NetTopologySuite.dll": {},
+          "lib/net45/PowerCollections.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NetTopologySuite.dll": {},
+          "lib/net45/PowerCollections.dll": {}
+        }
+      },
+      "NetTopologySuite.IO/1.14.0.1": {
+        "type": "package",
+        "dependencies": {
+          "NetTopologySuite": "1.14.0"
+        },
+        "frameworkAssemblies": [
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/net45/NetTopologySuite.IO.dll": {},
+          "lib/net45/NetTopologySuite.IO.GeoTools.dll": {},
+          "lib/net45/NetTopologySuite.IO.MsSqlSpatial.dll": {},
+          "lib/net45/NetTopologySuite.IO.PostGis.dll": {},
+          "lib/net45/NetTopologySuite.IO.ShapeFile.dll": {},
+          "lib/net45/NetTopologySuite.IO.ShapeFile.Extended.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NetTopologySuite.IO.dll": {},
+          "lib/net45/NetTopologySuite.IO.GeoTools.dll": {},
+          "lib/net45/NetTopologySuite.IO.MsSqlSpatial.dll": {},
+          "lib/net45/NetTopologySuite.IO.PostGis.dll": {},
+          "lib/net45/NetTopologySuite.IO.ShapeFile.dll": {},
+          "lib/net45/NetTopologySuite.IO.ShapeFile.Extended.dll": {}
+        }
+      },
+      "System.Data.Common/4.0.1-beta-23516": {
+        "type": "package",
+        "dependencies": {
+          "System.IO": "4.0.0",
+          "System.Runtime": "4.0.0",
+          "System.Threading.Tasks": "4.0.0"
+        },
+        "compile": {
+          "ref/dotnet5.1/System.Data.Common.dll": {}
+        }
+      },
+      "System.IO/4.0.0": {
+        "type": "package",
+        "compile": {
+          "ref/net45/_._": {}
+        },
+        "runtime": {
+          "lib/net45/_._": {}
+        }
+      },
+      "System.Runtime/4.0.0": {
+        "type": "package",
+        "compile": {
+          "ref/net45/_._": {}
+        },
+        "runtime": {
+          "lib/net45/_._": {}
+        }
+      },
+      "System.Threading.Tasks/4.0.0": {
+        "type": "package",
+        "compile": {
+          "ref/net45/_._": {}
+        },
+        "runtime": {
+          "lib/net45/_._": {}
+        }
+      }
+    },
+    "DNX,Version=v4.5.1/win7-x86": {
+      "GeoAPI/1.7.4": {
+        "type": "package",
+        "compile": {
+          "lib/net45/GeoAPI.dll": {}
+        },
+        "runtime": {
+          "lib/net45/GeoAPI.dll": {}
+        }
+      },
+      "NetTopologySuite/1.14.0": {
+        "type": "package",
+        "dependencies": {
+          "GeoAPI": "[1.7.4, 1.8.0)"
+        },
+        "frameworkAssemblies": [
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/net45/NetTopologySuite.dll": {},
+          "lib/net45/PowerCollections.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NetTopologySuite.dll": {},
+          "lib/net45/PowerCollections.dll": {}
+        }
+      },
+      "NetTopologySuite.IO/1.14.0.1": {
+        "type": "package",
+        "dependencies": {
+          "NetTopologySuite": "1.14.0"
+        },
+        "frameworkAssemblies": [
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/net45/NetTopologySuite.IO.dll": {},
+          "lib/net45/NetTopologySuite.IO.GeoTools.dll": {},
+          "lib/net45/NetTopologySuite.IO.MsSqlSpatial.dll": {},
+          "lib/net45/NetTopologySuite.IO.PostGis.dll": {},
+          "lib/net45/NetTopologySuite.IO.ShapeFile.dll": {},
+          "lib/net45/NetTopologySuite.IO.ShapeFile.Extended.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NetTopologySuite.IO.dll": {},
+          "lib/net45/NetTopologySuite.IO.GeoTools.dll": {},
+          "lib/net45/NetTopologySuite.IO.MsSqlSpatial.dll": {},
+          "lib/net45/NetTopologySuite.IO.PostGis.dll": {},
+          "lib/net45/NetTopologySuite.IO.ShapeFile.dll": {},
+          "lib/net45/NetTopologySuite.IO.ShapeFile.Extended.dll": {}
+        }
+      },
+      "System.Data.Common/4.0.1-beta-23516": {
+        "type": "package",
+        "dependencies": {
+          "System.IO": "4.0.0",
+          "System.Runtime": "4.0.0",
+          "System.Threading.Tasks": "4.0.0"
+        },
+        "compile": {
+          "ref/dotnet5.1/System.Data.Common.dll": {}
+        }
+      },
+      "System.IO/4.0.0": {
+        "type": "package",
+        "compile": {
+          "ref/net45/_._": {}
+        },
+        "runtime": {
+          "lib/net45/_._": {}
+        }
+      },
+      "System.Runtime/4.0.0": {
+        "type": "package",
+        "compile": {
+          "ref/net45/_._": {}
+        },
+        "runtime": {
+          "lib/net45/_._": {}
+        }
+      },
+      "System.Threading.Tasks/4.0.0": {
+        "type": "package",
+        "compile": {
+          "ref/net45/_._": {}
+        },
+        "runtime": {
+          "lib/net45/_._": {}
+        }
+      }
+    },
+    "DNX,Version=v4.5.1/win7-x64": {
+      "GeoAPI/1.7.4": {
+        "type": "package",
+        "compile": {
+          "lib/net45/GeoAPI.dll": {}
+        },
+        "runtime": {
+          "lib/net45/GeoAPI.dll": {}
+        }
+      },
+      "NetTopologySuite/1.14.0": {
+        "type": "package",
+        "dependencies": {
+          "GeoAPI": "[1.7.4, 1.8.0)"
+        },
+        "frameworkAssemblies": [
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/net45/NetTopologySuite.dll": {},
+          "lib/net45/PowerCollections.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NetTopologySuite.dll": {},
+          "lib/net45/PowerCollections.dll": {}
+        }
+      },
+      "NetTopologySuite.IO/1.14.0.1": {
+        "type": "package",
+        "dependencies": {
+          "NetTopologySuite": "1.14.0"
+        },
+        "frameworkAssemblies": [
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/net45/NetTopologySuite.IO.dll": {},
+          "lib/net45/NetTopologySuite.IO.GeoTools.dll": {},
+          "lib/net45/NetTopologySuite.IO.MsSqlSpatial.dll": {},
+          "lib/net45/NetTopologySuite.IO.PostGis.dll": {},
+          "lib/net45/NetTopologySuite.IO.ShapeFile.dll": {},
+          "lib/net45/NetTopologySuite.IO.ShapeFile.Extended.dll": {}
+        },
+        "runtime": {
+          "lib/net45/NetTopologySuite.IO.dll": {},
+          "lib/net45/NetTopologySuite.IO.GeoTools.dll": {},
+          "lib/net45/NetTopologySuite.IO.MsSqlSpatial.dll": {},
+          "lib/net45/NetTopologySuite.IO.PostGis.dll": {},
+          "lib/net45/NetTopologySuite.IO.ShapeFile.dll": {},
+          "lib/net45/NetTopologySuite.IO.ShapeFile.Extended.dll": {}
+        }
+      },
+      "System.Data.Common/4.0.1-beta-23516": {
+        "type": "package",
+        "dependencies": {
+          "System.IO": "4.0.0",
+          "System.Runtime": "4.0.0",
+          "System.Threading.Tasks": "4.0.0"
+        },
+        "compile": {
+          "ref/dotnet5.1/System.Data.Common.dll": {}
+        }
+      },
+      "System.IO/4.0.0": {
+        "type": "package",
+        "compile": {
+          "ref/net45/_._": {}
+        },
+        "runtime": {
+          "lib/net45/_._": {}
+        }
+      },
+      "System.Runtime/4.0.0": {
+        "type": "package",
+        "compile": {
+          "ref/net45/_._": {}
+        },
+        "runtime": {
+          "lib/net45/_._": {}
+        }
+      },
+      "System.Threading.Tasks/4.0.0": {
+        "type": "package",
+        "compile": {
+          "ref/net45/_._": {}
+        },
+        "runtime": {
+          "lib/net45/_._": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "GeoAPI/1.7.4": {
+      "type": "package",
+      "sha512": "joDULkwmUsXSZPsqQ6H62QmQOi54t3TWyhiKDb48PVUfIox1nSy1RRuEIDQ51h/jBmgb+ZeCsUmMoETVddKJ1A==",
+      "files": [
+        "GeoAPI.1.7.4.nupkg",
+        "GeoAPI.1.7.4.nupkg.sha512",
+        "GeoAPI.nuspec",
+        "lib/net20/GeoAPI.dll",
+        "lib/net20/GeoAPI.xml",
+        "lib/net35-client/GeoAPI.dll",
+        "lib/net35-client/GeoAPI.xml",
+        "lib/net403-client/GeoAPI.dll",
+        "lib/net403-client/GeoAPI.xml",
+        "lib/net40-client/GeoAPI.dll",
+        "lib/net40-client/GeoAPI.xml",
+        "lib/net45/GeoAPI.dll",
+        "lib/net45/GeoAPI.xml",
+        "lib/portable-net403+sl5+netcore45+wpa81+wp8+MonoAndroid10+XamariniOS10+MonoTouch10/GeoAPI.dll",
+        "lib/portable-net403+sl5+netcore45+wpa81+wp8+MonoAndroid10+XamariniOS10+MonoTouch10/GeoAPI.xml"
+      ]
+    },
+    "NetTopologySuite/1.14.0": {
+      "type": "package",
+      "sha512": "WZxN1WPRELed8vrTFZXc1lxRuLB29hJMx7W6FiisgZc27XGV+1Q9tdwb9ESAimc1i1sFfG7jQqVW9v090wtchQ==",
+      "files": [
+        "lib/net20/NetTopologySuite.dll",
+        "lib/net20/NetTopologySuite.xml",
+        "lib/net20/PowerCollections.dll",
+        "lib/net20/PowerCollections.xml",
+        "lib/net35-client/NetTopologySuite.dll",
+        "lib/net35-client/NetTopologySuite.xml",
+        "lib/net35-client/PowerCollections.dll",
+        "lib/net35-client/PowerCollections.xml",
+        "lib/net403-client/NetTopologySuite.dll",
+        "lib/net403-client/NetTopologySuite.xml",
+        "lib/net403-client/PowerCollections.dll",
+        "lib/net403-client/PowerCollections.xml",
+        "lib/net40-client/NetTopologySuite.dll",
+        "lib/net40-client/NetTopologySuite.xml",
+        "lib/net40-client/PowerCollections.dll",
+        "lib/net40-client/PowerCollections.xml",
+        "lib/net45/NetTopologySuite.dll",
+        "lib/net45/NetTopologySuite.xml",
+        "lib/net45/PowerCollections.dll",
+        "lib/net45/PowerCollections.xml",
+        "lib/portable-net403+sl5+netcore45+wpa81+wp8+MonoAndroid10+XamariniOS10+MonoTouch10/GeoAPI.Bootstrapper.NetTopologySuite.dll",
+        "lib/portable-net403+sl5+netcore45+wpa81+wp8+MonoAndroid10+XamariniOS10+MonoTouch10/GeoAPI.Bootstrapper.NetTopologySuite.xml",
+        "lib/portable-net403+sl5+netcore45+wpa81+wp8+MonoAndroid10+XamariniOS10+MonoTouch10/NetTopologySuite.dll",
+        "lib/portable-net403+sl5+netcore45+wpa81+wp8+MonoAndroid10+XamariniOS10+MonoTouch10/NetTopologySuite.xml",
+        "lib/portable-net403+sl5+netcore45+wpa81+wp8+MonoAndroid10+XamariniOS10+MonoTouch10/PowerCollections.dll",
+        "lib/portable-net403+sl5+netcore45+wpa81+wp8+MonoAndroid10+XamariniOS10+MonoTouch10/PowerCollections.xml",
+        "NetTopologySuite.1.14.0.nupkg",
+        "NetTopologySuite.1.14.0.nupkg.sha512",
+        "NetTopologySuite.nuspec"
+      ]
+    },
+    "NetTopologySuite.IO/1.14.0.1": {
+      "type": "package",
+      "sha512": "XTsFycrhC/tUBepRnSwWvLDUWRMO0rxemU5HmXYfk4/vP626t9g/xcy2ZiN6qroFDWGEB2tPbSPnwwINaWefpA==",
+      "files": [
+        "lib/net20/NetTopologySuite.IO.dll",
+        "lib/net20/NetTopologySuite.IO.GeoTools.dll",
+        "lib/net20/NetTopologySuite.IO.GeoTools.xml",
+        "lib/net20/NetTopologySuite.IO.MsSqlSpatial.dll",
+        "lib/net20/NetTopologySuite.IO.MsSqlSpatial.xml",
+        "lib/net20/NetTopologySuite.IO.PostGis.dll",
+        "lib/net20/NetTopologySuite.IO.PostGis.xml",
+        "lib/net20/NetTopologySuite.IO.ShapeFile.dll",
+        "lib/net20/NetTopologySuite.IO.ShapeFile.xml",
+        "lib/net20/NetTopologySuite.IO.xml",
+        "lib/net35-client/NetTopologySuite.IO.dll",
+        "lib/net35-client/NetTopologySuite.IO.GeoTools.dll",
+        "lib/net35-client/NetTopologySuite.IO.GeoTools.xml",
+        "lib/net35-client/NetTopologySuite.IO.MsSqlSpatial.dll",
+        "lib/net35-client/NetTopologySuite.IO.MsSqlSpatial.xml",
+        "lib/net35-client/NetTopologySuite.IO.PostGis.dll",
+        "lib/net35-client/NetTopologySuite.IO.PostGis.xml",
+        "lib/net35-client/NetTopologySuite.IO.ShapeFile.dll",
+        "lib/net35-client/NetTopologySuite.IO.ShapeFile.xml",
+        "lib/net35-client/NetTopologySuite.IO.xml",
+        "lib/net403-client/NetTopologySuite.IO.dll",
+        "lib/net403-client/NetTopologySuite.IO.GeoTools.dll",
+        "lib/net403-client/NetTopologySuite.IO.GeoTools.xml",
+        "lib/net403-client/NetTopologySuite.IO.MsSqlSpatial.dll",
+        "lib/net403-client/NetTopologySuite.IO.MsSqlSpatial.xml",
+        "lib/net403-client/NetTopologySuite.IO.PostGis.dll",
+        "lib/net403-client/NetTopologySuite.IO.PostGis.xml",
+        "lib/net403-client/NetTopologySuite.IO.ShapeFile.dll",
+        "lib/net403-client/NetTopologySuite.IO.ShapeFile.Extended.dll",
+        "lib/net403-client/NetTopologySuite.IO.ShapeFile.Extended.xml",
+        "lib/net403-client/NetTopologySuite.IO.ShapeFile.xml",
+        "lib/net403-client/NetTopologySuite.IO.xml",
+        "lib/net40-client/NetTopologySuite.IO.dll",
+        "lib/net40-client/NetTopologySuite.IO.GeoTools.dll",
+        "lib/net40-client/NetTopologySuite.IO.GeoTools.xml",
+        "lib/net40-client/NetTopologySuite.IO.MsSqlSpatial.dll",
+        "lib/net40-client/NetTopologySuite.IO.MsSqlSpatial.xml",
+        "lib/net40-client/NetTopologySuite.IO.PostGis.dll",
+        "lib/net40-client/NetTopologySuite.IO.PostGis.xml",
+        "lib/net40-client/NetTopologySuite.IO.ShapeFile.dll",
+        "lib/net40-client/NetTopologySuite.IO.ShapeFile.Extended.dll",
+        "lib/net40-client/NetTopologySuite.IO.ShapeFile.Extended.xml",
+        "lib/net40-client/NetTopologySuite.IO.ShapeFile.xml",
+        "lib/net40-client/NetTopologySuite.IO.xml",
+        "lib/net45/NetTopologySuite.IO.dll",
+        "lib/net45/NetTopologySuite.IO.GeoTools.dll",
+        "lib/net45/NetTopologySuite.IO.GeoTools.xml",
+        "lib/net45/NetTopologySuite.IO.MsSqlSpatial.dll",
+        "lib/net45/NetTopologySuite.IO.MsSqlSpatial.xml",
+        "lib/net45/NetTopologySuite.IO.PostGis.dll",
+        "lib/net45/NetTopologySuite.IO.PostGis.xml",
+        "lib/net45/NetTopologySuite.IO.ShapeFile.dll",
+        "lib/net45/NetTopologySuite.IO.ShapeFile.Extended.dll",
+        "lib/net45/NetTopologySuite.IO.ShapeFile.Extended.xml",
+        "lib/net45/NetTopologySuite.IO.ShapeFile.xml",
+        "lib/net45/NetTopologySuite.IO.xml",
+        "NetTopologySuite.IO.1.14.0.1.nupkg",
+        "NetTopologySuite.IO.1.14.0.1.nupkg.sha512",
+        "NetTopologySuite.IO.nuspec"
+      ]
+    },
+    "System.Data.Common/4.0.1-beta-23516": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "A7XaBAqCPRFmoUmss4qdQAzLwrm9mwxoiVGm6Yca2Lwy5lYcmPr45TZ43JsJo6XwbKdDT6lstKz1GrW797gkYw==",
+      "files": [
+        "lib/dotnet5.4/System.Data.Common.dll",
+        "lib/MonoAndroid10/_._",
+        "lib/MonoTouch10/_._",
+        "lib/net46/System.Data.Common.dll",
+        "lib/xamarinios10/_._",
+        "lib/xamarinmac20/_._",
+        "ref/dotnet5.1/de/System.Data.Common.xml",
+        "ref/dotnet5.1/es/System.Data.Common.xml",
+        "ref/dotnet5.1/fr/System.Data.Common.xml",
+        "ref/dotnet5.1/it/System.Data.Common.xml",
+        "ref/dotnet5.1/ja/System.Data.Common.xml",
+        "ref/dotnet5.1/ko/System.Data.Common.xml",
+        "ref/dotnet5.1/ru/System.Data.Common.xml",
+        "ref/dotnet5.1/System.Data.Common.dll",
+        "ref/dotnet5.1/System.Data.Common.xml",
+        "ref/dotnet5.1/zh-hans/System.Data.Common.xml",
+        "ref/dotnet5.1/zh-hant/System.Data.Common.xml",
+        "ref/MonoAndroid10/_._",
+        "ref/MonoTouch10/_._",
+        "ref/net46/System.Data.Common.dll",
+        "ref/xamarinios10/_._",
+        "ref/xamarinmac20/_._",
+        "System.Data.Common.4.0.1-beta-23516.nupkg",
+        "System.Data.Common.4.0.1-beta-23516.nupkg.sha512",
+        "System.Data.Common.nuspec"
+      ]
+    },
+    "System.IO/4.0.0": {
+      "type": "package",
+      "sha512": "MoCHQ0u5n0OMwUS8OX4Gl48qKiQziSW5cXvt82d+MmAcsLq9OL90+ihnu/aJ1h6OOYcBswrZAEuApfZha9w2lg==",
+      "files": [
+        "lib/MonoAndroid10/_._",
+        "lib/MonoTouch10/_._",
+        "lib/net45/_._",
+        "lib/win8/_._",
+        "lib/wp80/_._",
+        "lib/wpa81/_._",
+        "lib/xamarinios10/_._",
+        "lib/xamarinmac20/_._",
+        "License.rtf",
+        "ref/dotnet/de/System.IO.xml",
+        "ref/dotnet/es/System.IO.xml",
+        "ref/dotnet/fr/System.IO.xml",
+        "ref/dotnet/it/System.IO.xml",
+        "ref/dotnet/ja/System.IO.xml",
+        "ref/dotnet/ko/System.IO.xml",
+        "ref/dotnet/ru/System.IO.xml",
+        "ref/dotnet/System.IO.dll",
+        "ref/dotnet/System.IO.xml",
+        "ref/dotnet/zh-hans/System.IO.xml",
+        "ref/dotnet/zh-hant/System.IO.xml",
+        "ref/MonoAndroid10/_._",
+        "ref/MonoTouch10/_._",
+        "ref/net45/_._",
+        "ref/netcore50/de/System.IO.xml",
+        "ref/netcore50/es/System.IO.xml",
+        "ref/netcore50/fr/System.IO.xml",
+        "ref/netcore50/it/System.IO.xml",
+        "ref/netcore50/ja/System.IO.xml",
+        "ref/netcore50/ko/System.IO.xml",
+        "ref/netcore50/ru/System.IO.xml",
+        "ref/netcore50/System.IO.dll",
+        "ref/netcore50/System.IO.xml",
+        "ref/netcore50/zh-hans/System.IO.xml",
+        "ref/netcore50/zh-hant/System.IO.xml",
+        "ref/win8/_._",
+        "ref/wp80/_._",
+        "ref/wpa81/_._",
+        "ref/xamarinios10/_._",
+        "ref/xamarinmac20/_._",
+        "System.IO.4.0.0.nupkg",
+        "System.IO.4.0.0.nupkg.sha512",
+        "System.IO.nuspec"
+      ]
+    },
+    "System.Runtime/4.0.0": {
+      "type": "package",
+      "sha512": "Uq9epame8hEqJlj4KaWb67dDJvj4IM37jRFGVeFbugRdPz48bR0voyBhrbf3iSa2tAmlkg4lsa6BUOL9iwlMew==",
+      "files": [
+        "lib/MonoAndroid10/_._",
+        "lib/MonoTouch10/_._",
+        "lib/net45/_._",
+        "lib/win8/_._",
+        "lib/wp80/_._",
+        "lib/wpa81/_._",
+        "lib/xamarinios10/_._",
+        "lib/xamarinmac20/_._",
+        "License.rtf",
+        "ref/dotnet/de/System.Runtime.xml",
+        "ref/dotnet/es/System.Runtime.xml",
+        "ref/dotnet/fr/System.Runtime.xml",
+        "ref/dotnet/it/System.Runtime.xml",
+        "ref/dotnet/ja/System.Runtime.xml",
+        "ref/dotnet/ko/System.Runtime.xml",
+        "ref/dotnet/ru/System.Runtime.xml",
+        "ref/dotnet/System.Runtime.dll",
+        "ref/dotnet/System.Runtime.xml",
+        "ref/dotnet/zh-hans/System.Runtime.xml",
+        "ref/dotnet/zh-hant/System.Runtime.xml",
+        "ref/MonoAndroid10/_._",
+        "ref/MonoTouch10/_._",
+        "ref/net45/_._",
+        "ref/netcore50/de/System.Runtime.xml",
+        "ref/netcore50/es/System.Runtime.xml",
+        "ref/netcore50/fr/System.Runtime.xml",
+        "ref/netcore50/it/System.Runtime.xml",
+        "ref/netcore50/ja/System.Runtime.xml",
+        "ref/netcore50/ko/System.Runtime.xml",
+        "ref/netcore50/ru/System.Runtime.xml",
+        "ref/netcore50/System.Runtime.dll",
+        "ref/netcore50/System.Runtime.xml",
+        "ref/netcore50/zh-hans/System.Runtime.xml",
+        "ref/netcore50/zh-hant/System.Runtime.xml",
+        "ref/win8/_._",
+        "ref/wp80/_._",
+        "ref/wpa81/_._",
+        "ref/xamarinios10/_._",
+        "ref/xamarinmac20/_._",
+        "System.Runtime.4.0.0.nupkg",
+        "System.Runtime.4.0.0.nupkg.sha512",
+        "System.Runtime.nuspec"
+      ]
+    },
+    "System.Threading.Tasks/4.0.0": {
+      "type": "package",
+      "sha512": "dA3y1B6Pc8mNt9obhEWWGGpvEakS51+nafXpmM/Z8IF847GErLXGTjdfA+AYEKszfFbH7SVLWUklXhYeeSQ1lw==",
+      "files": [
+        "lib/MonoAndroid10/_._",
+        "lib/MonoTouch10/_._",
+        "lib/net45/_._",
+        "lib/win8/_._",
+        "lib/wp80/_._",
+        "lib/wpa81/_._",
+        "lib/xamarinios10/_._",
+        "lib/xamarinmac20/_._",
+        "License.rtf",
+        "ref/dotnet/de/System.Threading.Tasks.xml",
+        "ref/dotnet/es/System.Threading.Tasks.xml",
+        "ref/dotnet/fr/System.Threading.Tasks.xml",
+        "ref/dotnet/it/System.Threading.Tasks.xml",
+        "ref/dotnet/ja/System.Threading.Tasks.xml",
+        "ref/dotnet/ko/System.Threading.Tasks.xml",
+        "ref/dotnet/ru/System.Threading.Tasks.xml",
+        "ref/dotnet/System.Threading.Tasks.dll",
+        "ref/dotnet/System.Threading.Tasks.xml",
+        "ref/dotnet/zh-hans/System.Threading.Tasks.xml",
+        "ref/dotnet/zh-hant/System.Threading.Tasks.xml",
+        "ref/MonoAndroid10/_._",
+        "ref/MonoTouch10/_._",
+        "ref/net45/_._",
+        "ref/netcore50/de/System.Threading.Tasks.xml",
+        "ref/netcore50/es/System.Threading.Tasks.xml",
+        "ref/netcore50/fr/System.Threading.Tasks.xml",
+        "ref/netcore50/it/System.Threading.Tasks.xml",
+        "ref/netcore50/ja/System.Threading.Tasks.xml",
+        "ref/netcore50/ko/System.Threading.Tasks.xml",
+        "ref/netcore50/ru/System.Threading.Tasks.xml",
+        "ref/netcore50/System.Threading.Tasks.dll",
+        "ref/netcore50/System.Threading.Tasks.xml",
+        "ref/netcore50/zh-hans/System.Threading.Tasks.xml",
+        "ref/netcore50/zh-hant/System.Threading.Tasks.xml",
+        "ref/win8/_._",
+        "ref/wp80/_._",
+        "ref/wpa81/_._",
+        "ref/xamarinios10/_._",
+        "ref/xamarinmac20/_._",
+        "System.Threading.Tasks.4.0.0.nupkg",
+        "System.Threading.Tasks.4.0.0.nupkg.sha512",
+        "System.Threading.Tasks.nuspec"
+      ]
+    }
+  },
+  "projectFileDependencyGroups": {
+    "": [
+      "System.Data.Common >= 4.0.1-beta-23516",
+      "GeoAPI >= 1.7.4",
+      "NetTopologySuite >= 1.14.0",
+      "NetTopologySuite.IO >= 1.14.0.1"
+    ],
+    "DNX,Version=v4.5.1": [
+      "fx/System.Data >= 4.0.0"
+    ]
+  }
+}
