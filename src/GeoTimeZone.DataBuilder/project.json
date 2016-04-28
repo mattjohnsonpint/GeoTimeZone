@@ -1,0 +1,33 @@
+﻿{
+  "version": "1.0.0-*",
+  "description": "GeoTimeZone.DataBuilder Console Application",
+  "authors": [ "platzer.m" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
+
+  "compilationOptions": {
+    "emitEntryPoint": true
+  },
+
+  "dependencies": {
+    "System.Data.Common": "4.0.1-beta-23516",
+    "GeoAPI": "1.7.4",
+    "NetTopologySuite": "1.14.0",
+    "NetTopologySuite.IO": "1.14.0.1"
+  },
+
+  "commands": {
+    "GeoTimeZone.DataBuilder": "GeoTimeZone.DataBuilder"
+  },
+
+  "frameworks": {
+    "dnx451": {
+      "dependencies": {
+      },
+      "frameworkAssemblies": {
+        "System.Data":"4.0.0.0"
+      }
+    }
+  }
+}
