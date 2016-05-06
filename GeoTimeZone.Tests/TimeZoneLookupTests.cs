@@ -6,18 +6,6 @@ namespace GeoTimeZone.Tests
     public class TimeZoneLookupTests
     {
         [Test]
-        public void Can_Lookup_Where_Two_Countries_Meet()
-        {
-            var france = TimeZoneLookup.GetTimeZone(47.589983, 7.587417);
-            Assert.AreEqual("Europe/Paris", france.Result);
-            Assert.AreEqual("Europe/Zurich", france.AlternativeResults[0]);
-
-            var switzerland = TimeZoneLookup.GetTimeZone(47.58735, 7.588967);
-            Assert.AreEqual("Europe/Zurich", switzerland.Result);
-            Assert.AreEqual("Europe/Paris", switzerland.AlternativeResults[0]);
-        }
-
-        [Test]
         public void Can_Lookup_TimeZone_PaigntonPier()
         {
             var tz = TimeZoneLookup.GetTimeZone(50.4372, -3.5559).Result;
