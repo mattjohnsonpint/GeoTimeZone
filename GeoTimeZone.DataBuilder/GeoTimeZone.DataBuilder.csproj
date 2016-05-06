@@ -34,32 +34,40 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="GeoAPI, Version=1.7.3.0, Culture=neutral, PublicKeyToken=a1a0da7def465678, processorArchitecture=MSIL">
-      <HintPath>..\packages\GeoAPI.1.7.3.1\lib\net45\GeoAPI.dll</HintPath>
+    <Reference Include="GeoAPI, Version=1.7.4.0, Culture=neutral, PublicKeyToken=a1a0da7def465678, processorArchitecture=MSIL">
+      <HintPath>..\packages\GeoAPI.1.7.4\lib\net45\GeoAPI.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NetTopologySuite, Version=1.13.3.0, Culture=neutral, PublicKeyToken=f580a05016ebada1, processorArchitecture=MSIL">
-      <HintPath>..\packages\NetTopologySuite.1.13.3.2\lib\net45\NetTopologySuite.dll</HintPath>
+    <Reference Include="NetTopologySuite, Version=1.14.0.0, Culture=neutral, PublicKeyToken=f580a05016ebada1, processorArchitecture=MSIL">
+      <HintPath>..\packages\NetTopologySuite.1.14\lib\net45\NetTopologySuite.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NetTopologySuite.IO.GeoTools, Version=1.13.3.0, Culture=neutral, PublicKeyToken=f580a05016ebada1, processorArchitecture=MSIL">
-      <HintPath>..\packages\NetTopologySuite.IO.1.13.3.2\lib\net45\NetTopologySuite.IO.GeoTools.dll</HintPath>
+    <Reference Include="NetTopologySuite.IO, Version=1.14.0.0, Culture=neutral, PublicKeyToken=f580a05016ebada1, processorArchitecture=MSIL">
+      <HintPath>..\packages\NetTopologySuite.IO.1.14.0.1\lib\net45\NetTopologySuite.IO.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NetTopologySuite.IO.MsSqlSpatial, Version=1.13.3.0, Culture=neutral, PublicKeyToken=f580a05016ebada1, processorArchitecture=MSIL">
-      <HintPath>..\packages\NetTopologySuite.IO.1.13.3.2\lib\net45\NetTopologySuite.IO.MsSqlSpatial.dll</HintPath>
+    <Reference Include="NetTopologySuite.IO.GeoTools, Version=1.14.0.0, Culture=neutral, PublicKeyToken=f580a05016ebada1, processorArchitecture=MSIL">
+      <HintPath>..\packages\NetTopologySuite.IO.1.14.0.1\lib\net45\NetTopologySuite.IO.GeoTools.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NetTopologySuite.IO.PostGis, Version=1.13.3.0, Culture=neutral, PublicKeyToken=f580a05016ebada1, processorArchitecture=MSIL">
-      <HintPath>..\packages\NetTopologySuite.IO.1.13.3.2\lib\net45\NetTopologySuite.IO.PostGis.dll</HintPath>
+    <Reference Include="NetTopologySuite.IO.MsSqlSpatial, Version=1.14.0.0, Culture=neutral, PublicKeyToken=f580a05016ebada1, processorArchitecture=MSIL">
+      <HintPath>..\packages\NetTopologySuite.IO.1.14.0.1\lib\net45\NetTopologySuite.IO.MsSqlSpatial.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NetTopologySuite.IO.ShapeFile, Version=1.13.3.0, Culture=neutral, PublicKeyToken=f580a05016ebada1, processorArchitecture=MSIL">
-      <HintPath>..\packages\NetTopologySuite.IO.1.13.3.2\lib\net45\NetTopologySuite.IO.ShapeFile.dll</HintPath>
+    <Reference Include="NetTopologySuite.IO.PostGis, Version=1.14.0.0, Culture=neutral, PublicKeyToken=f580a05016ebada1, processorArchitecture=MSIL">
+      <HintPath>..\packages\NetTopologySuite.IO.1.14.0.1\lib\net45\NetTopologySuite.IO.PostGis.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NetTopologySuite.IO.ShapeFile, Version=1.14.0.0, Culture=neutral, PublicKeyToken=f580a05016ebada1, processorArchitecture=MSIL">
+      <HintPath>..\packages\NetTopologySuite.IO.1.14.0.1\lib\net45\NetTopologySuite.IO.ShapeFile.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NetTopologySuite.IO.ShapeFile.Extended, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NetTopologySuite.IO.1.14.0.1\lib\net45\NetTopologySuite.IO.ShapeFile.Extended.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="PowerCollections, Version=1.0.0.0, Culture=neutral, PublicKeyToken=2573bf8a1bdddcd5, processorArchitecture=MSIL">
-      <HintPath>..\packages\NetTopologySuite.1.13.3.2\lib\net45\PowerCollections.dll</HintPath>
+      <HintPath>..\packages\NetTopologySuite.1.14\lib\net45\PowerCollections.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
