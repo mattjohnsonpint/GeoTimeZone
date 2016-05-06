@@ -147,6 +147,7 @@ America/Metlakatla
 America/Mexico_City
 America/Miquelon
 America/Moncton
+America/Monterey
 America/Monterrey
 America/Montevideo
 America/Montreal
@@ -174,7 +175,6 @@ America/Recife
 America/Regina
 America/Resolute
 America/Rio_Branco
-America/Santa_Isabel
 America/Santarem
 America/Santiago
 America/Santo_Domingo
@@ -212,6 +212,7 @@ Asia/Baghdad
 Asia/Bahrain
 Asia/Baku
 Asia/Bangkok
+Asia/Barnaul
 Asia/Beirut
 Asia/Bishkek
 Asia/Brunei
@@ -306,6 +307,7 @@ Australia/Perth
 Australia/Sydney
 Europe/Amsterdam
 Europe/Andorra
+Europe/Astrakhan
 Europe/Athens
 Europe/Belgrade
 Europe/Berlin
@@ -313,6 +315,7 @@ Europe/Bratislava
 Europe/Brussels
 Europe/Bucharest
 Europe/Budapest
+Europe/Busingen
 Europe/Chisinau
 Europe/Copenhagen
 Europe/Dublin
@@ -349,6 +352,7 @@ Europe/Sofia
 Europe/Stockholm
 Europe/Tallinn
 Europe/Tirane
+Europe/Ulyanovsk
 Europe/Uzhgorod
 Europe/Vaduz
 Europe/Vatican
