@@ -147,7 +147,6 @@ America/Metlakatla
 America/Mexico_City
 America/Miquelon
 America/Moncton
-America/Monterey
 America/Monterrey
 America/Montevideo
 America/Montreal
@@ -275,6 +274,7 @@ Asia/Tbilisi
 Asia/Tehran
 Asia/Thimphu
 Asia/Tokyo
+Asia/Tomsk
 Asia/Ulaanbaatar
 Asia/Urumqi
 Asia/Ust-Nera
@@ -327,6 +327,7 @@ Europe/Istanbul
 Europe/Jersey
 Europe/Kaliningrad
 Europe/Kiev
+Europe/Kirov
 Europe/Lisbon
 Europe/Ljubljana
 Europe/London
