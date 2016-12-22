@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <package>
   <metadata>
     <id>GeoTimeZone</id>
@@ -11,5 +11,22 @@
     <projectUrl>https://github.com/mj1856/GeoTimeZone</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <tags>timezone time zone geolocation geo latitude longitude coordinates iana tzdb</tags>
+    <dependencies>
+      <group targetFramework="netstandard1.0">
+        <dependency id="System.Collections" version="4.0.11" />
+        <dependency id="System.Diagnostics.Debug" version="4.0.11" />
+        <dependency id="System.IO" version="4.1.0" />
+        <dependency id="System.Linq" version="4.1.0" />
+        <dependency id="System.Reflection" version="4.1.0" />
+        <dependency id="System.Runtime" version="4.1.0" />
+        <dependency id="System.Runtime.Extensions" version="4.1.0" />
+        <dependency id="System.Text.Encoding" version="4.0.11" />
+        <dependency id="System.Threading" version="4.0.11" />
+      </group>
+      <group targetFramework=".NETPortable4.5-Profile259" />
+      <group targetFramework="portable45-net45+win8+wp8+wpa81" />
+      <group targetFramework=".NETPortable4.0-Profile136" />
+      <group targetFramework="portable40-net40+sl5+win8+wp8" />
+    </dependencies>
   </metadata>
 </package>

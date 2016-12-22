@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using System.Reflection;
 
 namespace GeoTimeZone
 {
@@ -17,7 +18,11 @@ namespace GeoTimeZone
         {
             var ms = new MemoryStream();
 
+#if NET40
             var assembly = typeof(TimezoneFileReader).Assembly;
+#else
+            var assembly = typeof(TimezoneFileReader).GetTypeInfo().Assembly;
+#endif
             using (var stream = assembly.GetManifestResourceStream("GeoTimeZone.TZ.dat"))
             {
                 if (stream == null)
