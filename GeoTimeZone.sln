@@ -1,18 +1,24 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeoTimeZone.Tests", "GeoTimeZone.Tests\GeoTimeZone.Tests.csproj", "{CA246E9E-379D-4D5D-BAD4-DA3557219C0F}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{F4DA3B11-79E1-4028-98FB-F7BC92A3FFA2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeoTimeZone", "GeoTimeZone\GeoTimeZone.csproj", "{8716F91F-A528-43B3-86AA-B0D24B259466}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeoTimeZone.DataBuilder", "GeoTimeZone.DataBuilder\GeoTimeZone.DataBuilder.csproj", "{D1EC7045-B2DD-42FF-A824-48455A16B000}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E3F8EFA0-C70A-40AC-86BC-5A5155E1FAA5}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BC1F3607-62CA-4325-8FEF-9A5FE8204A27}"
 	ProjectSection(SolutionItems) = preProject
-		SharedAssemblyInfo.cs = SharedAssemblyInfo.cs
+		global.json = global.json
 	EndProjectSection
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "GeoTimeZone", "src\GeoTimeZone\GeoTimeZone.xproj", "{CEB807E6-7694-42ED-B914-051EDB2230C5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{316C44CA-36EC-49D7-A09C-E0393C785019}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "GeoTimeZone.DataBuilder", "src\GeoTimeZone.DataBuilder\GeoTimeZone.DataBuilder.xproj", "{D3894B4B-A08E-4FBD-AEF8-41287B0C6E7F}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "GeoTimeZone.Tests", "test\GeoTimeZone.Tests\GeoTimeZone.Tests.xproj", "{348EBAF0-24A4-427D-81A9-BD4B483DD6D4}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "GeoTimeZone.DataBuilder.Tests", "test\GeoTimeZone.DataBuilder.Tests\GeoTimeZone.DataBuilder.Tests.xproj", "{3E2E566B-60A3-4F7D-B6B8-2A70AA2C29B4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,20 +26,30 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{CA246E9E-379D-4D5D-BAD4-DA3557219C0F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CA246E9E-379D-4D5D-BAD4-DA3557219C0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CA246E9E-379D-4D5D-BAD4-DA3557219C0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CA246E9E-379D-4D5D-BAD4-DA3557219C0F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8716F91F-A528-43B3-86AA-B0D24B259466}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8716F91F-A528-43B3-86AA-B0D24B259466}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8716F91F-A528-43B3-86AA-B0D24B259466}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8716F91F-A528-43B3-86AA-B0D24B259466}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D1EC7045-B2DD-42FF-A824-48455A16B000}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D1EC7045-B2DD-42FF-A824-48455A16B000}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D1EC7045-B2DD-42FF-A824-48455A16B000}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D1EC7045-B2DD-42FF-A824-48455A16B000}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CEB807E6-7694-42ED-B914-051EDB2230C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CEB807E6-7694-42ED-B914-051EDB2230C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CEB807E6-7694-42ED-B914-051EDB2230C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CEB807E6-7694-42ED-B914-051EDB2230C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3894B4B-A08E-4FBD-AEF8-41287B0C6E7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3894B4B-A08E-4FBD-AEF8-41287B0C6E7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3894B4B-A08E-4FBD-AEF8-41287B0C6E7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3894B4B-A08E-4FBD-AEF8-41287B0C6E7F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{348EBAF0-24A4-427D-81A9-BD4B483DD6D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{348EBAF0-24A4-427D-81A9-BD4B483DD6D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{348EBAF0-24A4-427D-81A9-BD4B483DD6D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{348EBAF0-24A4-427D-81A9-BD4B483DD6D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E2E566B-60A3-4F7D-B6B8-2A70AA2C29B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E2E566B-60A3-4F7D-B6B8-2A70AA2C29B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E2E566B-60A3-4F7D-B6B8-2A70AA2C29B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E2E566B-60A3-4F7D-B6B8-2A70AA2C29B4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{CEB807E6-7694-42ED-B914-051EDB2230C5} = {F4DA3B11-79E1-4028-98FB-F7BC92A3FFA2}
+		{D3894B4B-A08E-4FBD-AEF8-41287B0C6E7F} = {F4DA3B11-79E1-4028-98FB-F7BC92A3FFA2}
+		{348EBAF0-24A4-427D-81A9-BD4B483DD6D4} = {316C44CA-36EC-49D7-A09C-E0393C785019}
+		{3E2E566B-60A3-4F7D-B6B8-2A70AA2C29B4} = {316C44CA-36EC-49D7-A09C-E0393C785019}
 	EndGlobalSection
 EndGlobal

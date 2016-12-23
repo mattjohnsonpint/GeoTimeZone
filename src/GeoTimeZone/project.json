@@ -1,0 +1,22 @@
+{
+    "version": "2.0.0-*",
+    "title": "GeoTimeZone",
+    "description": "Provides an IANA time zone identifier from latitude and longitude coordinates.",
+    "authors": [ "Matt Johnson", "Simon Bartlett" ],
+
+    "buildOptions": {
+        "embed": {
+            "includeFiles": [ "TZ.dat", "TZL.dat" ]
+        }
+    },
+
+    "dependencies": {
+        "NETStandard.Library": "1.6.1"
+    },
+
+    "frameworks": {
+        "netstandard1.0": {
+            "imports": "dnxcore50"
+        }
+    }
+}

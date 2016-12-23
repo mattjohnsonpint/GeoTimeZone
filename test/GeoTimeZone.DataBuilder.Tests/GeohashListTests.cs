@@ -1,9 +1,8 @@
 ﻿using System.Linq;
 using GeoAPI.Geometries;
-using GeoTimeZone.DataBuilder;
 using Xunit;
 
-namespace GeoTimeZone.Tests
+namespace GeoTimeZone.DataBuilder.Tests
 {
     public class GeohashListTests
     {
@@ -46,29 +45,5 @@ namespace GeoTimeZone.Tests
             Assert.Equal(new Envelope(-90, 0, -90, 0), envelopes[2]);
             Assert.Equal(new Envelope(-90, 0, 0, 90), envelopes[3]);
         }
-
-        [Fact]
-        public void Temp2()
-        {
-            var envelopes = GeohashTree.GetNextLevel();
-
-            Assert.Equal(32, envelopes.Count());
-
-            var envelopes2 = new GeohashTree();
-
-            Assert.Equal(32, envelopes2.Count);
-        }
-
-        //[Fact]
-        //public void Temp3()
-        //{
-        //    var sw = new Stopwatch();
-        //    sw.Start();
-        //    TimeZoneLookup.Geohash();
-        //    //Console.WriteLine(.Count);
-        //    sw.Stop();
-        //    Console.WriteLine(sw.ElapsedMilliseconds);
-        //    Assert.True(true);
-        //}
     }
 }

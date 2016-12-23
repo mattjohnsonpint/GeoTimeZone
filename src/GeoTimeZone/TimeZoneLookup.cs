@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 
 namespace GeoTimeZone
 {
@@ -122,7 +123,7 @@ namespace GeoTimeZone
 
         private static IList<string> LoadLookupData()
         {
-            var assembly = typeof(TimezoneFileReader).Assembly;
+            var assembly = typeof(TimezoneFileReader).GetTypeInfo().Assembly;
             using (var stream = assembly.GetManifestResourceStream("GeoTimeZone.TZL.dat"))
             {
                 if (stream == null)
