@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using GeoAPI.Geometries;
 using NetTopologySuite.Geometries;
-using NetTopologySuite.Simplify;
 
 namespace GeoTimeZone.DataBuilder
 {
@@ -46,14 +44,14 @@ namespace GeoTimeZone.DataBuilder
             }
         }
 
-        private static void WriteGeohash(StreamWriter writer, string tz, string geohash)
+        private static void WriteGeohash(TextWriter writer, string tz, string geohash)
         {
             var h = geohash.PadRight(5, '-');
             var p = TimeZones[tz].LineNumber.ToString("D3");
             writer.WriteLine(h + p);
         }
 
-        private static void WriteTreeNode(StreamWriter writer, TimeZoneTreeNode node, string geohash = "")
+        private static void WriteTreeNode(TextWriter writer, TimeZoneTreeNode node, string geohash = "")
         {
             foreach (var childNode in node.ChildNodes.OrderBy(x => x.Key))
             {
@@ -125,6 +123,8 @@ namespace GeoTimeZone.DataBuilder
 
         public static void CreateGeohashData(ConsoleOutput console, TimeZoneShapeFileReader inputShapefile, string outputPath)
         {
+            console.WriteMessage("Loading polygons...");
+
             var features = inputShapefile.ReadShapeFile()
                 .SelectMany(x =>
                 {
@@ -140,7 +140,7 @@ namespace GeoTimeZone.DataBuilder
 
             PreLoadTimeZones(features);
 
-            console.WriteMessage("Polygons loaded and simplified");
+            console.WriteMessage("Polygons loaded.");
 
             var geohashes = features
                 .AsParallel()
@@ -156,25 +156,25 @@ namespace GeoTimeZone.DataBuilder
                 })
                 .ToList();
 
-            console.WriteMessage("Geohashes generated for polygons");
+            console.WriteMessage("Geohashes generated for polygons.");
 
             foreach (var hash in geohashes)
                 foreach (var g in hash.Geohashes)
                     AddResult(g, hash.TimeZone);
 
-            console.WriteMessage("Geohash tree built");
+            console.WriteMessage("Geohash tree built.");
 
             WorldBoundsTreeNode.PrepareForOutput();
 
-            console.WriteMessage("Geohash tree preparing for output");
+            console.WriteMessage("Geohash tree preparing for output.");
 
             WriteGeohashDataFile(outputPath);
-            console.WriteMessage("Data file written");
+            console.WriteMessage("Data file written.");
 
             WriteLookup(outputPath);
-            console.WriteMessage("Lookup file written");
-        }
+            console.WriteMessage("Lookup file written.");
 
+            console.WriteMessage("Done!");
         }
 
         private static void PreLoadTimeZones(IEnumerable<TimeZoneFeature> features)
