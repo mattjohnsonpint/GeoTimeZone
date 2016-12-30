@@ -37,26 +37,12 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 -----------------------------------------------------------------------------
 
-Time zone boundary data is provided by Eric Muller, who has waived all copyright
-and related or neighboring rights to this data.  This work is in the public domain.
+Time zone boundary data is sourced from Open Street Map (OSM), and correlated via
+the Time Zone Boundary Builder, by Evan Siroky.
+https://github.com/evansiroky/timezone-boundary-builder
 
-http://efele.net/maps/tz/
-
------------------------------------------------------------------------------
-
-Marine Exclusive Economic Zone (EZ) boundary data is provided by the
-Flanders Marine Institute, and is intended for use solely with this project,
-as permitted for a "Value-Added Software Application".  The following disclaimer
-applies to the MarineRegions data:
-
-The data is provided "as is", and no warranty express, implied or otherwise is
-offered as to the data's accuracy. The developers do not imply any opinion
-concerning the legal status of any country, territory or area, or concerning the
-delimitation of its frontiers or boundaries. The data can be used for educational,
-scientific or research purposes but should not be used for legal,
-commercial/economical (exploration of natural resources) or navigational purposes.
-
-http://www.marineregions.org
+The data is licensed under the Open Data Commons Open Database License (ODbL).
+http://opendatacommons.org/licenses/odbl/
 
 -----------------------------------------------------------------------------
 

@@ -33,7 +33,7 @@ namespace GeoTimeZone.DataBuilder
                     }
 
                     // skip uninhabited areas
-                    var zone = (string)attributes["TZID"];
+                    var zone = (string)attributes["tzid"];
                     if (zone.Equals("uninhabited", StringComparison.OrdinalIgnoreCase))
                         continue;
 
