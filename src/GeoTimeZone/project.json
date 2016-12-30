@@ -4,6 +4,12 @@
     "description": "Provides an IANA time zone identifier from latitude and longitude coordinates.",
     "authors": [ "Matt Johnson", "Simon Bartlett" ],
 
+    "packOptions": {
+        "projectUrl": "https://github.com/mj1856/GeoTimeZone",
+        "licenseUrl": "https://raw.githubusercontent.com/mj1856/GeoTimeZone/master/LICENSE",
+        "tags": [ "timezone", "time", "zone", "geolocation", "geo", "latitude", "longitude", "coordinates", "iana", "tzdb" ]
+    },
+
     "buildOptions": {
         "embed": {
             "includeFiles": [ "TZ.dat", "TZL.dat" ]
