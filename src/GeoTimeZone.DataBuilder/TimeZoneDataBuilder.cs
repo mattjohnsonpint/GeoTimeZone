@@ -125,23 +125,34 @@ namespace GeoTimeZone.DataBuilder
 
         public static void CreateGeohashData(ConsoleOutput console, TimeZoneShapeFileReader inputShapefile, string outputPath)
         {
-            var features = inputShapefile.ReadShapeFile().AsParallel()
-                .Select(x =>
+            var features = inputShapefile.ReadShapeFile()
+                .SelectMany(x =>
                 {
-                    x.Geometry = x.Geometry.Simplify();
-                    return x;
+                    // Expand MultiPolygons to individual Polygons
+                    var mp = x.Geometry as MultiPolygon;
+                    return mp != null
+                        ? mp.Geometries.Select((y, i) => new TimeZoneFeature {TzName = x.TzName, Geometry = y, MultiPolyIndex = i})
+                        : new[] {x};
                 })
+                .Where(x=> x.Geometry.Area > 0)
+                .OrderBy(x=> x.TzName).ThenBy(x=> x.MultiPolyIndex)
                 .ToList();
 
             PreLoadTimeZones(features);
 
             console.WriteMessage("Polygons loaded and simplified");
 
-            var geohashes = features.AsParallel()
-                .Select(x => new
+            var geohashes = features
+                .AsParallel()
+                .Select(x =>
                 {
-                    TimeZone = x,
-                    Geohashes = GeohashTree.GetGeohashes(x.Geometry)
+                    var indexString = x.MultiPolyIndex >= 0 ? $"[{x.MultiPolyIndex}]" : "";
+                    console.WriteMessage($"Generating geohash for {x.TzName}" + indexString);
+                    return new
+                    {
+                        TimeZone = x,
+                        Geohashes = GeohashTree.GetGeohashes(x.Geometry)
+                    };
                 })
                 .ToList();
 
@@ -164,26 +175,6 @@ namespace GeoTimeZone.DataBuilder
             console.WriteMessage("Lookup file written");
         }
 
-        private static IGeometry Simplify(this IGeometry geometry)
-        {
-            // Simplify the geometry.
-            if (geometry.Area < 0.1)
-            {
-                // For very small regions, use a convex hull.
-                return geometry.ConvexHull();
-            }
-
-            // Simplify the polygon.
-            var tolerance = 0.05;
-            while (true)
-            {
-                var result = TopologyPreservingSimplifier.Simplify(geometry, tolerance);
-                if (result is Polygon && result.IsValid && !result.IsEmpty)
-                    return result;
-
-                // Reduce the tolerance incrementally until we have a valid polygon.
-                tolerance -= 0.005;
-            }
         }
 
         private static void PreLoadTimeZones(IEnumerable<TimeZoneFeature> features)

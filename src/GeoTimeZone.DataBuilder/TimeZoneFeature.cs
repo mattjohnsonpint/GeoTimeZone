@@ -6,5 +6,6 @@ namespace GeoTimeZone.DataBuilder
     {
         public string TzName { get; set; }
         public IGeometry Geometry { get; set; }
+        public int MultiPolyIndex { get; set; } = -1;
     }
 }
