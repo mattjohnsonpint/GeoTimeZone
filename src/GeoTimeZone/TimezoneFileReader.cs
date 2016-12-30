@@ -18,7 +18,12 @@ namespace GeoTimeZone
         {
             var ms = new MemoryStream();
 
+#if NETSTANDARD1_0
             var assembly = typeof(TimezoneFileReader).GetTypeInfo().Assembly;
+#else
+            var assembly = typeof(TimezoneFileReader).Assembly;
+#endif
+
             using (var stream = assembly.GetManifestResourceStream("GeoTimeZone.TZ.dat"))
             {
                 if (stream == null)

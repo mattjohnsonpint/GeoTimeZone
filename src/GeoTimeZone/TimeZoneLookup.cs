@@ -123,7 +123,13 @@ namespace GeoTimeZone
 
         private static IList<string> LoadLookupData()
         {
-            var assembly = typeof(TimezoneFileReader).GetTypeInfo().Assembly;
+
+#if NETSTANDARD1_0
+            var assembly = typeof(TimeZoneLookup).GetTypeInfo().Assembly;
+#else
+            var assembly = typeof(TimeZoneLookup).Assembly;
+#endif
+
             using (var stream = assembly.GetManifestResourceStream("GeoTimeZone.TZL.dat"))
             {
                 if (stream == null)
