@@ -20,24 +20,32 @@ namespace GeoTimeZone.DataBuilder
 
         private static IEnumerable<string> GetGeohashes(IGeometry geometry, GeohashTreeNode level)
         {
-            var env = level.Geometry;
-
-            if (geometry.Contains(env))
+            try
             {
-                return new[] { level.Geohash };
+                var env = level.Geometry;
+
+                if (geometry.Contains(env))
+                {
+                    return new[] {level.Geohash};
+                }
+
+                if (!geometry.Intersects(env))
+                {
+                    return new string[0];
+                }
+
+                if (level.Geohash.Length == 5)
+                {
+                    return new[] {level.Geohash};
+                }
+
+                return level.GetChildren().SelectMany(child => GetGeohashes(geometry, child));
             }
-
-            if (!geometry.Intersects(env))
+            catch
             {
+                // Ignore errors caused by invalid geometry
                 return new string[0];
             }
-
-            if (level.Geohash.Length == 5)
-            {
-                return new[] { level.Geohash };
-            }
-
-            return level.GetChildren().SelectMany(child => GetGeohashes(geometry, child));
         }
 
         public GeohashTreeNode GetTreeNode(string geohash)
