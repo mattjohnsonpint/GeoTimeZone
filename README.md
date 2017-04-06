@@ -1,4 +1,4 @@
-GeoTimeZone
+GeoTimeZone  [![NuGet Version](https://img.shields.io/nuget/v/GeoTimeZone.svg?style=flat)](https://www.nuget.org/packages/GeoTimeZone/) 
 ===========
 
 Provides an IANA time zone identifier from latitude and longitude coordinates.
