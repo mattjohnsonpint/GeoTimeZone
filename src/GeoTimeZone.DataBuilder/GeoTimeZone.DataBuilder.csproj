@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net461</TargetFramework>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="GeoAPI" Version="1.7.4" />
+    <PackageReference Include="NetTopologySuite" Version="1.14.0" />
+    <PackageReference Include="NetTopologySuite.IO" Version="1.14.0.1" />
+  </ItemGroup>
+
+</Project>

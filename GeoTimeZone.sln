@@ -1,24 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{F4DA3B11-79E1-4028-98FB-F7BC92A3FFA2}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BC1F3607-62CA-4325-8FEF-9A5FE8204A27}"
-	ProjectSection(SolutionItems) = preProject
-		global.json = global.json
-	EndProjectSection
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "GeoTimeZone", "src\GeoTimeZone\GeoTimeZone.xproj", "{CEB807E6-7694-42ED-B914-051EDB2230C5}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{316C44CA-36EC-49D7-A09C-E0393C785019}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "GeoTimeZone.DataBuilder", "src\GeoTimeZone.DataBuilder\GeoTimeZone.DataBuilder.xproj", "{D3894B4B-A08E-4FBD-AEF8-41287B0C6E7F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeoTimeZone", "src\GeoTimeZone\GeoTimeZone.csproj", "{CEB807E6-7694-42ED-B914-051EDB2230C5}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "GeoTimeZone.Tests", "test\GeoTimeZone.Tests\GeoTimeZone.Tests.xproj", "{348EBAF0-24A4-427D-81A9-BD4B483DD6D4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeoTimeZone.DataBuilder", "src\GeoTimeZone.DataBuilder\GeoTimeZone.DataBuilder.csproj", "{D3894B4B-A08E-4FBD-AEF8-41287B0C6E7F}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "GeoTimeZone.DataBuilder.Tests", "test\GeoTimeZone.DataBuilder.Tests\GeoTimeZone.DataBuilder.Tests.xproj", "{3E2E566B-60A3-4F7D-B6B8-2A70AA2C29B4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeoTimeZone.Tests", "test\GeoTimeZone.Tests\GeoTimeZone.Tests.csproj", "{348EBAF0-24A4-427D-81A9-BD4B483DD6D4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeoTimeZone.DataBuilder.Tests", "test\GeoTimeZone.DataBuilder.Tests\GeoTimeZone.DataBuilder.Tests.csproj", "{3E2E566B-60A3-4F7D-B6B8-2A70AA2C29B4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,5 +46,8 @@ Global
 		{D3894B4B-A08E-4FBD-AEF8-41287B0C6E7F} = {F4DA3B11-79E1-4028-98FB-F7BC92A3FFA2}
 		{348EBAF0-24A4-427D-81A9-BD4B483DD6D4} = {316C44CA-36EC-49D7-A09C-E0393C785019}
 		{3E2E566B-60A3-4F7D-B6B8-2A70AA2C29B4} = {316C44CA-36EC-49D7-A09C-E0393C785019}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D86DF842-A482-4EBD-81A7-2C0FE22856F1}
 	EndGlobalSection
 EndGlobal

@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Provides an IANA time zone identifier from latitude and longitude coordinates.</Description>
+    <Authors>Matt Johnson;Simon Bartlett</Authors>
+    <TargetFrameworks>netstandard2.0;netstandard1.0;net45;net40</TargetFrameworks>
+    <PackageId>GeoTimeZone</PackageId>
+    <PackageTags>timezone;time;zone;geolocation;geo;latitude;longitude;coordinates;iana;tzdb</PackageTags>
+    <PackageProjectUrl>https://github.com/mj1856/GeoTimeZone</PackageProjectUrl>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/mj1856/GeoTimeZone/master/LICENSE</PackageLicenseUrl>
+    <IncludeSource>True</IncludeSource>
+    <IncludeSymbols>True</IncludeSymbols>
+    <Version>3.0.0</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="TZ.dat;TZL.dat" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.0' ">
+    <PackageReference Remove="NETStandard.Library" />
+    <PackageReference Include="System.Linq" Version="4.3.0" />
+    <PackageReference Include="System.Reflection" Version="4.3.0" />
+    <PackageReference Include="System.Runtime.Extensions" Version="4.3.0" />
+    <PackageReference Include="System.Threading" Version="4.3.0" />
+  </ItemGroup>
+
+</Project>
