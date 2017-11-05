@@ -2,6 +2,10 @@
 using System.IO;
 using System.Text;
 
+#if NETSTANDARD1_0
+using System.Reflection;
+#endif
+
 namespace GeoTimeZone
 {
     internal static class TimezoneFileReader

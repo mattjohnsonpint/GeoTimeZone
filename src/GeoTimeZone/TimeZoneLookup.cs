@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
+#if NETSTANDARD1_0
+using System.Reflection;
+#endif
+
 namespace GeoTimeZone
 {
     public static class TimeZoneLookup
