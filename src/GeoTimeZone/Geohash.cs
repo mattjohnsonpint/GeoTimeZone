@@ -18,7 +18,7 @@ namespace GeoTimeZone
             int bit = 0;
             int ch = 0;
             int length = 0;
-            char[] geohash = new char[precision];
+            var geohash = new char[precision];
 
             double[] lat = { -90.0, 90.0 };
             double[] lon = { -180.0, 180.0 };

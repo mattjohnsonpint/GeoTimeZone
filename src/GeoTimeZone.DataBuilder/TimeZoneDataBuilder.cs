@@ -103,8 +103,7 @@ namespace GeoTimeZone.DataBuilder
             for (int i = 0; i < geohash.Length; i++)
             {
                 var geohashChar = geohash[i];
-                TimeZoneTreeNode childNode;
-                if (!currentNode.ChildNodes.TryGetValue(geohashChar, out childNode))
+                if (!currentNode.ChildNodes.TryGetValue(geohashChar, out var childNode))
                 {
                     childNode = currentNode.ChildNodes[geohashChar] = new TimeZoneTreeNode();
                 }

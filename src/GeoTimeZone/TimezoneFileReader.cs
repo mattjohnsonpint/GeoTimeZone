@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Reflection;
 using System.Text;
 
 namespace GeoTimeZone
@@ -41,10 +40,7 @@ namespace GeoTimeZone
             return ms.Length/(LineLength + LineEndLength);
         }
 
-        public static long Count
-        {
-            get { return LazyCount.Value; }
-        }
+        public static long Count => LazyCount.Value;
 
         public static string GetLine(long line)
         {

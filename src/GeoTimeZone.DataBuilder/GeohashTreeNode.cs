@@ -12,7 +12,7 @@ namespace GeoTimeZone.DataBuilder
         public Envelope Envelope { get; set; }
 
         private IGeometry _geometry;
-        public IGeometry Geometry { get { return _geometry ?? (_geometry = GeometryFactory.Default.ToGeometry(Envelope));  } }
+        public IGeometry Geometry => _geometry ?? (_geometry = GeometryFactory.Default.ToGeometry(Envelope));
 
         private List<GeohashTreeNode> _children; 
         public List<GeohashTreeNode> GetChildren()

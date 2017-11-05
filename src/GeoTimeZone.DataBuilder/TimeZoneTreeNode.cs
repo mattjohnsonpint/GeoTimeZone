@@ -85,8 +85,7 @@ namespace GeoTimeZone.DataBuilder
             {
                 foreach (var hashChar in GeohashTree.Base32)
                 {
-                    TimeZoneTreeNode childNode;
-                    if (!ChildNodes.TryGetValue(hashChar, out childNode))
+                    if (!ChildNodes.TryGetValue(hashChar, out var childNode))
                     {
                         childNode = ChildNodes[hashChar] = new TimeZoneTreeNode();
                     }
