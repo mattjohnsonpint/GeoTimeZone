@@ -87,7 +87,6 @@ America/Cayenne
 America/Cayman
 America/Chicago
 America/Chihuahua
-America/Coral_Harbour
 America/Costa_Rica
 America/Creston
 America/Cuiaba
@@ -149,7 +148,6 @@ America/Miquelon
 America/Moncton
 America/Monterrey
 America/Montevideo
-America/Montreal
 America/Montserrat
 America/Nassau
 America/New_York
@@ -168,6 +166,7 @@ America/Port_of_Spain
 America/Port-au-Prince
 America/Porto_Velho
 America/Puerto_Rico
+America/Punta_Arenas
 America/Rainy_River
 America/Rankin_Inlet
 America/Recife
@@ -218,7 +217,6 @@ Asia/Bishkek
 Asia/Brunei
 Asia/Chita
 Asia/Choibalsan
-Asia/Chongqing
 Asia/Colombo
 Asia/Damascus
 Asia/Dhaka
@@ -227,7 +225,6 @@ Asia/Dubai
 Asia/Dushanbe
 Asia/Famagusta
 Asia/Gaza
-Asia/Harbin
 Asia/Hebron
 Asia/Ho_Chi_Minh
 Asia/Hong_Kong
@@ -239,7 +236,6 @@ Asia/Jerusalem
 Asia/Kabul
 Asia/Kamchatka
 Asia/Karachi
-Asia/Kashgar
 Asia/Kathmandu
 Asia/Khandyga
 Asia/Kolkata
@@ -262,7 +258,6 @@ Asia/Pontianak
 Asia/Pyongyang
 Asia/Qatar
 Asia/Qyzylorda
-Asia/Rangoon
 Asia/Riyadh
 Asia/Sakhalin
 Asia/Samarkand
@@ -283,6 +278,7 @@ Asia/Ust-Nera
 Asia/Vientiane
 Asia/Vladivostok
 Asia/Yakutsk
+Asia/Yangon
 Asia/Yekaterinburg
 Asia/Yerevan
 Atlantic/Azores
@@ -394,7 +390,6 @@ Pacific/Gambier
 Pacific/Guadalcanal
 Pacific/Guam
 Pacific/Honolulu
-Pacific/Johnston
 Pacific/Kiritimati
 Pacific/Kosrae
 Pacific/Kwajalein
@@ -417,4 +412,3 @@ Pacific/Tarawa
 Pacific/Tongatapu
 Pacific/Wake
 Pacific/Wallis
-Pacific/Yap
