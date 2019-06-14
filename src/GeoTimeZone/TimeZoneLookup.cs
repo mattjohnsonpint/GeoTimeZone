@@ -9,8 +9,17 @@ using System.Reflection;
 
 namespace GeoTimeZone
 {
+    /// <summary>
+    /// Provides the time zone lookup functionality.
+    /// </summary>
     public static class TimeZoneLookup
     {
+        /// <summary>
+        /// Determines the IANA time zone for given location coordinates.
+        /// </summary>
+        /// <param name="latitude">The latitude of the location.</param>
+        /// <param name="longitude">The longitude of the location.</param>
+        /// <returns>A <see cref="TimeZoneResult"/> object, which contains the result(s) of the operation.</returns>
         public static TimeZoneResult GetTimeZone(double latitude, double longitude)
         {
             var geohash = Geohash.Encode(latitude, longitude, 5);

@@ -4,6 +4,9 @@ using System.Linq;
 
 namespace GeoTimeZone
 {
+    /// <summary>
+    /// Contains the result of a time zone lookup operation.
+    /// </summary>
     public class TimeZoneResult
     {
         internal TimeZoneResult(params string[] timeZones)
@@ -17,7 +20,15 @@ namespace GeoTimeZone
             this.AlternativeResults = new ReadOnlyCollection<string>(timeZones.Skip(1).ToList());
         }
 
+        /// <summary>
+        /// Gets the primary result of the time zone lookup operation.
+        /// </summary>
         public string Result { get; }
+
+        /// <summary>
+        /// Gets any alternative results of the time zone lookup operation.
+        /// This usually happens very close to borders between time zones.
+        /// </summary>
         public ReadOnlyCollection<string> AlternativeResults { get; }
     }
 }
