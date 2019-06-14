@@ -29,7 +29,7 @@ namespace GeoTimeZone.DataBuilder
                     {
                         var name = header.Fields[i].Name;
                         var value = reader.GetValue(i);
-                        attributes.AddAttribute(name, value);
+                        attributes.Add(name, value);
                     }
 
                     // skip uninhabited areas
