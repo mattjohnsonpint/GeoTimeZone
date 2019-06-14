@@ -6,8 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GeoAPI" Version="1.7.4" />
-    <PackageReference Include="NetTopologySuite" Version="1.14.0" />
+    <PackageReference Include="GeoAPI" Version="1.7.5" />
+    <PackageReference Include="NetTopologySuite" Version="1.15.2" />
+    <PackageReference Include="NetTopologySuite.Features" Version="1.15.0" />
     <PackageReference Include="NetTopologySuite.IO" Version="1.14.0.1" />
   </ItemGroup>
 
