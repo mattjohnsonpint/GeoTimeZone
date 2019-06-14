@@ -15,6 +15,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\GeoTimeZone.xml</DocumentationFile>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>mj1856_oss.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
