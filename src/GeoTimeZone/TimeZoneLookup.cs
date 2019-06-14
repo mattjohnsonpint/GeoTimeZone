@@ -14,23 +14,13 @@ namespace GeoTimeZone
         public static TimeZoneResult GetTimeZone(double latitude, double longitude)
         {
             var geohash = Geohash.Encode(latitude, longitude, 5);
-
             var lineNumber = GetTzDataLineNumbers(geohash);
-
-            var timeZones = GetTzsFromData(lineNumber).ToList();
-
-            if (timeZones.Count == 1)
-            {
-                return new TimeZoneResult { Result = timeZones[0] };
-            }
-
-            if (timeZones.Count > 1)
-            {
-                return new TimeZoneResult { Result = timeZones[0], AlternativeResults = timeZones.Skip(1).ToList() };
-            }
+            var timeZones = GetTzsFromData(lineNumber).ToArray();
+            if (timeZones.Length != 0)
+                return new TimeZoneResult(timeZones);
 
             var offsetHours = CalculateOffsetHoursFromLongitude(longitude);
-            return new TimeZoneResult { Result = GetTimeZoneId(offsetHours) };
+            return new TimeZoneResult(GetTimeZoneId(offsetHours));
         }
 
         private static IEnumerable<int> GetTzDataLineNumbers(string geohash)
