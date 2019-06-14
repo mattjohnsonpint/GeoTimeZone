@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 
 #if NETSTANDARD1_1
@@ -132,7 +133,8 @@ namespace GeoTimeZone
             var assembly = typeof(TimeZoneLookup).Assembly;
 #endif
 
-            using (var stream = assembly.GetManifestResourceStream("GeoTimeZone.TZL.dat"))
+            using (var compressedStream = assembly.GetManifestResourceStream("GeoTimeZone.TZL.dat.gz"))
+            using (var stream = new GZipStream(compressedStream, CompressionMode.Decompress))
             {
                 if (stream == null)
                     throw new InvalidOperationException();

@@ -25,7 +25,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="TZ.dat;TZL.dat" />
+    <EmbeddedResource Include="TZ.dat.gz;TZL.dat.gz" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.1' ">
