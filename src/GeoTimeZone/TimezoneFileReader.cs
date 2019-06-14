@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 
-#if NETSTANDARD1_0
+#if NETSTANDARD1_1
 using System.Reflection;
 #endif
 
@@ -21,7 +21,7 @@ namespace GeoTimeZone
         {
             var ms = new MemoryStream();
 
-#if NETSTANDARD1_0
+#if NETSTANDARD1_1
             var assembly = typeof(TimezoneFileReader).GetTypeInfo().Assembly;
 #else
             var assembly = typeof(TimezoneFileReader).Assembly;

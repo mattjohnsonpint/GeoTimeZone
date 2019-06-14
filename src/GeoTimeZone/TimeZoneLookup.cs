@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-#if NETSTANDARD1_0
+#if NETSTANDARD1_1
 using System.Reflection;
 #endif
 
@@ -126,7 +126,7 @@ namespace GeoTimeZone
         private static IList<string> LoadLookupData()
         {
 
-#if NETSTANDARD1_0
+#if NETSTANDARD1_1
             var assembly = typeof(TimeZoneLookup).GetTypeInfo().Assembly;
 #else
             var assembly = typeof(TimeZoneLookup).Assembly;
