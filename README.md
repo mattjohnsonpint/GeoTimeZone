@@ -22,6 +22,8 @@ string tz = TimeZoneLookup.GetTimeZone(50.4372, -3.5559).Result;  // "Europe/Lon
 
 ## Usage Notes
 
+This library returns [IANA time zone IDs](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).  If you need a Windows time zone ID, pass the return value into the [TimeZoneConverter](https://github.com/mj1856/TimeZoneConverter) library's `TZConvert.IanaToWindows` method, or to `TZConvert.GetTimeZoneInfo` to get a `TimeZoneInfo` object in a platform-neutral manner.
+
 This library uses the time zone border definitions from the [Timezone Boundary Builder][1] project,
 which in-turn derive from [Open Street Map][2].  As some international borders are the subject of dispute,
 the results may or may not align with your worldview.  Use at your own risk.
