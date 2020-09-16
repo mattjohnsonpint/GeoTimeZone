@@ -28,7 +28,7 @@ namespace GeoTimeZone.DataBuilder
                     for (int i = 0; i < header.NumFields; i++)
                     {
                         var name = header.Fields[i].Name;
-                        var value = reader.GetValue(i);
+                        var value = reader.GetValue(i + 1);
                         attributes.Add(name, value);
                     }
 

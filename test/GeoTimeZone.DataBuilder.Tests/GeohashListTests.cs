@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using GeoAPI.Geometries;
+using NetTopologySuite.Geometries;
 using Xunit;
 
 namespace GeoTimeZone.DataBuilder.Tests

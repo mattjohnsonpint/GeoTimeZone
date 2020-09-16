@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using GeoAPI.Geometries;
 using NetTopologySuite.Geometries;
 
 namespace GeoTimeZone.DataBuilder
@@ -11,8 +10,8 @@ namespace GeoTimeZone.DataBuilder
 
         public Envelope Envelope { get; set; }
 
-        private IGeometry _geometry;
-        public IGeometry Geometry => _geometry ?? (_geometry = GeometryFactory.Default.ToGeometry(Envelope));
+        private Geometry _geometry;
+        public Geometry Geometry => _geometry ?? (_geometry = GeometryFactory.Default.ToGeometry(Envelope));
 
         private List<GeohashTreeNode> _children; 
         public List<GeohashTreeNode> GetChildren()

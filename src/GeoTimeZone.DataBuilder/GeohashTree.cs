@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using GeoAPI.Geometries;
+using NetTopologySuite.Geometries;
 
 namespace GeoTimeZone.DataBuilder
 {
@@ -13,12 +13,12 @@ namespace GeoTimeZone.DataBuilder
             AddRange(GetNextLevel());
         }
 
-        public string[] GetGeohashes(IGeometry geometry)
+        public string[] GetGeohashes(Geometry geometry)
         {
             return this.SelectMany(level => GetGeohashes(geometry, level)).ToArray();
         }
 
-        private static IEnumerable<string> GetGeohashes(IGeometry geometry, GeohashTreeNode level)
+        private static IEnumerable<string> GetGeohashes(Geometry geometry, GeohashTreeNode level)
         {
             try
             {
