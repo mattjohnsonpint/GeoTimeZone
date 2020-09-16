@@ -11,7 +11,10 @@ namespace GeoTimeZone
         private const int LineLength = 8;
         private const int LineEndLength = 1;
 
+#if !NETSTANDARD2_1
         private static readonly object Locker = new object();
+#endif
+
         private static readonly Lazy<MemoryStream> LazyData = new Lazy<MemoryStream>(LoadData);
         private static readonly Lazy<int> LazyCount = new Lazy<int>(GetCount);
 
@@ -47,16 +50,22 @@ namespace GeoTimeZone
         {
             int index = (LineLength + LineEndLength) * (line - 1);
 
+            MemoryStream stream = LazyData.Value;
+
+#if NETSTANDARD2_1
+            var span = new ReadOnlySpan<byte>(stream.GetBuffer(), index, LineLength);
+            return Encoding.UTF8.GetString(span);
+#else
             var buffer = new byte[LineLength];
 
             lock (Locker)
             {
-                MemoryStream stream = LazyData.Value;
                 stream.Position = index;
                 stream.Read(buffer, 0, LineLength);
             }
 
             return Encoding.UTF8.GetString(buffer, 0, buffer.Length);
+#endif
         }
     }
 }
