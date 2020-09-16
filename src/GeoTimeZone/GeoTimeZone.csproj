@@ -7,7 +7,7 @@
     <PackageId>GeoTimeZone</PackageId>
     <PackageTags>timezone;time;zone;geolocation;geo;latitude;longitude;coordinates;iana;tzdb</PackageTags>
     <PackageProjectUrl>https://github.com/mj1856/GeoTimeZone</PackageProjectUrl>
-    <PackageLicense>MIT</PackageLicense>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <IncludeSource>True</IncludeSource>
     <IncludeSymbols>True</IncludeSymbols>
     <Version>4.0.0</Version>
