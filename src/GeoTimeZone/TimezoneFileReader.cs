@@ -13,7 +13,7 @@ namespace GeoTimeZone
 
         private static readonly object Locker = new object();
         private static readonly Lazy<MemoryStream> LazyData = new Lazy<MemoryStream>(LoadData);
-        private static readonly Lazy<long> LazyCount = new Lazy<long>(GetCount);
+        private static readonly Lazy<int> LazyCount = new Lazy<int>(GetCount);
 
         private static MemoryStream LoadData()
         {
@@ -35,17 +35,17 @@ namespace GeoTimeZone
             return ms;
         }
 
-        private static long GetCount()
+        private static int GetCount()
         {
             MemoryStream ms = LazyData.Value;
-            return ms.Length/(LineLength + LineEndLength);
+            return (int) (ms.Length / (LineLength + LineEndLength));
         }
 
-        public static long Count => LazyCount.Value;
+        public static int Count => LazyCount.Value;
 
-        public static string GetLine(long line)
+        public static string GetLine(int line)
         {
-            long index = (LineLength + LineEndLength) * (line - 1);
+            int index = (LineLength + LineEndLength) * (line - 1);
 
             var buffer = new byte[LineLength];
 

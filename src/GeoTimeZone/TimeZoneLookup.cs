@@ -32,11 +32,11 @@ namespace GeoTimeZone
 
         private static IEnumerable<int> GetTzDataLineNumbers(string geohash)
         {
-            long seeked = SeekTimeZoneFile(geohash);
+            int seeked = SeekTimeZoneFile(geohash);
             if (seeked == 0)
                 return new List<int>();
 
-            long min = seeked, max = seeked;
+            int min = seeked, max = seeked;
             string seekedGeohash = TimezoneFileReader.GetLine(seeked).Substring(0, 5);
 
             while (true)
@@ -58,7 +58,7 @@ namespace GeoTimeZone
             }
 
             var lineNumbers = new List<int>();
-            for (long i = min; i <= max; i++)
+            for (int i = min; i <= max; i++)
             {
                 int lineNumber = int.Parse(TimezoneFileReader.GetLine(i).Substring(5));
                 lineNumbers.Add(lineNumber);
@@ -67,15 +67,15 @@ namespace GeoTimeZone
             return lineNumbers;
         }
 
-        private static long SeekTimeZoneFile(string hash)
+        private static int SeekTimeZoneFile(string hash)
         {
-            long min = 1L;
-            long max = TimezoneFileReader.Count;
+            int min = 1;
+            int max = TimezoneFileReader.Count;
             bool converged = false;
 
             while (true)
             {
-                long mid = ((max - min) / 2) + min;
+                int mid = ((max - min) / 2) + min;
                 string midLine = TimezoneFileReader.GetLine(mid);
 
                 for (int i = 0; i < hash.Length; i++)
