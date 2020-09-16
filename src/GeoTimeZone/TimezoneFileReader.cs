@@ -1,11 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.IO.Compression;
-using System.Text;
-
-#if NETSTANDARD1_1
 using System.Reflection;
-#endif
+using System.Text;
 
 namespace GeoTimeZone
 {
@@ -23,26 +20,24 @@ namespace GeoTimeZone
             var ms = new MemoryStream();
 
 #if NETSTANDARD1_1
-            var assembly = typeof(TimezoneFileReader).GetTypeInfo().Assembly;
+            Assembly assembly = typeof(TimezoneFileReader).GetTypeInfo().Assembly;
 #else
-            var assembly = typeof(TimezoneFileReader).Assembly;
+            Assembly assembly = typeof(TimezoneFileReader).Assembly;
 #endif
 
-            using (var compressedStream = assembly.GetManifestResourceStream("GeoTimeZone.TZ.dat.gz"))
-            using (var stream = new GZipStream(compressedStream, CompressionMode.Decompress))
-            {
-                if (stream == null)
-                    throw new InvalidOperationException();
+            using Stream compressedStream = assembly.GetManifestResourceStream("GeoTimeZone.TZ.dat.gz");
+            using var stream = new GZipStream(compressedStream!, CompressionMode.Decompress);
+            if (stream == null)
+                throw new InvalidOperationException();
 
-                stream.CopyTo(ms);
-            }
+            stream.CopyTo(ms);
 
             return ms;
         }
 
         private static long GetCount()
         {
-            var ms = LazyData.Value;
+            MemoryStream ms = LazyData.Value;
             return ms.Length/(LineLength + LineEndLength);
         }
 
@@ -50,13 +45,13 @@ namespace GeoTimeZone
 
         public static string GetLine(long line)
         {
-            var index = (LineLength + LineEndLength) * (line - 1);
+            long index = (LineLength + LineEndLength) * (line - 1);
 
             var buffer = new byte[LineLength];
 
             lock (Locker)
             {
-                var stream = LazyData.Value;
+                MemoryStream stream = LazyData.Value;
                 stream.Position = index;
                 stream.Read(buffer, 0, LineLength);
             }

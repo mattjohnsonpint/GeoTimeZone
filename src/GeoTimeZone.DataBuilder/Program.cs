@@ -9,14 +9,14 @@ namespace GeoTimeZone.DataBuilder
             var console = new ConsoleOutput();
             console.Start();
 
-            var projectPath = Path.GetFullPath(".");
+            string projectPath = Path.GetFullPath(".");
             while (!File.Exists(Path.Combine(projectPath, "GeoTimeZone.sln")))
                 projectPath = Path.GetFullPath(Path.Combine(projectPath, ".."));
 
-            var shapeFile = Path.Combine(projectPath, "data", "combined-shapefile.shp");
+            string shapeFile = Path.Combine(projectPath, "data", "combined-shapefile.shp");
             var tzShapeReader = new TimeZoneShapeFileReader(shapeFile);
 
-            var outputPath = Path.Combine(projectPath, "src", "GeoTimeZone");
+            string outputPath = Path.Combine(projectPath, "src", "GeoTimeZone");
             TimeZoneDataBuilder.CreateGeohashData(console, tzShapeReader, outputPath);
             
             console.Stop();

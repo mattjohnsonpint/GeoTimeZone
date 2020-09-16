@@ -22,7 +22,7 @@ namespace GeoTimeZone.DataBuilder
         {
             try
             {
-                var env = level.Geometry;
+                Geometry env = level.Geometry;
 
                 if (geometry.Contains(env))
                 {
@@ -56,14 +56,14 @@ namespace GeoTimeZone.DataBuilder
             }
 
             GeohashTreeNode result = null;
-            foreach (var c in geohash)
+            foreach (char c in geohash)
             {
                 if (c == '-')
                 {
                     return result;
                 }
 
-                var index = Base32.IndexOf(c);
+                int index = Base32.IndexOf(c);
                 result = result == null ? this[index] : result.GetChildren()[index];
             }
 
@@ -78,7 +78,7 @@ namespace GeoTimeZone.DataBuilder
                 envelope = new Envelope(-180, 180, -90, 90);
             }
 
-            var even = geohash.Length % 2 == 0;
+            bool even = geohash.Length % 2 == 0;
 
             return SplitEnvelope2(envelope, even)
                 .SelectMany(x => SplitEnvelope4(x, even))
@@ -91,13 +91,13 @@ namespace GeoTimeZone.DataBuilder
             if (even)
             {
 
-                var midX = envelope.MinX + envelope.Width / 2;
+                double midX = envelope.MinX + envelope.Width / 2;
                 yield return new Envelope(envelope.MinX, midX, envelope.MinY, envelope.MaxY);
                 yield return new Envelope(midX, envelope.MaxX, envelope.MinY, envelope.MaxY);
             }
             else
             {
-                var midY = envelope.MinY + envelope.Height / 2;
+                double midY = envelope.MinY + envelope.Height / 2;
                 yield return new Envelope(envelope.MinX, envelope.MaxX, envelope.MinY, midY);
                 yield return new Envelope(envelope.MinX, envelope.MaxX, midY, envelope.MaxY);
             }
@@ -105,11 +105,11 @@ namespace GeoTimeZone.DataBuilder
 
         public static IEnumerable<Envelope> SplitEnvelope4(Envelope envelope, bool even)
         {
-            var minX = envelope.MinX;
-            var minY = envelope.MinY;
+            double minX = envelope.MinX;
+            double minY = envelope.MinY;
 
-            var stepX = envelope.Width / 2;
-            var stepY = envelope.Height / 2;
+            double stepX = envelope.Width / 2;
+            double stepY = envelope.Height / 2;
 
             if (even)
             {
@@ -117,8 +117,8 @@ namespace GeoTimeZone.DataBuilder
                 {
                     for (int x = 0; x < 2; x++)
                     {
-                        var x1 = minX + (stepX * x);
-                        var y1 = minY + (stepY * y);
+                        double x1 = minX + (stepX * x);
+                        double y1 = minY + (stepY * y);
                         yield return new Envelope(x1, x1 + stepX, y1, y1 + stepY);
                     }
                 }
@@ -129,8 +129,8 @@ namespace GeoTimeZone.DataBuilder
                 {
                     for (int y = 0; y < 2; y++)
                     {
-                        var x1 = minX + (stepX * x);
-                        var y1 = minY + (stepY * y);
+                        double x1 = minX + (stepX * x);
+                        double y1 = minY + (stepY * y);
                         yield return new Envelope(x1, x1 + stepX, y1, y1 + stepY);
                     }
                 }

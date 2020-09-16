@@ -24,32 +24,32 @@ namespace GeoTimeZone.DataBuilder
 
         private bool RollUpTimeZones()
         {
-            var allRolledUp = true;
+            bool allRolledUp = true;
 
             if (ChildNodes.Count == 0)
                 return true;
 
-            foreach (var childNode in ChildNodes)
+            foreach (KeyValuePair<char, TimeZoneTreeNode> childNode in ChildNodes)
             {
-                var temp = childNode.Value.RollUpTimeZones();
+                bool temp = childNode.Value.RollUpTimeZones();
                 if (!temp)
                     allRolledUp = false;
             }
 
             if (allRolledUp)
             {
-                var canRollup = ChildNodes.Count == 32;
+                bool canRollup = ChildNodes.Count == 32;
 
                 if (canRollup)
                 {
                     List<string> tzIds = null;
-                    foreach (var childNode in ChildNodes)
+                    foreach ((char _, TimeZoneTreeNode childNode) in ChildNodes)
                     {
                         if (tzIds == null)
-                            tzIds = childNode.Value.TimeZoneNames;
+                            tzIds = childNode.TimeZoneNames;
                         else
                         {
-                            var temp = childNode.Value.TimeZoneNames.SequenceEqual(tzIds);
+                            bool temp = childNode.TimeZoneNames.SequenceEqual(tzIds);
                             if (!temp)
                             {
                                 canRollup = false;
@@ -62,7 +62,7 @@ namespace GeoTimeZone.DataBuilder
                 if (canRollup)
                 {
                     var timeZones = ChildNodes.SelectMany(x => x.Value.TimeZones).ToList();
-                    foreach (var timeZone in timeZones)
+                    foreach (TimeZoneFeature timeZone in timeZones)
                     {
                         TimeZones.Add(timeZone);
                     }
@@ -83,14 +83,14 @@ namespace GeoTimeZone.DataBuilder
         {
             if (TimeZones.Count > 0 && ChildNodes.Count > 0)
             {
-                foreach (var hashChar in GeohashTree.Base32)
+                foreach (char hashChar in GeohashTree.Base32)
                 {
-                    if (!ChildNodes.TryGetValue(hashChar, out var childNode))
+                    if (!ChildNodes.TryGetValue(hashChar, out TimeZoneTreeNode childNode))
                     {
                         childNode = ChildNodes[hashChar] = new TimeZoneTreeNode();
                     }
 
-                    foreach (var timeZone in TimeZones)
+                    foreach (TimeZoneFeature timeZone in TimeZones)
                     {
                         childNode.TimeZones.Add(timeZone);
                     }
@@ -99,7 +99,7 @@ namespace GeoTimeZone.DataBuilder
                 TimeZones.Clear();
             }
 
-            foreach (var childNode in ChildNodes)
+            foreach (KeyValuePair<char, TimeZoneTreeNode> childNode in ChildNodes)
             {
                 childNode.Value.RollDownTimeZones();
             }

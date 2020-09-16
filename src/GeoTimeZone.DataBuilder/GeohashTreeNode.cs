@@ -11,12 +11,12 @@ namespace GeoTimeZone.DataBuilder
         public Envelope Envelope { get; set; }
 
         private Geometry _geometry;
-        public Geometry Geometry => _geometry ?? (_geometry = GeometryFactory.Default.ToGeometry(Envelope));
+        public Geometry Geometry => _geometry ??= GeometryFactory.Default.ToGeometry(Envelope);
 
         private List<GeohashTreeNode> _children; 
         public List<GeohashTreeNode> GetChildren()
         {
-            return _children ?? (_children = GeohashTree.GetNextLevel(Geohash, Envelope).ToList());
+            return _children ??= GeohashTree.GetNextLevel(Geohash, Envelope).ToList();
         }
     }
 }

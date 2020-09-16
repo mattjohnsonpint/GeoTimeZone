@@ -1,9 +1,7 @@
 ﻿//
 //  GeoHash implementation by Sharon Lourduraj.
-//  See accompanying LICENCE file for details.
+//  See accompanying LICENSE file for details.
 //
-
-using System;
 
 namespace GeoTimeZone
 {
@@ -12,7 +10,7 @@ namespace GeoTimeZone
         private const string Base32 = "0123456789bcdefghjkmnpqrstuvwxyz";
         private static readonly int[] Bits = { 16, 8, 4, 2, 1 };
 
-        public static String Encode(double latitude, double longitude, int precision = 12)
+        public static string Encode(double latitude, double longitude, int precision = 12)
         {
             bool even = true;
             int bit = 0;

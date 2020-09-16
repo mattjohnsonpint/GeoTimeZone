@@ -3,10 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-
-#if NETSTANDARD1_1
 using System.Reflection;
-#endif
 
 namespace GeoTimeZone
 {
@@ -23,28 +20,28 @@ namespace GeoTimeZone
         /// <returns>A <see cref="TimeZoneResult"/> object, which contains the result(s) of the operation.</returns>
         public static TimeZoneResult GetTimeZone(double latitude, double longitude)
         {
-            var geohash = Geohash.Encode(latitude, longitude, 5);
-            var lineNumber = GetTzDataLineNumbers(geohash);
-            var timeZones = GetTzsFromData(lineNumber).ToArray();
+            string geohash = Geohash.Encode(latitude, longitude, 5);
+            IEnumerable<int> lineNumber = GetTzDataLineNumbers(geohash);
+            string[] timeZones = GetTzsFromData(lineNumber).ToArray();
             if (timeZones.Length != 0)
                 return new TimeZoneResult(timeZones);
 
-            var offsetHours = CalculateOffsetHoursFromLongitude(longitude);
+            int offsetHours = CalculateOffsetHoursFromLongitude(longitude);
             return new TimeZoneResult(GetTimeZoneId(offsetHours));
         }
 
         private static IEnumerable<int> GetTzDataLineNumbers(string geohash)
         {
-            var seeked = SeekTimeZoneFile(geohash);
+            long seeked = SeekTimeZoneFile(geohash);
             if (seeked == 0)
                 return new List<int>();
 
             long min = seeked, max = seeked;
-            var seekedGeohash = TimezoneFileReader.GetLine(seeked).Substring(0, 5);
+            string seekedGeohash = TimezoneFileReader.GetLine(seeked).Substring(0, 5);
 
             while (true)
             {
-                var prevGeohash = TimezoneFileReader.GetLine(min - 1).Substring(0, 5);
+                string prevGeohash = TimezoneFileReader.GetLine(min - 1).Substring(0, 5);
                 if (seekedGeohash == prevGeohash)
                     min--;
                 else
@@ -53,7 +50,7 @@ namespace GeoTimeZone
 
             while (true)
             {
-                var nextGeohash = TimezoneFileReader.GetLine(max + 1).Substring(0, 5);
+                string nextGeohash = TimezoneFileReader.GetLine(max + 1).Substring(0, 5);
                 if (seekedGeohash == nextGeohash)
                     max++;
                 else
@@ -61,9 +58,9 @@ namespace GeoTimeZone
             }
 
             var lineNumbers = new List<int>();
-            for (var i = min; i <= max; i++)
+            for (long i = min; i <= max; i++)
             {
-                var lineNumber = int.Parse(TimezoneFileReader.GetLine(i).Substring(5));
+                int lineNumber = int.Parse(TimezoneFileReader.GetLine(i).Substring(5));
                 lineNumbers.Add(lineNumber);
             }
 
@@ -72,14 +69,14 @@ namespace GeoTimeZone
 
         private static long SeekTimeZoneFile(string hash)
         {
-            var min = 1L;
-            var max = TimezoneFileReader.Count;
-            var converged = false;
+            long min = 1L;
+            long max = TimezoneFileReader.Count;
+            bool converged = false;
 
             while (true)
             {
-                var mid = ((max - min) / 2) + min;
-                var midLine = TimezoneFileReader.GetLine(mid);
+                long mid = ((max - min) / 2) + min;
+                string midLine = TimezoneFileReader.GetLine(mid);
 
                 for (int i = 0; i < hash.Length; i++)
                 {
@@ -128,47 +125,43 @@ namespace GeoTimeZone
         {
 
 #if NETSTANDARD1_1
-            var assembly = typeof(TimeZoneLookup).GetTypeInfo().Assembly;
+            Assembly assembly = typeof(TimeZoneLookup).GetTypeInfo().Assembly;
 #else
-            var assembly = typeof(TimeZoneLookup).Assembly;
+            Assembly assembly = typeof(TimeZoneLookup).Assembly;
 #endif
 
-            using (var compressedStream = assembly.GetManifestResourceStream("GeoTimeZone.TZL.dat.gz"))
-            using (var stream = new GZipStream(compressedStream, CompressionMode.Decompress))
+            using Stream compressedStream = assembly.GetManifestResourceStream("GeoTimeZone.TZL.dat.gz");
+            using var stream = new GZipStream(compressedStream!, CompressionMode.Decompress);
+            if (stream == null)
+                throw new InvalidOperationException();
+
+            using var reader = new StreamReader(stream);
+            var list = new List<string>();
+
+            string line;
+            while ((line = reader.ReadLine()) != null)
             {
-                if (stream == null)
-                    throw new InvalidOperationException();
-
-                using (var reader = new StreamReader(stream))
-                {
-                    var list = new List<string>();
-
-                    string line;
-                    while ((line = reader.ReadLine()) != null)
-                    {
-                        list.Add(line);
-                    }
-
-                    return list;
-                }
+                list.Add(line);
             }
+
+            return list;
         }
 
         private static IEnumerable<string> GetTzsFromData(IEnumerable<int> lineNumbers)
         {
-            var lookupData = LookupData.Value;
+            IList<string> lookupData = LookupData.Value;
             return lineNumbers.OrderBy(x => x).Select(x => lookupData[x - 1]);
         }
 
         private static int CalculateOffsetHoursFromLongitude(double longitude)
         {
-            var dir = longitude < 0 ? -1 : 1;
-            var posNo = Math.Sqrt(Math.Pow(longitude, 2));
+            int dir = longitude < 0 ? -1 : 1;
+            double posNo = Math.Sqrt(Math.Pow(longitude, 2));
             if (posNo <= 7.5)
                 return 0;
 
             posNo -= 7.5;
-            var offset = posNo / 15;
+            double offset = posNo / 15;
             if (posNo % 15 > 0)
                 offset++;
 
@@ -180,7 +173,7 @@ namespace GeoTimeZone
             if (offsetHours == 0)
                 return "UTC";
 
-            var reversed = (offsetHours >= 0 ? "-" : "+") + Math.Abs(offsetHours);
+            string reversed = (offsetHours >= 0 ? "-" : "+") + Math.Abs(offsetHours);
             return "Etc/GMT" + reversed;
         }
     }
