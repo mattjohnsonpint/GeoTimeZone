@@ -11,7 +11,11 @@ PM> Install-Package GeoTimeZone
 
 ## Supported Environments
 
-As of version 3.0, this library is targeting .NET Standard 1.1+, .NET Standard 2.0+, and .NET Framework 4.0+.
+As of version 3.0.0, this library is targeting .NET Standard 1.1+, .NET Standard 2.0+, and .NET Framework 4.0+.
+
+As of version 4.1.0, an additional target for .NET Standard 2.1 is added, which improves runtime performance by leveraging `ReadOnlySpan<T>` in its internals.
+(This version will be used when your app targets .NET Core 3.0 or newer.)
+
 See the [.NET Standard Platform Support Matrix](https://docs.microsoft.com/en-us/dotnet/articles/standard/library) for further details.
 
 ## Example Usage
