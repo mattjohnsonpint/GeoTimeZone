@@ -32,6 +32,18 @@ This library uses the time zone border definitions from the [Timezone Boundary B
 which in-turn derive from [Open Street Map][2].  As some international borders are the subject of dispute,
 the results may or may not align with your worldview.  Use at your own risk.
 
+## Acknowledgements
+
+Huge thank you to the following people:
+
+- Evan Siroky, who tirelessly maintains the Time Zone Boundary Builder project, which we use for our source data.
+- Eric Muller, who authored the original tz_world data set (now deprecated in favor of TBB).
+- Simon Bartlett, who contributed all the polygon indexing and lookup bits to this library.
+- Sharon Lourduraj, who wrote GeoHash-net that we used for our original implementation.
+- David Troy, who wrote Geohash-js that Sharon later ported to .NET
+- Nick Johnson, who's [excellent blog post](http://blog.notdot.net/2009/11/Damn-Cool-Algorithms-Spatial-indexing-with-Quadtrees-and-Hilbert-Curves) has been an inspiration to this project and so many others!
+
+
 ## License
 
 This library is provided free of charge, under the terms of the [MIT license][3].
