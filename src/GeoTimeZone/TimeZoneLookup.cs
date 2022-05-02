@@ -156,7 +156,7 @@ namespace GeoTimeZone
         private static int CalculateOffsetHoursFromLongitude(double longitude)
         {
             int dir = longitude < 0 ? -1 : 1;
-            double posNo = Math.Sqrt(Math.Pow(longitude, 2));
+            double posNo = Math.Abs(longitude);
             if (posNo <= 7.5)
                 return 0;
 
