@@ -46,28 +46,6 @@ namespace GeoTimeZone
 
         public static int Count => LazyCount.Value;
 
-        public static string GetLine(int line)
-        {
-            int index = (LineLength + LineEndLength) * (line - 1);
-
-            MemoryStream stream = LazyData.Value;
-
-#if NETSTANDARD2_1
-            var span = new ReadOnlySpan<byte>(stream.GetBuffer(), index, LineLength);
-            return Encoding.UTF8.GetString(span);
-#else
-            var buffer = new byte[LineLength];
-
-            lock (Locker)
-            {
-                stream.Position = index;
-                stream.Read(buffer, 0, LineLength);
-            }
-
-            return Encoding.UTF8.GetString(buffer, 0, buffer.Length);
-#endif
-        }
-
         public static
 #if NETSTANDARD2_1
             ReadOnlySpan<byte>
@@ -76,19 +54,38 @@ namespace GeoTimeZone
 #endif
             GetGeohash(int line)
         {
-            int index = (LineLength + LineEndLength) * (line - 1);
+            return GetLine(line, 0, Geohash.Precision);
+        }
+
+        public static int GetLineNumber(int line)
+        {
+            var digits = GetLine(line, Geohash.Precision, LineLength - Geohash.Precision);
+            return GetDigit(digits[2]) + ((GetDigit(digits[1]) + (GetDigit(digits[0]) * 10)) * 10);
+
+            static int GetDigit(byte b) => b - '0';
+        }
+
+        private static
+#if NETSTANDARD2_1_OR_GREATER
+            ReadOnlySpan<byte>
+#else
+            byte[]
+#endif
+            GetLine(int line, int start, int count)
+        {
+            int index = (LineLength + LineEndLength) * (line - 1) + start;
 
             MemoryStream stream = LazyData.Value;
 
-#if NETSTANDARD2_1
-            return new ReadOnlySpan<byte>(stream.GetBuffer(), index, Geohash.Precision);
+#if NETSTANDARD2_1_OR_GREATER
+            return new ReadOnlySpan<byte>(stream.GetBuffer(), index, count);
 #else
-            var buffer = new byte[Geohash.Precision];
+            var buffer = new byte[count];
 
             lock (Locker)
             {
                 stream.Position = index;
-                stream.Read(buffer, 0, Geohash.Precision);
+                stream.Read(buffer, 0, count);
             }
 
             return buffer;

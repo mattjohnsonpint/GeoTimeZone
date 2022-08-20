@@ -60,7 +60,7 @@ namespace GeoTimeZone
             var lineNumbers = new List<int>();
             for (int i = min; i <= max; i++)
             {
-                int lineNumber = int.Parse(TimezoneFileReader.GetLine(i).Substring(Geohash.Precision));
+                int lineNumber = TimezoneFileReader.GetLineNumber(i);
                 lineNumbers.Add(lineNumber);
             }
 
