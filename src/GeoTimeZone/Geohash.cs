@@ -27,8 +27,13 @@ namespace GeoTimeZone
             int ch = 0;
             int length = 0;
 
+#if NETSTANDARD2_1_OR_GREATER
+            Span<double> lat = stackalloc[] { -90.0, 90.0 };
+            Span<double> lon = stackalloc[] { -180.0, 180.0 };
+#else
             double[] lat = { -90.0, 90.0 };
             double[] lon = { -180.0, 180.0 };
+#endif
 
             while (length < Precision)
             {
