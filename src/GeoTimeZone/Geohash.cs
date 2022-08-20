@@ -10,21 +10,20 @@ namespace GeoTimeZone
         private const string Base32 = "0123456789bcdefghjkmnpqrstuvwxyz";
         private static readonly int[] Bits = { 16, 8, 4, 2, 1 };
 
-        public static string Encode(double latitude, double longitude, int precision = 12)
+        internal const int Precision = 5;
+
+        public static string Encode(double latitude, double longitude)
         {
             bool even = true;
             int bit = 0;
             int ch = 0;
             int length = 0;
-            var geohash = new char[precision];
+            var geohash = new char[Precision];
 
             double[] lat = { -90.0, 90.0 };
             double[] lon = { -180.0, 180.0 };
 
-            if (precision < 1 || precision > 20)
-                precision = 12;
-
-            while (length < precision)
+            while (length < Precision)
             {
                 if (even)
                 {

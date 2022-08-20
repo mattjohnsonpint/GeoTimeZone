@@ -41,7 +41,7 @@ namespace GeoTimeZone
         private static int GetCount()
         {
             MemoryStream ms = LazyData.Value;
-            return (int) (ms.Length / (LineLength + LineEndLength));
+            return (int)(ms.Length / (LineLength + LineEndLength));
         }
 
         public static int Count => LazyCount.Value;

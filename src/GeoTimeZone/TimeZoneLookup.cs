@@ -20,7 +20,7 @@ namespace GeoTimeZone
         /// <returns>A <see cref="TimeZoneResult"/> object, which contains the result(s) of the operation.</returns>
         public static TimeZoneResult GetTimeZone(double latitude, double longitude)
         {
-            string geohash = Geohash.Encode(latitude, longitude, 5);
+            string geohash = Geohash.Encode(latitude, longitude);
             IEnumerable<int> lineNumber = GetTzDataLineNumbers(geohash);
             string[] timeZones = GetTzsFromData(lineNumber).ToArray();
             if (timeZones.Length != 0)
@@ -37,11 +37,11 @@ namespace GeoTimeZone
                 return new List<int>();
 
             int min = seeked, max = seeked;
-            string seekedGeohash = TimezoneFileReader.GetLine(seeked).Substring(0, 5);
+            string seekedGeohash = TimezoneFileReader.GetLine(seeked).Substring(0, Geohash.Precision);
 
             while (true)
             {
-                string prevGeohash = TimezoneFileReader.GetLine(min - 1).Substring(0, 5);
+                string prevGeohash = TimezoneFileReader.GetLine(min - 1).Substring(0, Geohash.Precision);
                 if (seekedGeohash == prevGeohash)
                     min--;
                 else
@@ -50,7 +50,7 @@ namespace GeoTimeZone
 
             while (true)
             {
-                string nextGeohash = TimezoneFileReader.GetLine(max + 1).Substring(0, 5);
+                string nextGeohash = TimezoneFileReader.GetLine(max + 1).Substring(0, Geohash.Precision);
                 if (seekedGeohash == nextGeohash)
                     max++;
                 else
@@ -60,7 +60,7 @@ namespace GeoTimeZone
             var lineNumbers = new List<int>();
             for (int i = min; i <= max; i++)
             {
-                int lineNumber = int.Parse(TimezoneFileReader.GetLine(i).Substring(5));
+                int lineNumber = int.Parse(TimezoneFileReader.GetLine(i).Substring(Geohash.Precision));
                 lineNumbers.Add(lineNumber);
             }
 
