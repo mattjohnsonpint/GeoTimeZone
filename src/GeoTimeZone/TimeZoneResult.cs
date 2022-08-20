@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 
 namespace GeoTimeZone
 {
@@ -12,7 +11,7 @@ namespace GeoTimeZone
         internal TimeZoneResult(List<string> timeZones)
         {
             this.Result = timeZones[0];
-            this.AlternativeResults = new ReadOnlyCollection<string>(timeZones.Skip(1).ToList());
+            this.AlternativeResults = new ReadOnlyCollection<string>(timeZones.GetRange(1, timeZones.Count - 1));
         }
 
         internal TimeZoneResult(string timeZone)
