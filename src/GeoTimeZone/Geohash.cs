@@ -3,6 +3,8 @@
 //  See accompanying LICENSE file for details.
 //
 
+using System;
+
 namespace GeoTimeZone
 {
     internal static class Geohash
@@ -12,13 +14,18 @@ namespace GeoTimeZone
 
         internal const int Precision = 5;
 
-        public static byte[] Encode(double latitude, double longitude)
+        public static void Encode(double latitude, double longitude,
+#if NETSTANDARD2_1_OR_GREATER
+            Span<byte> geohash
+#else
+            byte[] geohash
+#endif
+        )
         {
             bool even = true;
             int bit = 0;
             int ch = 0;
             int length = 0;
-            var geohash = new byte[Precision];
 
             double[] lat = { -90.0, 90.0 };
             double[] lon = { -180.0, 180.0 };
@@ -66,8 +73,6 @@ namespace GeoTimeZone
                     ch = 0;
                 }
             }
-
-            return geohash;
         }
     }
 }
