@@ -37,12 +37,12 @@ namespace GeoTimeZone
                 return new List<int>();
 
             int min = seeked, max = seeked;
-            string seekedGeohash = TimezoneFileReader.GetLine(seeked).Substring(0, Geohash.Precision);
+            var seekedGeohash = TimezoneFileReader.GetGeohash(seeked);
 
             while (true)
             {
-                string prevGeohash = TimezoneFileReader.GetLine(min - 1).Substring(0, Geohash.Precision);
-                if (seekedGeohash == prevGeohash)
+                var prevGeohash = TimezoneFileReader.GetGeohash(min - 1);
+                if (GeohashEquals(seekedGeohash, prevGeohash))
                     min--;
                 else
                     break;
@@ -50,8 +50,8 @@ namespace GeoTimeZone
 
             while (true)
             {
-                string nextGeohash = TimezoneFileReader.GetLine(max + 1).Substring(0, Geohash.Precision);
-                if (seekedGeohash == nextGeohash)
+                var nextGeohash = TimezoneFileReader.GetGeohash(max + 1);
+                if (GeohashEquals(seekedGeohash, nextGeohash))
                     max++;
                 else
                     break;
@@ -67,6 +67,22 @@ namespace GeoTimeZone
             return lineNumbers;
         }
 
+        private static bool GeohashEquals
+#if NETSTANDARD2_1_OR_GREATER
+            (ReadOnlySpan<byte> a, ReadOnlySpan<byte> b)
+#else
+            (byte[] a, byte[] b)
+#endif
+        {
+            bool equals = true;
+            for (int i = Geohash.Precision - 1; i >= 0; i--)
+            {
+                equals &= a[i] == b[i];
+            }
+
+            return equals;
+        }
+
         private static int SeekTimeZoneFile(string hash)
         {
             int min = 1;
@@ -76,7 +92,7 @@ namespace GeoTimeZone
             while (true)
             {
                 int mid = ((max - min) / 2) + min;
-                string midLine = TimezoneFileReader.GetLine(mid);
+                var midLine = TimezoneFileReader.GetGeohash(mid);
 
                 for (int i = 0; i < hash.Length; i++)
                 {

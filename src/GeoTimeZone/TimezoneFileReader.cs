@@ -67,5 +67,32 @@ namespace GeoTimeZone
             return Encoding.UTF8.GetString(buffer, 0, buffer.Length);
 #endif
         }
+
+        public static
+#if NETSTANDARD2_1
+            ReadOnlySpan<byte>
+#else
+            byte[]
+#endif
+            GetGeohash(int line)
+        {
+            int index = (LineLength + LineEndLength) * (line - 1);
+
+            MemoryStream stream = LazyData.Value;
+
+#if NETSTANDARD2_1
+            return new ReadOnlySpan<byte>(stream.GetBuffer(), index, Geohash.Precision);
+#else
+            var buffer = new byte[Geohash.Precision];
+
+            lock (Locker)
+            {
+                stream.Position = index;
+                stream.Read(buffer, 0, Geohash.Precision);
+            }
+
+            return buffer;
+#endif
+        }
     }
 }
