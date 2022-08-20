@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
@@ -10,7 +9,7 @@ namespace GeoTimeZone
     /// </summary>
     public class TimeZoneResult
     {
-        internal TimeZoneResult(string[] timeZones)
+        internal TimeZoneResult(List<string> timeZones)
         {
             this.Result = timeZones[0];
             this.AlternativeResults = new ReadOnlyCollection<string>(timeZones.Skip(1).ToList());

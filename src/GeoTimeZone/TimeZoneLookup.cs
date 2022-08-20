@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Reflection;
 
 namespace GeoTimeZone
@@ -21,20 +20,22 @@ namespace GeoTimeZone
         public static TimeZoneResult GetTimeZone(double latitude, double longitude)
         {
             string geohash = Geohash.Encode(latitude, longitude);
-            IEnumerable<int> lineNumber = GetTzDataLineNumbers(geohash);
-            string[] timeZones = GetTzsFromData(lineNumber).ToArray();
-            if (timeZones.Length != 0)
+            int[] lineNumbers = GetTzDataLineNumbers(geohash);
+            if (lineNumbers.Length != 0)
+            {
+                List<string> timeZones = GetTzsFromData(lineNumbers);
                 return new TimeZoneResult(timeZones);
+            }
 
             int offsetHours = CalculateOffsetHoursFromLongitude(longitude);
             return new TimeZoneResult(GetTimeZoneId(offsetHours));
         }
 
-        private static IEnumerable<int> GetTzDataLineNumbers(string geohash)
+        private static int[] GetTzDataLineNumbers(string geohash)
         {
             int seeked = SeekTimeZoneFile(geohash);
             if (seeked == 0)
-                return new List<int>();
+                return new int[0];
 
             int min = seeked, max = seeked;
             var seekedGeohash = TimezoneFileReader.GetGeohash(seeked);
@@ -162,10 +163,18 @@ namespace GeoTimeZone
             return list;
         }
 
-        private static IEnumerable<string> GetTzsFromData(IEnumerable<int> lineNumbers)
+        private static List<string> GetTzsFromData(int[] lineNumbers)
         {
             IList<string> lookupData = LookupData.Value;
-            return lineNumbers.OrderBy(x => x).Select(x => lookupData[x - 1]);
+            var timezones = new List<string>(lineNumbers.Length);
+            Array.Sort(lineNumbers);
+
+            foreach (var lineNumber in lineNumbers)
+            {
+                timezones.Add(lookupData[lineNumber - 1]);
+            }
+
+            return timezones;
         }
 
         private static int CalculateOffsetHoursFromLongitude(double longitude)
