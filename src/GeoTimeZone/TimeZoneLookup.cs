@@ -19,7 +19,7 @@ namespace GeoTimeZone
         /// <returns>A <see cref="TimeZoneResult"/> object, which contains the result(s) of the operation.</returns>
         public static TimeZoneResult GetTimeZone(double latitude, double longitude)
         {
-            string geohash = Geohash.Encode(latitude, longitude);
+            byte[] geohash = Geohash.Encode(latitude, longitude);
             int[] lineNumbers = GetTzDataLineNumbers(geohash);
             if (lineNumbers.Length != 0)
             {
@@ -31,7 +31,7 @@ namespace GeoTimeZone
             return new TimeZoneResult(GetTimeZoneId(offsetHours));
         }
 
-        private static int[] GetTzDataLineNumbers(string geohash)
+        private static int[] GetTzDataLineNumbers(byte[] geohash)
         {
             int seeked = SeekTimeZoneFile(geohash);
             if (seeked == 0)
@@ -83,7 +83,7 @@ namespace GeoTimeZone
             return equals;
         }
 
-        private static int SeekTimeZoneFile(string hash)
+        private static int SeekTimeZoneFile(byte[] hash)
         {
             int min = 1;
             int max = TimezoneFileReader.Count;

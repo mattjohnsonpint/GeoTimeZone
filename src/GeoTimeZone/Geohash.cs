@@ -12,13 +12,13 @@ namespace GeoTimeZone
 
         internal const int Precision = 5;
 
-        public static string Encode(double latitude, double longitude)
+        public static byte[] Encode(double latitude, double longitude)
         {
             bool even = true;
             int bit = 0;
             int ch = 0;
             int length = 0;
-            var geohash = new char[Precision];
+            var geohash = new byte[Precision];
 
             double[] lat = { -90.0, 90.0 };
             double[] lon = { -180.0, 180.0 };
@@ -60,14 +60,14 @@ namespace GeoTimeZone
                 }
                 else
                 {
-                    geohash[length] = Base32[ch];
+                    geohash[length] = (byte)Base32[ch];
                     length++;
                     bit = 0;
                     ch = 0;
                 }
             }
 
-            return new string(geohash);
+            return geohash;
         }
     }
 }
