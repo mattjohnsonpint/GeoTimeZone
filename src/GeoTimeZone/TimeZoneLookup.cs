@@ -57,11 +57,10 @@ namespace GeoTimeZone
                     break;
             }
 
-            var lineNumbers = new List<int>();
-            for (int i = min; i <= max; i++)
+            var lineNumbers = new int[max - min + 1];
+            for (int i = 0; i < lineNumbers.Length; i++)
             {
-                int lineNumber = TimezoneFileReader.GetLineNumber(i);
-                lineNumbers.Add(lineNumber);
+                lineNumbers[i] = TimezoneFileReader.GetLineNumber(i + min);
             }
 
             return lineNumbers;
