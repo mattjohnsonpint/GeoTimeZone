@@ -2,7 +2,6 @@
 using System.IO;
 using System.IO.Compression;
 using System.Reflection;
-using System.Text;
 
 namespace GeoTimeZone
 {
@@ -11,7 +10,7 @@ namespace GeoTimeZone
         private const int LineLength = 8;
         private const int LineEndLength = 1;
 
-#if !NETSTANDARD2_1
+#if NETSTANDARD1_1
         private static readonly object Locker = new object();
 #endif
 
@@ -79,6 +78,11 @@ namespace GeoTimeZone
 
 #if NETSTANDARD2_1_OR_GREATER
             return new ReadOnlySpan<byte>(stream.GetBuffer(), index, count);
+#elif !NETSTANDARD1_1
+            var buffer = new byte[count];
+            Array.Copy(stream.GetBuffer(), index, buffer, 0, count);
+
+            return buffer;
 #else
             var buffer = new byte[count];
 
