@@ -19,7 +19,7 @@ namespace GeoTimeZone
         /// <returns>A <see cref="TimeZoneResult"/> object, which contains the result(s) of the operation.</returns>
         public static TimeZoneResult GetTimeZone(double latitude, double longitude)
         {
-#if NETSTANDARD2_1_OR_GREATER
+#if NET6_0_OR_GREATER || NETSTANDARD2_1
             Span<byte> geohash = stackalloc byte[Geohash.Precision];
 #else
             byte[] geohash = new byte[Geohash.Precision];
@@ -38,7 +38,7 @@ namespace GeoTimeZone
         }
 
         private static int[] GetTzDataLineNumbers(
-#if NETSTANDARD2_1_OR_GREATER
+#if NET6_0_OR_GREATER || NETSTANDARD2_1
             ReadOnlySpan<byte> geohash
 #else
             byte[] geohash
@@ -80,7 +80,7 @@ namespace GeoTimeZone
         }
 
         private static bool GeohashEquals
-#if NETSTANDARD2_1_OR_GREATER
+#if NET6_0_OR_GREATER || NETSTANDARD2_1
             (ReadOnlySpan<byte> a, ReadOnlySpan<byte> b)
 #else
             (byte[] a, byte[] b)
@@ -96,7 +96,7 @@ namespace GeoTimeZone
         }
 
         private static int SeekTimeZoneFile(
-#if NETSTANDARD2_1_OR_GREATER
+#if NET6_0_OR_GREATER || NETSTANDARD2_1
             ReadOnlySpan<byte> hash
 #else
             byte[] hash
@@ -157,12 +157,7 @@ namespace GeoTimeZone
 
         private static IList<string> LoadLookupData()
         {
-
-#if NETSTANDARD1_1
-            Assembly assembly = typeof(TimeZoneLookup).GetTypeInfo().Assembly;
-#else
             Assembly assembly = typeof(TimeZoneLookup).Assembly;
-#endif
 
             using Stream compressedStream = assembly.GetManifestResourceStream("GeoTimeZone.TZL.dat.gz");
             using var stream = new GZipStream(compressedStream!, CompressionMode.Decompress);

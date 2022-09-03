@@ -3,8 +3,6 @@
 //  See accompanying LICENSE file for details.
 //
 
-using System;
-
 namespace GeoTimeZone
 {
     internal static class Geohash
@@ -15,7 +13,7 @@ namespace GeoTimeZone
         internal const int Precision = 5;
 
         public static void Encode(double latitude, double longitude,
-#if NETSTANDARD2_1_OR_GREATER
+#if NET6_0_OR_GREATER || NETSTANDARD2_1
             Span<byte> geohash
 #else
             byte[] geohash
@@ -27,7 +25,7 @@ namespace GeoTimeZone
             int ch = 0;
             int length = 0;
 
-#if NETSTANDARD2_1_OR_GREATER
+#if NET6_0_OR_GREATER || NETSTANDARD2_1
             Span<double> lat = stackalloc[] { -90.0, 90.0 };
             Span<double> lon = stackalloc[] { -180.0, 180.0 };
 #else

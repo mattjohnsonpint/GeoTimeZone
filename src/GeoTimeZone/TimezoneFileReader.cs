@@ -10,10 +10,6 @@ namespace GeoTimeZone
         private const int LineLength = 8;
         private const int LineEndLength = 1;
 
-#if NETSTANDARD1_1
-        private static readonly object Locker = new object();
-#endif
-
         private static readonly Lazy<MemoryStream> LazyData = new Lazy<MemoryStream>(LoadData);
         private static readonly Lazy<int> LazyCount = new Lazy<int>(GetCount);
 
@@ -21,11 +17,7 @@ namespace GeoTimeZone
         {
             var ms = new MemoryStream();
 
-#if NETSTANDARD1_1
-            Assembly assembly = typeof(TimezoneFileReader).GetTypeInfo().Assembly;
-#else
             Assembly assembly = typeof(TimezoneFileReader).Assembly;
-#endif
 
             using Stream compressedStream = assembly.GetManifestResourceStream("GeoTimeZone.TZ.dat.gz");
             using var stream = new GZipStream(compressedStream!, CompressionMode.Decompress);
@@ -46,7 +38,7 @@ namespace GeoTimeZone
         public static int Count => LazyCount.Value;
 
         public static
-#if NETSTANDARD2_1
+#if NET6_0_OR_GREATER || NETSTANDARD2_1
             ReadOnlySpan<byte>
 #else
             byte[]
@@ -65,7 +57,7 @@ namespace GeoTimeZone
         }
 
         private static
-#if NETSTANDARD2_1_OR_GREATER
+#if NET6_0_OR_GREATER || NETSTANDARD2_1
             ReadOnlySpan<byte>
 #else
             byte[]
@@ -76,21 +68,11 @@ namespace GeoTimeZone
 
             MemoryStream stream = LazyData.Value;
 
-#if NETSTANDARD2_1_OR_GREATER
+#if NET6_0_OR_GREATER || NETSTANDARD2_1
             return new ReadOnlySpan<byte>(stream.GetBuffer(), index, count);
-#elif !NETSTANDARD1_1
-            var buffer = new byte[count];
-            Array.Copy(stream.GetBuffer(), index, buffer, 0, count);
-
-            return buffer;
 #else
             var buffer = new byte[count];
-
-            lock (Locker)
-            {
-                stream.Position = index;
-                stream.Read(buffer, 0, count);
-            }
+            Array.Copy(stream.GetBuffer(), index, buffer, 0, count);
 
             return buffer;
 #endif
