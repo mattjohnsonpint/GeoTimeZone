@@ -1,108 +1,87 @@
-using System.Collections.Generic;
-using System.Linq;
+namespace GeoTimeZone.DataBuilder;
 
-namespace GeoTimeZone.DataBuilder
+public class TimeZoneTreeNode
 {
-    public class TimeZoneTreeNode
+    public readonly List<(TimeZoneFeature Feature, double PctOfNode)> TimeZones = new();
+    public readonly Dictionary<char, TimeZoneTreeNode> ChildNodes = new();
+
+    public void PrepareForOutput()
     {
-        public List<string> TimeZoneNames
-        {
-            get
-            {
-                return TimeZones.Select(x => x.TzName).Distinct().OrderBy(x => x).ToList();
-            }
-        } 
+        RollDownTimeZones();
+        RollUpTimeZones();
+    }
 
-        public readonly HashSet<TimeZoneFeature> TimeZones = new HashSet<TimeZoneFeature>(); 
-        public readonly Dictionary<char, TimeZoneTreeNode> ChildNodes = new Dictionary<char, TimeZoneTreeNode>();
-        
-        public void PrepareForOutput()
+    private bool RollUpTimeZones()
+    {
+        // If there are no child nodes, we are already rolled up
+        if (ChildNodes.Count == 0)
         {
-            RollDownTimeZones();
-            RollUpTimeZones();
+            return true;
         }
 
-        private bool RollUpTimeZones()
+        // Recurse to roll up every child node
+        var allChildrenRolledUp = true;
+        foreach (var childNode in ChildNodes.Values)
         {
-            bool allRolledUp = true;
-
-            if (ChildNodes.Count == 0)
-                return true;
-
-            foreach (KeyValuePair<char, TimeZoneTreeNode> childNode in ChildNodes)
+            if (!childNode.RollUpTimeZones())
             {
-                bool temp = childNode.Value.RollUpTimeZones();
-                if (!temp)
-                    allRolledUp = false;
+                allChildrenRolledUp = false;
             }
-
-            if (allRolledUp)
-            {
-                bool canRollup = ChildNodes.Count == 32;
-
-                if (canRollup)
-                {
-                    List<string> tzIds = null;
-                    foreach ((char _, TimeZoneTreeNode childNode) in ChildNodes)
-                    {
-                        if (tzIds == null)
-                            tzIds = childNode.TimeZoneNames;
-                        else
-                        {
-                            bool temp = childNode.TimeZoneNames.SequenceEqual(tzIds);
-                            if (!temp)
-                            {
-                                canRollup = false;
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                if (canRollup)
-                {
-                    var timeZones = ChildNodes.SelectMany(x => x.Value.TimeZones).ToList();
-                    foreach (TimeZoneFeature timeZone in timeZones)
-                    {
-                        TimeZones.Add(timeZone);
-                    }
-
-                    ChildNodes.Clear();
-                }
-                else
-                {
-                    allRolledUp = false;
-                }
-            }
-
-            return allRolledUp;
         }
 
-
-        private void RollDownTimeZones()
+        // We can only roll up this node if there are 32 child nodes and they are all rolled up
+        if (ChildNodes.Count != 32 || !allChildrenRolledUp)
         {
-            if (TimeZones.Count > 0 && ChildNodes.Count > 0)
-            {
-                foreach (char hashChar in GeohashTree.Base32)
-                {
-                    if (!ChildNodes.TryGetValue(hashChar, out TimeZoneTreeNode childNode))
-                    {
-                        childNode = ChildNodes[hashChar] = new TimeZoneTreeNode();
-                    }
+            return false;
+        }
 
-                    foreach (TimeZoneFeature timeZone in TimeZones)
-                    {
-                        childNode.TimeZones.Add(timeZone);
-                    }
+        // All child nodes must have the same time zones, ordered by pct of node
+        List<string>? tzIds = null;
+        foreach (var childNode in ChildNodes.Values)
+        {
+            if (tzIds == null)
+            {
+                tzIds = childNode.GetTimeZonesOrderedByPctOfNode().ToList();
+            }
+            else if (!tzIds.SequenceEqual(childNode.GetTimeZonesOrderedByPctOfNode()))
+            {
+                return false;
+            }
+        }
+
+        // Roll up the time zone features into this node and clear the children
+        var timeZones = ChildNodes.SelectMany(x => x.Value.TimeZones);
+        TimeZones.AddRange(timeZones);
+        ChildNodes.Clear();
+
+        return true;
+    }
+
+    private IEnumerable<string> GetTimeZonesOrderedByPctOfNode() => TimeZones
+        .GroupBy(x => x.Feature.TimeZoneName)
+        .OrderByDescending(x => x.Sum(y => y.PctOfNode))
+        .Select(x => x.Key);
+
+    private void RollDownTimeZones()
+    {
+        if (TimeZones.Count > 0 && ChildNodes.Count > 0)
+        {
+            foreach (var hashChar in GeohashTree.Base32)
+            {
+                if (!ChildNodes.TryGetValue(hashChar, out var childNode))
+                {
+                    childNode = ChildNodes[hashChar] = new TimeZoneTreeNode();
                 }
 
-                TimeZones.Clear();
+                childNode.TimeZones.AddRange(TimeZones);
             }
 
-            foreach (KeyValuePair<char, TimeZoneTreeNode> childNode in ChildNodes)
-            {
-                childNode.Value.RollDownTimeZones();
-            }
+            TimeZones.Clear();
+        }
+
+        foreach (var childNode in ChildNodes)
+        {
+            childNode.Value.RollDownTimeZones();
         }
     }
 }

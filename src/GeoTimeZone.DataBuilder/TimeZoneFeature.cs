@@ -1,11 +1,23 @@
-﻿using NetTopologySuite.Geometries;
+using NetTopologySuite.Geometries;
+using NetTopologySuite.Geometries.Prepared;
 
-namespace GeoTimeZone.DataBuilder
+namespace GeoTimeZone.DataBuilder;
+
+public class TimeZoneFeature
 {
-    public class TimeZoneFeature
+    internal static readonly PreparedGeometryFactory PreparedGeometryFactory = new();
+    private IPreparedGeometry? _preparedGeometry;
+    
+    public TimeZoneFeature(string timeZoneName, Geometry geometry, int multiPolyIndex = -1)
     {
-        public string TzName { get; set; }
-        public Geometry Geometry { get; set; }
-        public int MultiPolyIndex { get; set; } = -1;
+        TimeZoneName = timeZoneName;
+        Geometry = geometry;
+        MultiPolyIndex = multiPolyIndex;
     }
+
+    public string TimeZoneName { get; }
+    public Geometry Geometry { get; }
+    public int MultiPolyIndex { get; }
+
+    public IPreparedGeometry PreparedGeometry => _preparedGeometry ??= PreparedGeometryFactory.Create(Geometry);
 }
