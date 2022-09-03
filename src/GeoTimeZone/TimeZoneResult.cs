@@ -1,6 +1,5 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 
 namespace GeoTimeZone
 {
@@ -9,15 +8,16 @@ namespace GeoTimeZone
     /// </summary>
     public class TimeZoneResult
     {
-        internal TimeZoneResult(params string[] timeZones)
+        internal TimeZoneResult(List<string> timeZones)
         {
-            if (timeZones.Length == 0)
-            {
-                throw new ArgumentException("There must be at least one value provided.", nameof(timeZones));
-            }
-
             this.Result = timeZones[0];
-            this.AlternativeResults = new ReadOnlyCollection<string>(timeZones.Skip(1).ToList());
+            this.AlternativeResults = new ReadOnlyCollection<string>(timeZones.GetRange(1, timeZones.Count - 1));
+        }
+
+        internal TimeZoneResult(string timeZone)
+        {
+            this.Result = timeZone;
+            this.AlternativeResults = new ReadOnlyCollection<string>(new List<string>());
         }
 
         /// <summary>

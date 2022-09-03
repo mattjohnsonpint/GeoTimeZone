@@ -3,6 +3,8 @@
 //  See accompanying LICENSE file for details.
 //
 
+using System;
+
 namespace GeoTimeZone
 {
     internal static class Geohash
@@ -10,21 +12,30 @@ namespace GeoTimeZone
         private const string Base32 = "0123456789bcdefghjkmnpqrstuvwxyz";
         private static readonly int[] Bits = { 16, 8, 4, 2, 1 };
 
-        public static string Encode(double latitude, double longitude, int precision = 12)
+        internal const int Precision = 5;
+
+        public static void Encode(double latitude, double longitude,
+#if NETSTANDARD2_1_OR_GREATER
+            Span<byte> geohash
+#else
+            byte[] geohash
+#endif
+        )
         {
             bool even = true;
             int bit = 0;
             int ch = 0;
             int length = 0;
-            var geohash = new char[precision];
 
+#if NETSTANDARD2_1_OR_GREATER
+            Span<double> lat = stackalloc[] { -90.0, 90.0 };
+            Span<double> lon = stackalloc[] { -180.0, 180.0 };
+#else
             double[] lat = { -90.0, 90.0 };
             double[] lon = { -180.0, 180.0 };
+#endif
 
-            if (precision < 1 || precision > 20)
-                precision = 12;
-
-            while (length < precision)
+            while (length < Precision)
             {
                 if (even)
                 {
@@ -61,14 +72,12 @@ namespace GeoTimeZone
                 }
                 else
                 {
-                    geohash[length] = Base32[ch];
+                    geohash[length] = (byte)Base32[ch];
                     length++;
                     bit = 0;
                     ch = 0;
                 }
             }
-
-            return new string(geohash);
         }
     }
 }
