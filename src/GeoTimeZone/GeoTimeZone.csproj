@@ -3,39 +3,16 @@
   <PropertyGroup>
     <Description>Provides an IANA time zone identifier from latitude and longitude coordinates.</Description>
     <Authors>Matt Johnson-Pint,Simon Bartlett</Authors>
-    <LangVersion>8.0</LangVersion>
     <TargetFrameworks>net6.0;netstandard2.1;netstandard2.0;net462</TargetFrameworks>
     <PackageId>GeoTimeZone</PackageId>
     <PackageTags>timezone;time;zone;geolocation;geo;latitude;longitude;coordinates;iana;tzdb</PackageTags>
-    <PackageProjectUrl>https://github.com/mj1856/GeoTimeZone</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/mattjohnsonpint/GeoTimeZone</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <IncludeSource>True</IncludeSource>
-    <IncludeSymbols>True</IncludeSymbols>
-    <Version>4.1.0</Version>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\GeoTimeZone.xml</DocumentationFile>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>mj1856_oss.snk</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Version>5.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="TZ.dat.gz;TZL.dat.gz" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.1' ">
-    <PackageReference Remove="NETStandard.Library" />
-    <PackageReference Include="System.IO.Compression" Version="4.3.0" />
-    <PackageReference Include="System.Linq" Version="4.3.0" />
-    <PackageReference Include="System.Reflection" Version="4.3.0" />
-    <PackageReference Include="System.Runtime.Extensions" Version="4.3.1" />
-    <PackageReference Include="System.Threading" Version="4.3.0" />
   </ItemGroup>
 
 </Project>
