@@ -43,7 +43,7 @@ Huge thank you to the following people:
 - Sharon Lourduraj, who wrote GeoHash-net that we used for our original implementation.
 - David Troy, who wrote Geohash-js that Sharon later ported to .NET
 - Nick Johnson, who's [excellent blog post](http://blog.notdot.net/2009/11/Damn-Cool-Algorithms-Spatial-indexing-with-Quadtrees-and-Hilbert-Curves) has been an inspiration to this project and so many others!
-
+- Jonas Nyrup, who has helped with performance optimizations.
 
 ## License
 
