@@ -20,8 +20,6 @@ public static class ConsoleOutput
         Console.WriteLine("Finished at: {0}", GetLocalDisplayTime());
         Console.WriteLine("Total elapsed time: {0:hh\\:mm\\:ss\\.fff}", Stopwatch.Elapsed);
         Console.WriteLine();
-        Console.WriteLine("Hit any key to exit.");
-        Console.ReadKey();
     }
 
     public static void WriteMessage(string message)

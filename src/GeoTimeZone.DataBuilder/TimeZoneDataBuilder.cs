@@ -192,8 +192,6 @@ public static class TimeZoneDataBuilder
 
         WriteLookup(outputPath);
         ConsoleOutput.WriteMessage("Lookup file written.");
-
-        ConsoleOutput.WriteMessage("Done!");
     }
 
     private static void PreLoadTimeZones(IEnumerable<TimeZoneFeature> features)
