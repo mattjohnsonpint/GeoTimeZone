@@ -1,0 +1,38 @@
+name: pack-for-release
+
+on:
+  workflow_dispatch:
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  DOTNET_NOLOGO: 1
+
+jobs:
+  build-and-pack:
+    runs-on: ubuntu-latest
+
+    steps:
+        - name: Checkout
+          uses: actions/checkout@v3
+
+        - name: Restore
+          run: dotnet restore --nologo
+
+        - name: Run Data Builder
+          run: dotnet run --project src/GeoTimeZone.DataBuilder -c Release --nologo --no-restore
+
+        - name: Build Solution
+          run: dotnet build -c Release --nologo --no-restore
+
+        - name: Test
+          run: dotnet test -c Release --nologo --no-build -l GitHubActions -l "trx;LogFileName=testresults.trx"
+
+        - name: Pack
+          run: dotnet pack -c Release --nologo --no-build
+
+        - name: Archive Artifacts
+          uses: actions/upload-artifact@v3
+          with:
+            name: nuget-packages
+            path: src/**/Release/*.*nupkg
+            if-no-files-found: error
