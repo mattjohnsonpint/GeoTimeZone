@@ -12,6 +12,11 @@ public static class TimeZoneDataBuilder
     private const string DataFileName = "TZ.dat.gz";
     private const string LookupFileName = "TZL.dat.gz";
 
+    private static readonly Dictionary<string, string> Overrides = new(StringComparer.Ordinal)
+    {
+        ["Europe/Kiev"] = "Europe/Kyiv"
+    };
+
     private static void WriteLookup(string outputPath)
     {
 
@@ -24,7 +29,13 @@ public static class TimeZoneDataBuilder
         var timeZones = TimeZones.Values.OrderBy(x => x.LineNumber);
         foreach (var timeZone in timeZones)
         {
-            writer.WriteLine(timeZone.IanaTimeZoneId);
+            var id = timeZone.IanaTimeZoneId;
+            if (Overrides.TryGetValue(id, out var replacement))
+            {
+                id = replacement;
+            }
+
+            writer.WriteLine(id);
         }
     }
 

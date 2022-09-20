@@ -71,4 +71,11 @@ public class TimeZoneLookupTests
         var tz = TimeZoneLookup.GetTimeZone(23.22, -106.42).Result;
         Assert.Equal("America/Mazatlan", tz);
     }
+    
+    [Fact]
+    public void Can_Lookup_TimeZone_Kyiv()
+    {
+        var tz = TimeZoneLookup.GetTimeZone(50.45, 30.523333).Result;
+        Assert.Equal("Europe/Kyiv", tz);
+    }
 }
