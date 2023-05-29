@@ -12,7 +12,7 @@ internal static class Program
 
         ConsoleOutput.WriteMessage("Downloading Time Zone Boundaries Shapefile");
         var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()[..8]);
-        var filePath = await DownloadDataAsync("2022g", tempDir);
+        var filePath = await DownloadDataAsync("2023b", tempDir);
 
         ConsoleOutput.WriteMessage("Extracting contents...");
         ZipFile.ExtractToDirectory(filePath, tempDir);
