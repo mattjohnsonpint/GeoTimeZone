@@ -85,4 +85,11 @@ public class TimeZoneLookupTests
         var tz = TimeZoneLookup.GetTimeZone(31.738581, -106.487014).Result;
         Assert.Equal("America/Ciudad_Juarez", tz);
     }
+
+    [Fact]
+    public void Can_Lookup_TimeZone_Copenhagen()
+    {
+        var tz = TimeZoneLookup.GetTimeZone(55.6712398, 12.5114246).Result;
+        Assert.Equal("Europe/Copenhagen", tz);
+    }
 }
