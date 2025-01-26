@@ -1,6 +1,4 @@
-using NetTopologySuite.Features;
-using NetTopologySuite.Geometries;
-using NetTopologySuite.IO;
+using NetTopologySuite.IO.Esri;
 
 namespace GeoTimeZone.DataBuilder;
 
@@ -15,27 +13,17 @@ public class TimeZoneShapeFileReader
 
     public IEnumerable<TimeZoneFeature> ReadShapeFile()
     {
-        using var reader = new ShapefileDataReader(_shapeFile, GeometryFactory.Default);
-        var header = reader.DbaseHeader;
-
-        while (reader.Read())
+        foreach (var feature in Shapefile.ReadAllFeatures(_shapeFile))
         {
-            var attributes = new AttributesTable();
-            for (var i = 0; i < header.NumFields; i++)
-            {
-                var name = header.Fields[i].Name;
-                var value = reader.GetValue(i + 1);
-                attributes.Add(name, value);
-            }
+            var zone = (string) feature.Attributes["tzid"];
 
             // skip uninhabited areas
-            var zone = (string) attributes["tzid"];
             if (zone.Equals("uninhabited", StringComparison.OrdinalIgnoreCase))
             {
                 continue;
             }
 
-            yield return new TimeZoneFeature(zone, reader.Geometry);
+            yield return new TimeZoneFeature(zone, feature.Geometry);
         }
     }
 }

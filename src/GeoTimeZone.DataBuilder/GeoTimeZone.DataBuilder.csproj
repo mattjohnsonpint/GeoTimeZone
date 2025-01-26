@@ -1,14 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <OutputType>Exe</OutputType>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="NetTopologySuite" Version="2.5.0" />
-    <PackageReference Include="NetTopologySuite.IO.ShapeFile" Version="2.1.0" />
+    <PackageReference Include="NetTopologySuite.IO.Esri.ShapeFile" Version="1.2.0" />
   </ItemGroup>
 
 </Project>
