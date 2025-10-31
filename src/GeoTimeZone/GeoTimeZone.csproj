@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Description>Provides an IANA time zone identifier from latitude and longitude coordinates.</Description>
     <Authors>Matt Johnson-Pint,Simon Bartlett</Authors>
-    <TargetFrameworks>netstandard2.0;netstandard2.1;net462;net6.0;net8.0;net9.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net462;net8.0;net9.0</TargetFrameworks>
     <PackageId>GeoTimeZone</PackageId>
     <PackageTags>timezone;time;zone;geolocation;geo;latitude;longitude;coordinates;iana;tzdb</PackageTags>
     <PackageProjectUrl>https://github.com/mattjohnsonpint/GeoTimeZone</PackageProjectUrl>
