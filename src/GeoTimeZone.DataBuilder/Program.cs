@@ -19,7 +19,7 @@ internal static class Program
 
         ConsoleOutput.WriteMessage("Processing data...");
         var shapeFile = Path.Combine(tempDir, "combined-shapefile.shp");
-        var outputPath = Path.Combine(GetSolutionDir(), "src", "GeoTimeZone");
+        var outputPath = Path.Combine(GetSolutionDir(), "src", "GeoTimeZone.Data");
         var tzShapeReader = new TimeZoneShapeFileReader(shapeFile);
         TimeZoneDataBuilder.CreateGeohashData(tzShapeReader, outputPath);
 

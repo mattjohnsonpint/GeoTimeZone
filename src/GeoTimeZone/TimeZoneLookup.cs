@@ -32,7 +32,7 @@ public static class TimeZoneLookup
         var offsetHours = CalculateOffsetHoursFromLongitude(longitude);
         return new TimeZoneResult(GetTimeZoneId(offsetHours));
     }
-    
+
 #if NET6_0_OR_GREATER || NETSTANDARD2_1
     private static int[] GetTzDataLineNumbers(ReadOnlySpan<byte> geohash)
 #else
@@ -86,7 +86,7 @@ public static class TimeZoneLookup
 #if NET6_0_OR_GREATER || NETSTANDARD2_1
     private static bool GeohashEquals (ReadOnlySpan<byte> a, ReadOnlySpan<byte> b)
 #else
-    private static bool GeohashEquals (byte[] a, byte[] b)
+    private static bool GeohashEquals(byte[] a, byte[] b)
 #endif
     {
         var equals = true;
@@ -97,7 +97,7 @@ public static class TimeZoneLookup
 
         return equals;
     }
-    
+
 #if NET6_0_OR_GREATER || NETSTANDARD2_1
     private static int SeekTimeZoneFile(ReadOnlySpan<byte> hash)
 #else
@@ -162,8 +162,7 @@ public static class TimeZoneLookup
 
     private static IList<string> LoadLookupData()
     {
-        var assembly = typeof(TimeZoneLookup).Assembly;
-        using var compressedStream = assembly.GetManifestResourceStream("GeoTimeZone.TZL.dat.gz");
+        using var compressedStream = GeoTimeZone.Data.Assembly.GetManifestResourceStream("GeoTimeZone.Data.TZL.dat.gz");
         using var stream = new GZipStream(compressedStream!, CompressionMode.Decompress);
         using var reader = new StreamReader(stream);
 
@@ -206,7 +205,7 @@ public static class TimeZoneLookup
             offset++;
         }
 
-        return dir * (int) Math.Floor(offset);
+        return dir * (int)Math.Floor(offset);
     }
 
     private static string GetTimeZoneId(int offsetHours)

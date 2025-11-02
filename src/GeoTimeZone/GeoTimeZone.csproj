@@ -11,10 +11,6 @@
     <Version>6.1.0</Version>
   </PropertyGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Include="TZ.dat.gz;TZL.dat.gz" />
-  </ItemGroup>
-
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>..\..\.assets\mattjohnsonpint.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
@@ -27,6 +23,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\GeoTimeZone.Data\GeoTimeZone.Data.csproj" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All"/>
   </ItemGroup>
 

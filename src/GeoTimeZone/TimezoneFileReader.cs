@@ -12,8 +12,7 @@ internal static class TimezoneFileReader
 
     private static MemoryStream LoadData()
     {
-        var assembly = typeof(TimezoneFileReader).Assembly;
-        using var compressedStream = assembly.GetManifestResourceStream("GeoTimeZone.TZ.dat.gz");
+        using var compressedStream = GeoTimeZone.Data.Assembly.GetManifestResourceStream("GeoTimeZone.Data.TZ.dat.gz");
         using var stream = new GZipStream(compressedStream!, CompressionMode.Decompress);
 
         var ms = new MemoryStream();
@@ -22,7 +21,7 @@ internal static class TimezoneFileReader
         return ms;
     }
 
-    private static int GetCount() => (int) (LazyData.Value.Length / (LineLength + LineEndLength));
+    private static int GetCount() => (int)(LazyData.Value.Length / (LineLength + LineEndLength));
 
     public static int Count => LazyCount.Value;
 
