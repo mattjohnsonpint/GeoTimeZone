@@ -1,0 +1,40 @@
+{
+  "version": "2.0.0",
+  "tasks": [    
+    {
+      "label": "build_data_builder",
+      "command": "dotnet",
+      "type": "shell",
+      "args": [
+        "build",
+        "${workspaceFolder}/src/GeoTimeZone.DataBuilder/GeoTimeZone.DataBuilder.csproj",
+        "--no-restore",
+        "/property:RunAnalyzers=false",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "presentation": {
+        "reveal": "silent"
+      },
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "spell_check",
+      "command": "cspell",
+      "type": "shell",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "args": ["\"**/*.cs\"", "--no-progress"],
+      "group": "none",
+      "presentation": {
+        "reveal": "always"
+      },
+      "problemMatcher": []
+    },
+  ]
+}

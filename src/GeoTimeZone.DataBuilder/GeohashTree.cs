@@ -5,25 +5,26 @@ namespace GeoTimeZone.DataBuilder;
 
 public class GeohashTree : List<GeohashTreeNode>
 {
-    internal const int Precision = 5;
-    
+    public readonly int Precision;
+
     internal const string Base32 = "0123456789bcdefghjkmnpqrstuvwxyz";
 
-    public GeohashTree()
+    public GeohashTree(int precision = 5)
     {
+        Precision = precision;
         AddRange(GetNextLevel());
     }
 
     public List<string> GetGeohashes(IPreparedGeometry geometry) => this.SelectMany(level => GetGeohashes(geometry, level)).ToList();
 
-    private static IEnumerable<string> GetGeohashes(IPreparedGeometry geometry, GeohashTreeNode level)
+    private IEnumerable<string> GetGeohashes(IPreparedGeometry geometry, GeohashTreeNode level)
     {
         try
         {
             var envelope = level.GetGeometry();
             if (geometry.Contains(envelope))
             {
-                return new[] {level.Geohash};
+                return new[] { level.Geohash };
             }
 
             if (!geometry.Intersects(envelope))
@@ -33,7 +34,7 @@ public class GeohashTree : List<GeohashTreeNode>
 
             if (level.Geohash.Length == Precision)
             {
-                return new[] {level.Geohash};
+                return new[] { level.Geohash };
             }
 
             return level.GetChildren().SelectMany(child => GetGeohashes(geometry, child));
@@ -62,7 +63,7 @@ public class GeohashTree : List<GeohashTreeNode>
         return result;
     }
 
-    public static IEnumerable<GeohashTreeNode> GetNextLevel(string geohash = "", Envelope? envelope = null)
+    public IEnumerable<GeohashTreeNode> GetNextLevel(string geohash = "", Envelope? envelope = null)
     {
         if (geohash == string.Empty || envelope == null)
         {
@@ -75,7 +76,7 @@ public class GeohashTree : List<GeohashTreeNode>
         return SplitEnvelope2(envelope, even)
             .SelectMany(x => SplitEnvelope4(x, even))
             .SelectMany(x => SplitEnvelope4(x, even))
-            .Select((envelope1, index) => new GeohashTreeNode (envelope1, geohash + Base32[index]));
+            .Select((envelope1, index) => new GeohashTreeNode(this, envelope1, geohash + Base32[index]));
     }
 
     public static IEnumerable<Envelope> SplitEnvelope2(Envelope envelope, bool even)

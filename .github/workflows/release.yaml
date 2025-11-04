@@ -30,8 +30,8 @@ jobs:
         - name: Pack
           run: dotnet pack -c Release --nologo --no-build
 
-        - name: Push to NuGet
-          run: dotnet nuget push --skip-duplicate -s https://api.nuget.org/v3/index.json -k ${{secrets.NUGET_API_KEY}} src/GeoTimeZone/**/*.nupkg
+        # - name: Push to NuGet
+        #   run: dotnet nuget push --skip-duplicate -s https://api.nuget.org/v3/index.json -k ${{secrets.NUGET_API_KEY}} src/GeoTimeZone/**/*.nupkg
 
         - name: Archive Artifacts
           uses: actions/upload-artifact@v5

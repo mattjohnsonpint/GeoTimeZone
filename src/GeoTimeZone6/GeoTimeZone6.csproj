@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Description>Provides an IANA time zone identifier from latitude and longitude coordinates.</Description>
+    <Authors>Matt Johnson-Pint,Simon Bartlett</Authors>
+    <PackageId>GeoTimeZone6</PackageId>
+    <PackageTags>timezone;time;zone;geolocation;geo;latitude;longitude;coordinates;iana;tzdb</PackageTags>
+    <PackageProjectUrl>https://github.com/mattjohnsonpint/GeoTimeZone</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Version>6.1.0</Version>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- <AssemblyOriginatorKeyFile>..\..\.assets\mattjohnsonpint.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly> -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!-- <PackageReadmeFile>README.md</PackageReadmeFile> -->
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)\..\GeoTimeZone\TimeZoneLookup.cs" LinkBase="Shared" />
+    <ProjectReference Include="..\GeoTimeZone.Core\GeoTimeZone.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="TZ.dat.gz;TZL.dat.gz" />
+  </ItemGroup>
+
+</Project>

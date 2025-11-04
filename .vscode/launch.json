@@ -1,0 +1,19 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "data_builder",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build_data_builder",
+      "program": "${workspaceFolder}/src/GeoTimeZone.DataBuilder/bin/Debug/net9.0/GeoTimeZone.DataBuilder.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/src/GeoTimeZone.DataBuilder",
+      "stopAtEntry": true,
+      "console": "integratedTerminal",
+      "logging": {
+        "moduleLoad": false
+      }
+    }
+  ]
+}

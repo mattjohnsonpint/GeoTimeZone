@@ -3,28 +3,55 @@ using NetTopologySuite.Geometries;
 
 namespace GeoTimeZone.DataBuilder;
 
-public static class TimeZoneDataBuilder
+public class TimeZoneDataBuilder
 {
-    private static readonly GeohashTree GeohashTree = new();
-    private static readonly TimeZoneTreeNode WorldBoundsTreeNode = new();
-    private static readonly Dictionary<string, TimeZoneMeta> TimeZones = new();
+    private readonly TimeZoneTreeNode WorldBoundsTreeNode = new();
+    private readonly Dictionary<string, TimeZoneMeta> TimeZones = new();
 
     private const string DataFileName = "TZ.dat.gz";
     private const string LookupFileName = "TZL.dat.gz";
 
-    private static readonly Dictionary<string, string> Overrides = new(StringComparer.Ordinal)
+    public TimeZoneDataBuilder(IEnumerable<TimeZoneFeature> fileFeatures)
+    {
+        ArgumentNullException.ThrowIfNull(fileFeatures);
+
+        ConsoleOutput.WriteMessage("Loading polygons...");
+
+        Features = fileFeatures
+            .SelectMany(x =>
+            {
+                if (x.Geometry is MultiPolygon mp)
+                {
+                    // Expand MultiPolygons to individual Polygons
+                    return mp.Geometries.Select((geometry, index) =>
+                        new TimeZoneFeature(x.TimeZoneName, geometry, index));
+                }
+
+                return new[] { x };
+            })
+            .Where(x => x.Geometry.Area > 0)
+            .OrderBy(x => x.TimeZoneName).ThenBy(x => x.MultiPolyIndex)
+            .ToList();
+
+        PreLoadTimeZones(Features);
+
+        ConsoleOutput.WriteMessage("Polygons loaded.");
+    }
+
+    private readonly Dictionary<string, string> Overrides = new(StringComparer.Ordinal)
     {
         ["Europe/Kiev"] = "Europe/Kyiv"
     };
+    private readonly List<TimeZoneFeature> Features;
 
-    private static void WriteLookup(string outputPath)
+    private void WriteLookup(string outputPath)
     {
 
         var path = Path.Combine(outputPath, LookupFileName);
 
         using var fileStream = File.Create(path);
         using var compressedStream = new GZipStream(fileStream, CompressionMode.Compress);
-        using var writer = new StreamWriter(compressedStream) {NewLine = "\n"};
+        using var writer = new StreamWriter(compressedStream) { NewLine = "\n" };
 
         var timeZones = TimeZones.Values.OrderBy(x => x.LineNumber);
         foreach (var timeZone in timeZones)
@@ -39,24 +66,24 @@ public static class TimeZoneDataBuilder
         }
     }
 
-    private static void WriteGeohashDataFile(string outputPath)
+    private void WriteGeohashDataFile(GeohashTree tree, string outputPath)
     {
         var path = Path.Combine(outputPath, DataFileName);
 
         using var fileStream = File.Create(path);
         using var compressedStream = new GZipStream(fileStream, CompressionMode.Compress);
-        using var writer = new StreamWriter(compressedStream) {NewLine = "\n"};
-        WriteTreeNode(writer, WorldBoundsTreeNode);
+        using var writer = new StreamWriter(compressedStream) { NewLine = "\n" };
+        WriteTreeNode(tree, writer, WorldBoundsTreeNode);
     }
 
-    private static void WriteGeohash(TextWriter writer, string tz, string geohash)
+    private void WriteGeohash(GeohashTree tree, TextWriter writer, string tz, string geohash)
     {
-        var h = geohash.PadRight(GeohashTree.Precision, '-');
+        var h = geohash.PadRight(tree.Precision, '-');
         var p = TimeZones[tz].LineNumber.ToString("D3");
         writer.WriteLine(h + p);
     }
 
-    private static void WriteTreeNode(TextWriter writer, TimeZoneTreeNode node, string geohash = "")
+    private void WriteTreeNode(GeohashTree tree, TextWriter writer, TimeZoneTreeNode node, string geohash = "")
     {
         var childNodes = node.ChildNodes
             .OrderBy(x => x.Key);
@@ -72,17 +99,17 @@ public static class TimeZoneDataBuilder
 
                 foreach (var timeZone in timeZones)
                 {
-                    WriteGeohash(writer, timeZone, childHash);
+                    WriteGeohash(tree, writer, timeZone, childHash);
                 }
             }
             else if (childNode.ChildNodes.Count > 0)
             {
-                WriteTreeNode(writer, childNode, childHash);
+                WriteTreeNode(tree, writer, childNode, childHash);
             }
         }
     }
 
-    private static double CalculatePctOfNode(TimeZoneFeature feature, GeohashTreeNode node)
+    private double CalculatePctOfNode(TimeZoneFeature feature, GeohashTreeNode node)
     {
         var preparedGeometry = feature.PreparedGeometry;
         var nodeGeometry = node.GetGeometry();
@@ -100,13 +127,13 @@ public static class TimeZoneDataBuilder
         // Test a set of evenly distributed points within the envelope.
         var points = GetTestPoints(node.Envelope);
         var hits = points.Count(p => preparedGeometry.Contains(p));
-        return (double) hits / points.Length;
+        return (double)hits / points.Length;
 
         // Here's how we can do it with area, but it's very slow.
         // return feature.Geometry.Intersection(nodeGeometry).Area / node.Envelope.Area;
     }
 
-    private static Point[] GetTestPoints(Envelope envelope)
+    private Point[] GetTestPoints(Envelope envelope)
     {
         const int step = 5;
         var stepX = envelope.Width / (step - 1);
@@ -126,7 +153,7 @@ public static class TimeZoneDataBuilder
         return points;
     }
 
-    private static void AddResult(string geohash, TimeZoneFeature feature)
+    private void AddResult(GeohashTree GeohashTree, string geohash, TimeZoneFeature feature)
     {
         var currentNode = WorldBoundsTreeNode;
 
@@ -149,37 +176,17 @@ public static class TimeZoneDataBuilder
         }
     }
 
-    public static void CreateGeohashData(TimeZoneShapeFileReader inputShapefile, string outputPath)
+    public void CreateGeohashData(int precision, string outputPath)
     {
-        ConsoleOutput.WriteMessage("Loading polygons...");
+        var tree = new GeohashTree(precision);
 
-        var features = inputShapefile.ReadShapeFile()
-            .SelectMany(x =>
-            {
-                if (x.Geometry is MultiPolygon mp)
-                {
-                    // Expand MultiPolygons to individual Polygons
-                    return mp.Geometries.Select((geometry, index) =>
-                        new TimeZoneFeature(x.TimeZoneName, geometry, index));
-                }
-
-                return new[] {x};
-            })
-            .Where(x => x.Geometry.Area > 0)
-            .OrderBy(x => x.TimeZoneName).ThenBy(x => x.MultiPolyIndex)
-            .ToList();
-
-        PreLoadTimeZones(features);
-
-        ConsoleOutput.WriteMessage("Polygons loaded.");
-
-        var featuresWithGeohashes = features
+        var featuresWithGeohashes = Features
             .AsParallel()
             .Select(feature =>
             {
                 var indexString = feature.MultiPolyIndex >= 0 ? $"[{feature.MultiPolyIndex}]" : "";
                 ConsoleOutput.WriteMessage($"Generating geohash for {feature.TimeZoneName}" + indexString);
-                var geohashes = GeohashTree.GetGeohashes(feature.PreparedGeometry);
+                var geohashes = tree.GetGeohashes(feature.PreparedGeometry);
                 return (Feature: feature, Geohashes: geohashes);
             })
             .ToList();
@@ -189,7 +196,7 @@ public static class TimeZoneDataBuilder
         {
             foreach (var geohash in geohashes)
             {
-                AddResult(geohash, feature);
+                AddResult(tree, geohash, feature);
             }
         }
 
@@ -198,14 +205,14 @@ public static class TimeZoneDataBuilder
         WorldBoundsTreeNode.PrepareForOutput();
         ConsoleOutput.WriteMessage("Tree prepared.  Writing output...");
 
-        WriteGeohashDataFile(outputPath);
+        WriteGeohashDataFile(tree, outputPath);
         ConsoleOutput.WriteMessage("Data file written.");
 
         WriteLookup(outputPath);
         ConsoleOutput.WriteMessage("Lookup file written.");
     }
 
-    private static void PreLoadTimeZones(IEnumerable<TimeZoneFeature> features)
+    private void PreLoadTimeZones(IEnumerable<TimeZoneFeature> features)
     {
         var zones = features
             .GroupBy(x => x.TimeZoneName)

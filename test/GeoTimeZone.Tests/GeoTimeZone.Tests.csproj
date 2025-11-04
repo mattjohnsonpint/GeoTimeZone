@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\GeoTimeZone\GeoTimeZone.csproj" />
+    <ProjectReference Include="..\..\src\GeoTimeZone6\GeoTimeZone6.csproj" />
   </ItemGroup>
 
 </Project>
