@@ -4,7 +4,7 @@ namespace GeoTimeZone;
 
 internal static class TimezoneFileReader
 {
-    private const int LineLength = 8;
+    private const int LineLength = 9;
     private const int LineEndLength = 1;
 
     private static readonly Lazy<MemoryStream> LazyData = new(LoadData);
@@ -22,7 +22,7 @@ internal static class TimezoneFileReader
         return ms;
     }
 
-    private static int GetCount() => (int) (LazyData.Value.Length / (LineLength + LineEndLength));
+    private static int GetCount() => (int)(LazyData.Value.Length / (LineLength + LineEndLength));
 
     public static int Count => LazyCount.Value;
 

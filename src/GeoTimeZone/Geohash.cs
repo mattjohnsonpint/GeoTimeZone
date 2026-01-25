@@ -7,10 +7,10 @@ namespace GeoTimeZone;
 
 internal static class Geohash
 {
-    internal const int Precision = 5;
-    
+    internal const int Precision = 7;
+
     private const string Base32 = "0123456789bcdefghjkmnpqrstuvwxyz";
-    private static readonly int[] Bits = {16, 8, 4, 2, 1};
+    private static readonly int[] Bits = { 16, 8, 4, 2, 1 };
 
 #if NET6_0_OR_GREATER || NETSTANDARD2_1
     public static void Encode(double latitude, double longitude, Span<byte> geohash)
@@ -27,8 +27,8 @@ internal static class Geohash
         Span<double> lat = stackalloc[] {-90.0, 90.0};
         Span<double> lon = stackalloc[] {-180.0, 180.0};
 #else
-        double[] lat = {-90.0, 90.0};
-        double[] lon = {-180.0, 180.0};
+        double[] lat = { -90.0, 90.0 };
+        double[] lon = { -180.0, 180.0 };
 #endif
 
         while (length < Precision)
@@ -68,7 +68,7 @@ internal static class Geohash
             }
             else
             {
-                geohash[length] = (byte) Base32[ch];
+                geohash[length] = (byte)Base32[ch];
                 length++;
                 bit = 0;
                 ch = 0;

@@ -5,8 +5,8 @@ namespace GeoTimeZone.DataBuilder;
 
 public class GeohashTree : List<GeohashTreeNode>
 {
-    internal const int Precision = 5;
-    
+    internal const int Precision = 7;
+
     internal const string Base32 = "0123456789bcdefghjkmnpqrstuvwxyz";
 
     public GeohashTree()
@@ -23,7 +23,7 @@ public class GeohashTree : List<GeohashTreeNode>
             var envelope = level.GetGeometry();
             if (geometry.Contains(envelope))
             {
-                return new[] {level.Geohash};
+                return new[] { level.Geohash };
             }
 
             if (!geometry.Intersects(envelope))
@@ -33,7 +33,7 @@ public class GeohashTree : List<GeohashTreeNode>
 
             if (level.Geohash.Length == Precision)
             {
-                return new[] {level.Geohash};
+                return new[] { level.Geohash };
             }
 
             return level.GetChildren().SelectMany(child => GetGeohashes(geometry, child));
@@ -75,7 +75,7 @@ public class GeohashTree : List<GeohashTreeNode>
         return SplitEnvelope2(envelope, even)
             .SelectMany(x => SplitEnvelope4(x, even))
             .SelectMany(x => SplitEnvelope4(x, even))
-            .Select((envelope1, index) => new GeohashTreeNode (envelope1, geohash + Base32[index]));
+            .Select((envelope1, index) => new GeohashTreeNode(envelope1, geohash + Base32[index]));
     }
 
     public static IEnumerable<Envelope> SplitEnvelope2(Envelope envelope, bool even)
