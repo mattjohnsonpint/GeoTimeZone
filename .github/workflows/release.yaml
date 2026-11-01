@@ -34,7 +34,7 @@ jobs:
           run: dotnet nuget push --skip-duplicate -s https://api.nuget.org/v3/index.json -k ${{secrets.NUGET_API_KEY}} src/GeoTimeZone/**/*.nupkg
 
         - name: Archive Artifacts
-          uses: actions/upload-artifact@v5
+          uses: actions/upload-artifact@v6
           with:
             name: nuget-packages
             path: src/**/Release/*.*nupkg
