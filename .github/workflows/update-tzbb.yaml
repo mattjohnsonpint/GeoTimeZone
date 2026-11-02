@@ -19,8 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     permissions:
-      contents: write
-      pull-requests: write
+      contents: read
 
     steps:
       - name: Checkout default branch
@@ -102,6 +101,7 @@ jobs:
         if: steps.tzbb.outputs.update == 'true'
         uses: peter-evans/create-pull-request@v8
         with:
+          token: ${{ secrets.TZBB_UPDATE_TOKEN }}
           branch: automation/update-tzbb
           base: ${{ github.event.repository.default_branch }}
           add-paths: |
@@ -117,6 +117,3 @@ jobs:
 
             - Updated the DataBuilder's pinned release.
             - Regenerated `TZ.dat.gz` and `TZL.dat.gz` from `timezones.shapefile.zip`.
-            - Built the solution and passed the .NET 8, 9, and 10 tests on Linux.
-
-            This PR uses `GITHUB_TOKEN`, so GitHub does not automatically trigger the separate pull-request build workflow.
