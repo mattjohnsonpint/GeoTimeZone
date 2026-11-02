@@ -6,22 +6,29 @@ namespace GeoTimeZone.DataBuilder;
 
 internal static class Program
 {
-    private static async Task Main()
+    private static async Task Main(string[] args)
     {
         ConsoleOutput.Start();
 
-        ConsoleOutput.WriteMessage("Downloading Time Zone Boundaries Shapefile");
-        var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()[..8]);
-        var filePath = await DownloadDataAsync("2026f", tempDir);
-
-        ConsoleOutput.WriteMessage("Extracting contents...");
-        ZipFile.ExtractToDirectory(filePath, tempDir);
+        string shapeFile;
+        if (args.Length == 0)
+        {
+            ConsoleOutput.WriteMessage("Downloading Time Zone Boundaries Shapefile");
+            var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()[..8]);
+            var filePath = await DownloadDataAsync("2026f", tempDir);
+            ConsoleOutput.WriteMessage("Extracting contents...");
+            ZipFile.ExtractToDirectory(filePath, tempDir);
+            shapeFile = Path.Combine(tempDir, "combined-shapefile.shp");
+        }
+        else
+        {
+            shapeFile = args[0];
+        }
 
         ConsoleOutput.WriteMessage("Processing data...");
-        var shapeFile = Path.Combine(tempDir, "combined-shapefile.shp");
-        var outputPath = Path.Combine(GetSolutionDir(), "src", "GeoTimeZone");
+        var outputPath = args.Length > 1 ? args[1] : Path.Combine(GetSolutionDir(), "src", "GeoTimeZone");
         var tzShapeReader = new TimeZoneShapeFileReader(shapeFile);
-        TimeZoneDataBuilder.CreateGeohashData(tzShapeReader, outputPath);
+        TimeZoneDataBuilder.CreateData(tzShapeReader, outputPath);
 
         ConsoleOutput.WriteMessage("Done!");
         ConsoleOutput.Stop();

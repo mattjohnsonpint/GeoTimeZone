@@ -2,6 +2,68 @@ namespace GeoTimeZone.Tests;
 
 public class TimeZoneLookupTests
 {
+    [Theory]
+    // Historical border reports: #24, #42, #45, #46, #54, and #66.
+    [InlineData(49.0427211, -122.8466416, "America/Vancouver")]
+    [InlineData(35.8894012908865, -5.30445597754788, "Africa/Ceuta")]
+    [InlineData(34.15, -114.26, "America/Phoenix")]
+    [InlineData(-28.1978, 153.5346, "Australia/Sydney")]
+    [InlineData(23.88, 91.25, "Asia/Kolkata")]
+    [InlineData(69.147532, 29.2426967, "Europe/Oslo")]
+    // Airport examples from discussion #73.
+    [InlineData(34.528889, -114.431972, "America/Los_Angeles")]
+    [InlineData(45.671778, -116.305722, "America/Los_Angeles")]
+    public void Resolves_Border_Points_Without_Returning_Nearby_Zones(
+        double latitude, double longitude, string primary)
+    {
+        var result = TimeZoneLookup.GetTimeZone(latitude, longitude);
+
+        Assert.Equal(primary, result.Result);
+        Assert.Empty(result.AlternativeResults);
+    }
+
+    [Fact]
+    public void Resolves_The_Indiana_Runway_From_Three_Candidate_Zones()
+    {
+        // Indiana runway from discussion #73: the other two candidate zones
+        // intersect its cell, but do not contain the runway itself.
+        var result = TimeZoneLookup.GetTimeZone(38.694506, -85.198286);
+
+        Assert.Equal("America/Indiana/Vevay", result.Result);
+        Assert.Empty(result.AlternativeResults);
+    }
+
+    [Fact]
+    public void Distinguishes_French_And_Swiss_Points_That_Shared_A_Geohash_Cell()
+    {
+        // Original regression from #14, previously impossible to resolve by
+        // assigning one result to their shared geohash cell.
+        var france = TimeZoneLookup.GetTimeZone(47.589983, 7.587417);
+        var switzerland = TimeZoneLookup.GetTimeZone(47.58735, 7.588967);
+        Assert.Equal("Europe/Paris", france.Result);
+        Assert.Equal("Europe/Zurich", switzerland.Result);
+        Assert.Empty(france.AlternativeResults);
+        Assert.Empty(switzerland.AlternativeResults);
+    }
+
+    [Fact]
+    public void Single_Candidate_Has_No_Alternatives()
+    {
+        var result = TimeZoneLookup.GetTimeZone(33.45, -112.0667);
+
+        Assert.Equal("America/Phoenix", result.Result);
+        Assert.Empty(result.AlternativeResults);
+    }
+
+    [Fact]
+    public void Nautical_Fallback_Has_No_Alternatives()
+    {
+        var result = TimeZoneLookup.GetTimeZone(41.7325, -49.9469);
+
+        Assert.Equal("Etc/GMT+3", result.Result);
+        Assert.Empty(result.AlternativeResults);
+    }
+
     [Fact]
     public void Can_Lookup_TimeZone_PaigntonPier()
     {

@@ -7,16 +7,18 @@ namespace GeoTimeZone;
 /// </summary>
 public class TimeZoneResult
 {
+    private static readonly ReadOnlyCollection<string> EmptyResults = new(Array.Empty<string>());
+
     internal TimeZoneResult(List<string> timeZones)
     {
         Result = timeZones[0];
-        AlternativeResults = new ReadOnlyCollection<string>(timeZones.GetRange(1, timeZones.Count - 1));
+        AlternativeResults = timeZones.Count == 1 ? EmptyResults : new ReadOnlyCollection<string>(timeZones.GetRange(1, timeZones.Count - 1));
     }
 
     internal TimeZoneResult(string timeZone)
     {
         Result = timeZone;
-        AlternativeResults = new ReadOnlyCollection<string>(new List<string>());
+        AlternativeResults = EmptyResults;
     }
 
     /// <summary>

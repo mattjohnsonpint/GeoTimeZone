@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\GeoTimeZone\GeoTimeZone.csproj" />
     <ProjectReference Include="..\..\src\GeoTimeZone.DataBuilder\GeoTimeZone.DataBuilder.csproj" />
   </ItemGroup>
 

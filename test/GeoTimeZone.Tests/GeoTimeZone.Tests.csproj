@@ -8,6 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- Run the same adversarial cases against each actual library target,
+         including the net462 assembly selected by the net48 tests. -->
+    <Compile Include="../GeoTimeZone.DataBuilder.Tests/OrientationTests.cs;../GeoTimeZone.DataBuilder.Tests/CoordinateCodecTests.cs;../GeoTimeZone.DataBuilder.Tests/GridMathTests.cs;../GeoTimeZone.DataBuilder.Tests/CompressedResourceTests.cs;../GeoTimeZone.DataBuilder.Tests/TestDoubles.cs" Link="Robustness/%(Filename)%(Extension)" />
     <ProjectReference Include="..\..\src\GeoTimeZone\GeoTimeZone.csproj" />
   </ItemGroup>
 
