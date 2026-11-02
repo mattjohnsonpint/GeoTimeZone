@@ -92,8 +92,7 @@ jobs:
           base: ${{ github.event.repository.default_branch }}
           add-paths: |
             src/GeoTimeZone.DataBuilder/Program.cs
-            src/GeoTimeZone/TZIndex.dat.gz
-            src/GeoTimeZone/TZGeometry.dat
+            src/GeoTimeZone/GeoTimeZoneData.zip
           commit-message: Update TZBB data to ${{ steps.tzbb.outputs.version }}
           title: Update TZBB data to ${{ steps.tzbb.outputs.version }}
           body: |
@@ -102,4 +101,4 @@ jobs:
             Release notes: https://github.com/evansiroky/timezone-boundary-builder/releases/tag/${{ steps.tzbb.outputs.version }}
 
             - Updated the DataBuilder's pinned release.
-            - Regenerated `TZIndex.dat.gz` and `TZGeometry.dat` from `timezones.shapefile.zip`.
+            - Regenerated `GeoTimeZoneData.zip` from `timezones.shapefile.zip`.

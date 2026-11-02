@@ -16,11 +16,12 @@
     <InternalsVisibleTo Include="GeoTimeZone.Tests" Key="$(TestAssemblyPublicKey)" />
     <InternalsVisibleTo Include="GeoTimeZone.DataBuilder.Tests" Key="$(TestAssemblyPublicKey)" />
     <Compile Include="../Shared/*.cs" Link="Shared/%(Filename)%(Extension)" />
-    <EmbeddedResource Include="TZIndex.dat.gz;TZGeometry.dat" />
+    <EmbeddedResource Include="GeoTimeZoneData.zip" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net462'">
     <Reference Include="System.Numerics" />
+    <Reference Include="System.IO.Compression" />
   </ItemGroup>
 
   <PropertyGroup>

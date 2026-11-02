@@ -3,3 +3,4 @@
 
 # Generated binary spatial data must never undergo line-ending conversion.
 *.dat binary
+*.zip binary

@@ -144,6 +144,7 @@ internal sealed class GeometryArchive : IPolygonGeometry
         SpatialFormat.Require(gzip.ReadByte() == -1);
         var geometry = new PackedGeometry(image, entry.Hash, _zoneCount, 1);
         SpatialFormat.Require(geometry.Zone(0) == entry.Zone);
+        geometry.ValidateBounds(0, entry.West, entry.East, entry.South, entry.North);
         var cost = geometry.RetainedBytes + 128; // LRU node, entry and dictionary allowance
         lock (_gate)
         {

@@ -25,6 +25,38 @@ Note that .NET Framework versions less than 4.6.2 are no longer supported.
 string tz = TimeZoneLookup.GetTimeZone(50.4372, -3.5559).Result;  // "Europe/London"
 ```
 
+## Initialization and Custom Data
+
+By default, the embedded data is selected automatically on the first lookup. No explicit initialization is required. To load the index and geometry directory during application startup instead, call:
+
+```csharp
+TimeZoneLookup.Initialize();
+```
+
+To override the embedded data, supply a compatible `GeoTimeZoneData.zip` produced by this project's data builder **before any lookup or initialization**:
+
+```csharp
+using (var data = File.OpenRead("GeoTimeZoneData.zip"))
+{
+    await TimeZoneLookup.InitializeAsync(data);
+}
+
+string tz = TimeZoneLookup.GetTimeZone(50.4372, -3.5559).Result;
+```
+
+The synchronous equivalent is:
+
+```csharp
+using (var data = File.OpenRead("GeoTimeZoneData.zip"))
+{
+    TimeZoneLookup.Initialize(data);
+}
+```
+
+The stream overloads read from the current position, support nonseekable streams, and leave the stream open. The library retains its own copy of the internally compressed geometry archive, so the caller can close the stream afterward. Polygon components are still cached on demand.
+
+Custom data is fully validated before it is selected. Failed or canceled loads allow a retry. `InitializeAsync` accepts an optional `CancellationToken`; await it before making lookups. Once initialization has started, supplying custom data throws `InvalidOperationException`. Repeated calls to the parameterless `Initialize()` are safe.
+
 ## Usage Notes
 
 This library returns [IANA time zone IDs](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).  If you need a Windows time zone ID, pass the return value into the [TimeZoneConverter](https://github.com/mattjohnsonpint/TimeZoneConverter) library's `TZConvert.IanaToWindows` method, or to `TZConvert.GetTimeZoneInfo` to get a `TimeZoneInfo` object in a platform-neutral manner.

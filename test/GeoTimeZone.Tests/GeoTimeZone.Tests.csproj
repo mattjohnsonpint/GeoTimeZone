@@ -14,4 +14,8 @@
     <ProjectReference Include="..\..\src\GeoTimeZone\GeoTimeZone.csproj" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+    <Reference Include="System.IO.Compression" />
+  </ItemGroup>
+
 </Project>
