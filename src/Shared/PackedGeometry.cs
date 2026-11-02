@@ -2,7 +2,7 @@ using System.IO;
 
 namespace GeoTimeZone.Internal;
 
-internal sealed class PackedGeometry
+internal sealed class PackedGeometry : IPolygonGeometry
 {
     private readonly byte[] _image;
     private readonly int _payload;
@@ -73,7 +73,12 @@ internal sealed class PackedGeometry
         _payload = checked((int)stream.Position);
     }
 
-    internal int Zone(int polygon) => _polygons[polygon].Zone;
+    public int Zone(int polygon) => _polygons[polygon].Zone;
+
+    // Conservatively account for the retained image, padded record arrays,
+    // array headers and this object. The cache adds its own entry overhead.
+    internal long RetainedBytes => _image.LongLength + (long)_polygons.Length * 48
+        + (long)_rings.Length * 40 + (long)_blocks.Length * 32 + 256;
 
     internal void ValidateCoordinates(GeometryPolygon[] source)
     {
@@ -113,7 +118,7 @@ internal sealed class PackedGeometry
         }
     }
 
-    internal bool Covers(int polygon, double latitude, double longitude)
+    public bool Covers(int polygon, double latitude, double longitude)
     {
         var entry = _polygons[polygon];
         if (!entry.Bounds.Covers(latitude, longitude) || Locate(entry.FirstRing, latitude, longitude) == 0) return false;

@@ -33,7 +33,7 @@ public static class TimeZoneDataBuilder
         }).ToArray();
 
         ConsoleOutput.WriteMessage("Encoding shared geometry...");
-        var geometry = GeometryWriter.Serialize(polygons);
+        var geometry = GeometryArchiveWriter.Serialize(polygons);
         var prepared = features.Select(f => PreparedGeometryFactory.Prepare(f.Geometry)).ToArray();
         var tree = new STRtree<int>();
         for (var i = 0; i < features.Length; i++) tree.Insert(features[i].Geometry.EnvelopeInternal, i);
@@ -77,12 +77,11 @@ public static class TimeZoneDataBuilder
             }
         }
 
-        var index = new SpatialIndex(zones, SpatialFormat.Hash(geometry), polygons.Length, roots, children.ToArray(), offsets.ToArray(), candidates.ToArray());
+        var index = new SpatialIndex(zones, geometry.DirectoryHash, polygons.Length, roots, children.ToArray(), offsets.ToArray(), candidates.ToArray());
         // Validate the geometry metadata and its pairing before publishing files.
-        var packed = new PackedGeometry(geometry, index.GeometryHash, zones.Length, polygons.Length);
-        packed.ValidateCoordinates(polygons);
+        _ = new GeometryArchive(() => new MemoryStream(geometry.Image, false), index.GeometryHash, zones.Length, polygons.Length);
         Directory.CreateDirectory(outputPath);
-        SpatialFormat.WriteCompressed(Path.Combine(outputPath, "TZGeometry.dat.gz"), geometry);
+        File.WriteAllBytes(Path.Combine(outputPath, "TZGeometry.dat"), geometry.Image);
         SpatialFormat.WriteCompressed(Path.Combine(outputPath, "TZIndex.dat.gz"), index.Serialize());
         ConsoleOutput.WriteMessage($"Wrote {zones.Length} zones, {polygons.Length} polygons, {children.Count / SpatialFormat.ChildrenPerCell} refined cells, and {lists.Count} candidate lists.");
         return;

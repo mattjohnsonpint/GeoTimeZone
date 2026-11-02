@@ -6,6 +6,7 @@ namespace GeoTimeZone.Internal;
 internal sealed class SpatialIndex
 {
     internal string[] Zones { get; }
+    // SHA256 of the archive directory, whose entries bind individual images.
     internal byte[] GeometryHash { get; }
     internal int PolygonCount { get; }
     private readonly int[] _roots;

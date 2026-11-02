@@ -16,7 +16,7 @@
     <InternalsVisibleTo Include="GeoTimeZone.Tests" Key="$(TestAssemblyPublicKey)" />
     <InternalsVisibleTo Include="GeoTimeZone.DataBuilder.Tests" Key="$(TestAssemblyPublicKey)" />
     <Compile Include="../Shared/*.cs" Link="Shared/%(Filename)%(Extension)" />
-    <EmbeddedResource Include="TZIndex.dat.gz;TZGeometry.dat.gz" />
+    <EmbeddedResource Include="TZIndex.dat.gz;TZGeometry.dat" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net462'">

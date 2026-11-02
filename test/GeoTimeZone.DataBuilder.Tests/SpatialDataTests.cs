@@ -97,7 +97,7 @@ public class SpatialDataTests
         features.Add(new TimeZoneFeature("Zone/Islands", new MultiPolygon(
             [Rectangle(-3, -2.5, -3, -2.5), Rectangle(2.5, 3, 2.5, 3)])));
         var (index, geometry) = Build(features.ToArray());
-        var lazy = new Lazy<PackedGeometry>(() => geometry);
+        var lazy = new Lazy<GeometryArchive>(() => geometry);
 
         for (var i = 0; i < 20000; i++) Check(random.NextDouble() * 8 - 4, random.NextDouble() * 8 - 4);
         foreach (var feature in features)
@@ -175,12 +175,12 @@ public class SpatialDataTests
         {
             TimeZoneDataBuilder.CreateData([new TimeZoneFeature("A", Rectangle(-1, 1, -1, 1))], directory);
             var index = File.ReadAllBytes(Path.Combine(directory, "TZIndex.dat.gz"));
-            var geometry = File.ReadAllBytes(Path.Combine(directory, "TZGeometry.dat.gz"));
+            var geometry = File.ReadAllBytes(Path.Combine(directory, "TZGeometry.dat"));
             var bowtie = new Polygon(new LinearRing([new(0, 0), new(1, 1), new(1, 0), new(0, 1), new(0, 0)]));
             Assert.Throws<InvalidDataException>(() => TimeZoneDataBuilder.CreateData(
                 [new TimeZoneFeature("A", new MultiPolygon([Rectangle(-1, 1, -1, 1), bowtie]))], directory));
             Assert.Equal(index, File.ReadAllBytes(Path.Combine(directory, "TZIndex.dat.gz")));
-            Assert.Equal(geometry, File.ReadAllBytes(Path.Combine(directory, "TZGeometry.dat.gz")));
+            Assert.Equal(geometry, File.ReadAllBytes(Path.Combine(directory, "TZGeometry.dat")));
         }
         finally
         {
@@ -234,11 +234,11 @@ public class SpatialDataTests
     private static Polygon Rectangle(double minX, double maxX, double minY, double maxY) =>
         (Polygon)GeometryFactory.Default.ToGeometry(new Envelope(minX, maxX, minY, maxY));
 
-    private static (SpatialIndex Index, PackedGeometry Geometry) Build(params TimeZoneFeature[] input)
+    private static (SpatialIndex Index, GeometryArchive Geometry) Build(params TimeZoneFeature[] input)
     {
         var files = Write(input);
         var index = SpatialIndex.Read(new MemoryStream(files.Index));
-        var geometry = new PackedGeometry(SpatialFormat.Decompress(new MemoryStream(files.Geometry)), index.GeometryHash, index.Zones.Length, index.PolygonCount);
+        var geometry = new GeometryArchive(() => new MemoryStream(files.Geometry, false), index.GeometryHash, index.Zones.Length, index.PolygonCount);
         return (index, geometry);
     }
 
@@ -248,7 +248,7 @@ public class SpatialDataTests
         try
         {
             TimeZoneDataBuilder.CreateData(input, directory);
-            return (File.ReadAllBytes(Path.Combine(directory, "TZIndex.dat.gz")), File.ReadAllBytes(Path.Combine(directory, "TZGeometry.dat.gz")));
+            return (File.ReadAllBytes(Path.Combine(directory, "TZIndex.dat.gz")), File.ReadAllBytes(Path.Combine(directory, "TZGeometry.dat")));
         }
         finally
         {
@@ -256,9 +256,9 @@ public class SpatialDataTests
         }
     }
 
-    private static string[] Matches(SpatialIndex index, PackedGeometry geometry, double latitude, double longitude)
+    private static string[] Matches(SpatialIndex index, GeometryArchive geometry, double latitude, double longitude)
     {
-        var result = TimeZoneLookup.Resolve(index, new Lazy<PackedGeometry>(() => geometry), latitude, longitude);
+        var result = TimeZoneLookup.Resolve(index, new Lazy<GeometryArchive>(() => geometry), latitude, longitude);
         return new[] { result.Result }.Concat(result.AlternativeResults)
             .Where(zone => Array.IndexOf(index.Zones, zone) >= 0).ToArray();
     }

@@ -8,7 +8,7 @@ namespace GeoTimeZone;
 public static class TimeZoneLookup
 {
     private static readonly Lazy<SpatialIndex> Index = new(LoadIndex);
-    private static readonly Lazy<PackedGeometry> Geometry = new(LoadGeometry);
+    private static readonly Lazy<GeometryArchive> Geometry = new(LoadGeometry);
 
     /// <summary>
     /// Determines the IANA time zone for given location coordinates.
@@ -26,7 +26,8 @@ public static class TimeZoneLookup
 
     // Keep data injection internal: tests exercise the production aggregation
     // and lazy-loading path without replacing process-wide resource state.
-    internal static TimeZoneResult Resolve(SpatialIndex index, Lazy<PackedGeometry> packedGeometry, double latitude, double longitude)
+    internal static TimeZoneResult Resolve<TGeometry>(SpatialIndex index, Lazy<TGeometry> packedGeometry, double latitude, double longitude)
+        where TGeometry : IPolygonGeometry
     {
         var cell = index.Find(latitude, longitude);
         if (cell > 0) return new TimeZoneResult(index.Zones[cell - 1]);
@@ -70,12 +71,12 @@ public static class TimeZoneLookup
         return SpatialIndex.Read(stream);
     }
 
-    private static PackedGeometry LoadGeometry()
+    private static GeometryArchive LoadGeometry()
     {
         var index = Index.Value;
-        using var stream = typeof(TimeZoneLookup).Assembly.GetManifestResourceStream(SpatialFormat.GeometryResource)
-            ?? throw new InvalidOperationException("Time zone geometry resource is missing.");
-        return new PackedGeometry(SpatialFormat.Decompress(stream), index.GeometryHash, index.Zones.Length, index.PolygonCount);
+        return new GeometryArchive(() => typeof(TimeZoneLookup).Assembly.GetManifestResourceStream(SpatialFormat.GeometryResource)
+            ?? throw new InvalidOperationException("Time zone geometry resource is missing."),
+            index.GeometryHash, index.Zones.Length, index.PolygonCount);
     }
 
     private static int CalculateOffsetHoursFromLongitude(double longitude)

@@ -6,9 +6,12 @@ namespace GeoTimeZone.Internal;
 
 internal static class SpatialFormat
 {
-    internal const int Version = 1;
+    internal const int Version = 2;
     internal const int IndexMagic = 0x495A5447;
     internal const int GeometryMagic = 0x475A5447;
+    internal const int ArchiveMagic = 0x415A5447;
+    internal const int ArchiveHeaderBytes = 4 * sizeof(int);
+    internal const int DirectoryRecordBytes = sizeof(int) + 4 * sizeof(double) + sizeof(long) + 2 * sizeof(int) + 32;
     internal const int Columns = 480;
     internal const int Rows = 240;
     internal const int Refinement = 4;
@@ -23,7 +26,7 @@ internal static class SpatialFormat
     internal const int RingRecordBytes = 4 * sizeof(double) + 2 * sizeof(int);
     internal const int BlockRecordBytes = 2 * sizeof(double) + 2 * sizeof(int) + sizeof(ushort);
     internal const string IndexResource = "GeoTimeZone.TZIndex.dat.gz";
-    internal const string GeometryResource = "GeoTimeZone.TZGeometry.dat.gz";
+    internal const string GeometryResource = "GeoTimeZone.TZGeometry.dat";
 
     internal static int ReadCount(BinaryReader reader, int maximum)
     {
