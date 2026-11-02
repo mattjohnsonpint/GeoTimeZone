@@ -158,9 +158,9 @@ public static class TimeZoneLookup
         return 0;
     }
 
-    private static readonly Lazy<IList<string>> LookupData = new(LoadLookupData);
+    private static readonly Lazy<List<string>> LookupData = new(LoadLookupData);
 
-    private static IList<string> LoadLookupData()
+    private static List<string> LoadLookupData()
     {
         var assembly = typeof(TimeZoneLookup).Assembly;
         using var compressedStream = assembly.GetManifestResourceStream("GeoTimeZone.TZL.dat.gz");

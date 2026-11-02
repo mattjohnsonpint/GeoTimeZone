@@ -29,6 +29,6 @@ public static class ConsoleOutput
 
     private static string GetLocalDisplayTime()
     {
-        return DateTime.Now.ToString("HH:mm:ss.fff");
+        return DateTime.Now.ToString("HH:mm:ss.fff", System.Globalization.CultureInfo.InvariantCulture);
     }
 }
