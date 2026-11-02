@@ -3,21 +3,22 @@ GeoTimeZone  [![NuGet Version](https://img.shields.io/nuget/v/GeoTimeZone.svg?st
 
 Provides an IANA time zone identifier from latitude and longitude coordinates.
 
-## Nuget Installation
+## Installation
 
-```powershell
-PM> Install-Package GeoTimeZone
-```
+- Add the `GeoTimeZone` NuGet package to your project.
+- Import the `GeoTimeZone` namespace where needed.
 
-## Supported Environments
+## Compatibility
 
-As of version 6.0.0, *GeoTimeZone* works with all of the following:
+As of version 7.0.0, GeoTimeZone works with all of the following:
 
-- .NET 6 or greater
+- .NET 5 and newer, with dedicated targets for .NET 8, .NET 9, and .NET 10
 - .NET Core 2.0 or greater
 - .NET Framework 4.6.2 and greater
 
-Note that .NET Framework versions less than 4.6.2 are no longer supported.
+The package also includes .NET Standard 2.0 and 2.1 targets for compatible platforms.
+
+.NET Framework versions less than 4.6.2 are no longer supported.
 
 ## Example Usage
 
