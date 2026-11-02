@@ -1,4 +1,5 @@
 using System.IO;
+using System.Threading;
 
 namespace GeoTimeZone.Internal;
 
@@ -75,10 +76,52 @@ internal sealed class PackedGeometry : IPolygonGeometry
 
     public int Zone(int polygon) => _polygons[polygon].Zone;
 
+    internal void ValidateBounds(int polygon, double west, double east, double south, double north) =>
+        SpatialFormat.Require(_polygons[polygon].Bounds.Matches(west, east, south, north));
+
     // Conservatively account for the retained image, padded record arrays,
     // array headers and this object. The cache adds its own entry overhead.
     internal long RetainedBytes => _image.LongLength + (long)_polygons.Length * 48
         + (long)_rings.Length * 40 + (long)_blocks.Length * 32 + 256;
+
+    internal void ValidateEncoding(CancellationToken cancellationToken)
+    {
+        // Overrides have no original vertices to compare against. Check every
+        // encoded value, bridging edge, closing edge and conservative bound
+        // before publication, without expanding or retaining coordinates.
+        foreach (var polygon in _polygons)
+        for (var ringIndex = polygon.FirstRing; ringIndex < polygon.FirstRing + polygon.Rings; ringIndex++)
+        {
+            var ring = _rings[ringIndex];
+            double firstX = 0, firstY = 0, lastX = 0, lastY = 0;
+            var edges = 0;
+            for (var i = ring.FirstBlock; i < ring.FirstBlock + ring.Blocks; i++)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var block = _blocks[i];
+                var cursor = _payload + block.Offset;
+                var end = cursor + block.Length;
+                int previousX = 0, previousY = 0;
+                for (var point = 0; point <= block.Edges; point++)
+                {
+                    var x = CoordinateCodec.Read(_image, ref cursor, end, ref previousX, 180);
+                    var y = CoordinateCodec.Read(_image, ref cursor, end, ref previousY, 90);
+                    SpatialFormat.Require(ring.Bounds.Covers(y, x) && polygon.Bounds.Covers(y, x)
+                        && y >= block.MinY && y <= block.MaxY);
+                    if (point == 0)
+                    {
+                        if (i == ring.FirstBlock) { firstX = x; firstY = y; }
+                        else SpatialFormat.Require(x == lastX && y == lastY);
+                    }
+                    lastX = x;
+                    lastY = y;
+                }
+                SpatialFormat.Require(cursor == end);
+                edges += block.Edges;
+            }
+            SpatialFormat.Require(edges >= 3 && firstX == lastX && firstY == lastY);
+        }
+    }
 
     internal void ValidateCoordinates(GeometryPolygon[] source)
     {
@@ -203,6 +246,8 @@ internal sealed class PackedGeometry : IPolygonGeometry
     private readonly struct Bounds(double minX, double maxX, double minY, double maxY)
     {
         internal bool Covers(double y, double x) => x >= minX && x <= maxX && y >= minY && y <= maxY;
+        internal bool Matches(double west, double east, double south, double north) =>
+            minX == west && maxX == east && minY == south && maxY == north;
     }
 
     private readonly struct PolygonRecord(int zone, Bounds bounds, int firstRing, int rings)

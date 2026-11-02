@@ -5,6 +5,7 @@ namespace GeoTimeZone.Internal;
 
 internal sealed class SpatialIndex
 {
+    internal const int MaximumImageBytes = 64 * 1024 * 1024;
     internal string[] Zones { get; }
     // SHA256 of the archive directory, whose entries bind individual images.
     internal byte[] GeometryHash { get; }
@@ -75,11 +76,10 @@ internal sealed class SpatialIndex
         return stream.ToArray();
     }
 
-    internal static SpatialIndex Read(Stream compressed)
+    internal static SpatialIndex Read(Stream stream)
     {
-        var bytes = SpatialFormat.Decompress(compressed);
-        using var stream = new MemoryStream(bytes, false);
-        using var reader = new BinaryReader(stream);
+        SpatialFormat.Require(stream.CanSeek && stream.Length - stream.Position <= MaximumImageBytes);
+        using var reader = new BinaryReader(stream, Encoding.UTF8, true);
         SpatialFormat.Require(reader.ReadInt32() == SpatialFormat.IndexMagic && reader.ReadInt32() == SpatialFormat.Version);
         SpatialFormat.Require(reader.ReadInt32() == SpatialFormat.Columns && reader.ReadInt32() == SpatialFormat.Rows
             && reader.ReadInt32() == SpatialFormat.Refinement);

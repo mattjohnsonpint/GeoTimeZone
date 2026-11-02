@@ -5,10 +5,9 @@ namespace GeoTimeZone;
 /// <summary>
 /// Provides the time zone lookup functionality.
 /// </summary>
-public static class TimeZoneLookup
+public static partial class TimeZoneLookup
 {
-    private static readonly Lazy<SpatialIndex> Index = new(LoadIndex);
-    private static readonly Lazy<GeometryArchive> Geometry = new(LoadGeometry);
+    private static readonly Lazy<SpatialData> Data = new(LoadData);
 
     /// <summary>
     /// Determines the IANA time zone for given location coordinates.
@@ -20,8 +19,8 @@ public static class TimeZoneLookup
     {
         if (!(latitude >= -90 && latitude <= 90)) throw new ArgumentOutOfRangeException(nameof(latitude));
         if (!(longitude >= -180 && longitude <= 180)) throw new ArgumentOutOfRangeException(nameof(longitude));
-        var index = Index.Value;
-        return Resolve(index, Geometry, latitude, longitude);
+        var data = Data.Value;
+        return Resolve(data.Index, data.Geometry, latitude, longitude);
     }
 
     // Keep data injection internal: tests exercise the production aggregation
@@ -62,21 +61,6 @@ public static class TimeZoneLookup
 
         var offsetHours = CalculateOffsetHoursFromLongitude(longitude);
         return new TimeZoneResult(GetTimeZoneId(offsetHours));
-    }
-
-    private static SpatialIndex LoadIndex()
-    {
-        using var stream = typeof(TimeZoneLookup).Assembly.GetManifestResourceStream(SpatialFormat.IndexResource)
-            ?? throw new InvalidOperationException("Time zone index resource is missing.");
-        return SpatialIndex.Read(stream);
-    }
-
-    private static GeometryArchive LoadGeometry()
-    {
-        var index = Index.Value;
-        return new GeometryArchive(() => typeof(TimeZoneLookup).Assembly.GetManifestResourceStream(SpatialFormat.GeometryResource)
-            ?? throw new InvalidOperationException("Time zone geometry resource is missing."),
-            index.GeometryHash, index.Zones.Length, index.PolygonCount);
     }
 
     private static int CalculateOffsetHoursFromLongitude(double longitude)

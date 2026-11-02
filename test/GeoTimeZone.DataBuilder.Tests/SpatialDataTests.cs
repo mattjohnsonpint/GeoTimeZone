@@ -168,19 +168,32 @@ public class SpatialDataTests
     }
 
     [Fact]
-    public void Invalid_Later_Component_Cannot_Overwrite_An_Existing_Valid_Resource_Pair()
+    public void Builder_Produces_One_Complete_Bundle_Readable_By_The_Runtime()
+    {
+        var directory = Path.Combine(Path.GetTempPath(), "GeoTimeZone.Tests", Guid.NewGuid().ToString("N"));
+        try
+        {
+            TimeZoneDataBuilder.CreateData([new TimeZoneFeature("Test/A", Rectangle(-1, 1, -1, 1))], directory);
+            Assert.Equal(new[] { DataBundle.FileName }, Directory.GetFiles(directory).Select(Path.GetFileName));
+            var data = DataBundle.Read(() => File.OpenRead(Path.Combine(directory, DataBundle.FileName)));
+            data.Validate(CancellationToken.None);
+            Assert.Equal("Test/A", TimeZoneLookup.Resolve(data.Index, data.Geometry, 0.5, 0.5).Result);
+        }
+        finally { if (Directory.Exists(directory)) Directory.Delete(directory, true); }
+    }
+
+    [Fact]
+    public void Invalid_Later_Component_Cannot_Overwrite_An_Existing_Valid_Bundle()
     {
         var directory = Path.Combine(Path.GetTempPath(), "GeoTimeZone.Tests", Guid.NewGuid().ToString("N"));
         try
         {
             TimeZoneDataBuilder.CreateData([new TimeZoneFeature("A", Rectangle(-1, 1, -1, 1))], directory);
-            var index = File.ReadAllBytes(Path.Combine(directory, "TZIndex.dat.gz"));
-            var geometry = File.ReadAllBytes(Path.Combine(directory, "TZGeometry.dat"));
+            var bundle = File.ReadAllBytes(Path.Combine(directory, DataBundle.FileName));
             var bowtie = new Polygon(new LinearRing([new(0, 0), new(1, 1), new(1, 0), new(0, 1), new(0, 0)]));
             Assert.Throws<InvalidDataException>(() => TimeZoneDataBuilder.CreateData(
                 [new TimeZoneFeature("A", new MultiPolygon([Rectangle(-1, 1, -1, 1), bowtie]))], directory));
-            Assert.Equal(index, File.ReadAllBytes(Path.Combine(directory, "TZIndex.dat.gz")));
-            Assert.Equal(geometry, File.ReadAllBytes(Path.Combine(directory, "TZGeometry.dat")));
+            Assert.Equal(bundle, File.ReadAllBytes(Path.Combine(directory, DataBundle.FileName)));
         }
         finally
         {
@@ -225,10 +238,10 @@ public class SpatialDataTests
     public void Rejects_Unknown_Index_Versions_And_Truncated_Data()
     {
         var files = Write([new TimeZoneFeature("A", Rectangle(-1, 1, -1, 1))]);
-        var bytes = SpatialFormat.Decompress(new MemoryStream(files.Index));
+        var bytes = files.Index;
         bytes[4] = 99;
-        Assert.Throws<InvalidDataException>(() => SpatialIndex.Read(Compress(bytes)));
-        Assert.ThrowsAny<IOException>(() => SpatialIndex.Read(Compress(bytes[..4])));
+        Assert.Throws<InvalidDataException>(() => SpatialIndex.Read(new MemoryStream(bytes)));
+        Assert.ThrowsAny<IOException>(() => SpatialIndex.Read(new MemoryStream(bytes[..4])));
     }
 
     private static Polygon Rectangle(double minX, double maxX, double minY, double maxY) =>
@@ -248,7 +261,14 @@ public class SpatialDataTests
         try
         {
             TimeZoneDataBuilder.CreateData(input, directory);
-            return (File.ReadAllBytes(Path.Combine(directory, "TZIndex.dat.gz")), File.ReadAllBytes(Path.Combine(directory, "TZGeometry.dat")));
+            using var archive = new ZipArchive(File.OpenRead(Path.Combine(directory, DataBundle.FileName)), ZipArchiveMode.Read);
+            using var indexEntry = archive.GetEntry(DataBundle.IndexName)!.Open();
+            using var geometryEntry = archive.GetEntry(DataBundle.GeometryName)!.Open();
+            using var index = new MemoryStream();
+            using var geometry = new MemoryStream();
+            indexEntry.CopyTo(index);
+            geometryEntry.CopyTo(geometry);
+            return (index.ToArray(), geometry.ToArray());
         }
         finally
         {
@@ -263,11 +283,4 @@ public class SpatialDataTests
             .Where(zone => Array.IndexOf(index.Zones, zone) >= 0).ToArray();
     }
 
-    private static MemoryStream Compress(byte[] bytes)
-    {
-        var result = new MemoryStream();
-        using (var gzip = new GZipStream(result, CompressionLevel.Optimal, true)) gzip.Write(bytes);
-        result.Position = 0;
-        return result;
-    }
 }

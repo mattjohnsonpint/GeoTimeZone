@@ -80,9 +80,9 @@ public static class TimeZoneDataBuilder
         var index = new SpatialIndex(zones, geometry.DirectoryHash, polygons.Length, roots, children.ToArray(), offsets.ToArray(), candidates.ToArray());
         // Validate the geometry metadata and its pairing before publishing files.
         _ = new GeometryArchive(() => new MemoryStream(geometry.Image, false), index.GeometryHash, zones.Length, polygons.Length);
+        var bundle = DataBundle.Write(index.Serialize(), geometry.Image);
         Directory.CreateDirectory(outputPath);
-        File.WriteAllBytes(Path.Combine(outputPath, "TZGeometry.dat"), geometry.Image);
-        SpatialFormat.WriteCompressed(Path.Combine(outputPath, "TZIndex.dat.gz"), index.Serialize());
+        File.WriteAllBytes(Path.Combine(outputPath, DataBundle.FileName), bundle);
         ConsoleOutput.WriteMessage($"Wrote {zones.Length} zones, {polygons.Length} polygons, {children.Count / SpatialFormat.ChildrenPerCell} refined cells, and {lists.Count} candidate lists.");
         return;
 

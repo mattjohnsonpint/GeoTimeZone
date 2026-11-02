@@ -25,8 +25,6 @@ internal static class SpatialFormat
     internal const int PolygonRecordBytes = sizeof(int) + 4 * sizeof(double) + 2 * sizeof(int);
     internal const int RingRecordBytes = 4 * sizeof(double) + 2 * sizeof(int);
     internal const int BlockRecordBytes = 2 * sizeof(double) + 2 * sizeof(int) + sizeof(ushort);
-    internal const string IndexResource = "GeoTimeZone.TZIndex.dat.gz";
-    internal const string GeometryResource = "GeoTimeZone.TZGeometry.dat";
 
     internal static int ReadCount(BinaryReader reader, int maximum)
     {
@@ -42,7 +40,7 @@ internal static class SpatialFormat
 
     internal static bool IsFinite(double value) => !double.IsNaN(value) && !double.IsInfinity(value);
 
-    internal static byte[] Decompress(Stream compressed)
+    internal static byte[] Decompress(Stream compressed, int maximumSize = MaxDecompressedBytes)
     {
         // Our resources are single gzip members. Their final ISIZE word is
         // the uncompressed byte count modulo 2^32. Since the format is capped
@@ -61,7 +59,7 @@ internal static class SpatialFormat
             }
 
             compressed.Position = position;
-            Require(length <= MaxDecompressedBytes);
+            Require(length <= maximumSize);
             var bytes = new byte[(int)length];
             using var member = new GZipStream(compressed, CompressionMode.Decompress, true);
             var offset = 0;
@@ -82,7 +80,7 @@ internal static class SpatialFormat
         int count;
         while ((count = gzip.Read(buffer, 0, buffer.Length)) != 0)
         {
-            Require(output.Length + count <= MaxDecompressedBytes);
+            Require(output.Length + count <= maximumSize);
             output.Write(buffer, 0, count);
         }
 
