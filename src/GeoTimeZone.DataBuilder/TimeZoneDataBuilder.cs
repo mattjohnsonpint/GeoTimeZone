@@ -52,7 +52,7 @@ public static class TimeZoneDataBuilder
     private static void WriteGeohash(TextWriter writer, string tz, string geohash)
     {
         var h = geohash.PadRight(GeohashTree.Precision, '-');
-        var p = TimeZones[tz].LineNumber.ToString("D3");
+        var p = TimeZones[tz].LineNumber.ToString("D3", System.Globalization.CultureInfo.InvariantCulture);
         writer.WriteLine(h + p);
     }
 

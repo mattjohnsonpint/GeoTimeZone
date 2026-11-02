@@ -2,8 +2,8 @@ namespace GeoTimeZone.DataBuilder;
 
 public class TimeZoneTreeNode
 {
-    public readonly List<(TimeZoneFeature Feature, double PctOfNode)> TimeZones = new();
-    public readonly Dictionary<char, TimeZoneTreeNode> ChildNodes = new();
+    public List<(TimeZoneFeature Feature, double PctOfNode)> TimeZones { get; } = new();
+    public Dictionary<char, TimeZoneTreeNode> ChildNodes { get; } = new();
 
     public void PrepareForOutput()
     {
