@@ -71,31 +71,17 @@ jobs:
         if: steps.tzbb.outputs.update == 'true'
         uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: |
-            8.0.x
-            9.0.x
-            10.0.x
+          dotnet-version: 10.0.x
           cache: true
           cache-dependency-path: '**/packages.lock.json'
 
       - name: Restore
         if: steps.tzbb.outputs.update == 'true'
-        run: dotnet restore GeoTimeZone.sln --nologo --locked-mode
+        run: dotnet restore src/GeoTimeZone.DataBuilder --nologo --locked-mode
 
       - name: Regenerate time zone data
         if: steps.tzbb.outputs.update == 'true'
         run: dotnet run --project src/GeoTimeZone.DataBuilder -c Release --nologo --no-restore
-
-      - name: Build
-        if: steps.tzbb.outputs.update == 'true'
-        run: dotnet build GeoTimeZone.sln -c Release --nologo --no-restore
-
-      - name: Test
-        if: steps.tzbb.outputs.update == 'true'
-        run: |
-          dotnet test --test-modules "test/**/bin/Release/net10.0/*.Tests.dll" --report-xunit-trx
-          dotnet test --test-modules "test/**/bin/Release/net8.0/*.Tests.dll" --report-xunit-trx
-          dotnet test --test-modules "test/**/bin/Release/net9.0/*.Tests.dll" --report-xunit-trx
 
       - name: Create or update pull request
         if: steps.tzbb.outputs.update == 'true'
