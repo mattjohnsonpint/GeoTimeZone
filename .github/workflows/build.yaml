@@ -73,7 +73,7 @@ jobs:
           run: dotnet restore GeoTimeZone.sln --nologo --locked-mode
 
         - name: Run Data Builder
-          run: dotnet run --project src/GeoTimeZone.DataBuilder -c Release --nologo --no-restore
+          run: dotnet run --project src/GeoTimeZone.DataBuilder -c Release --no-restore
 
         - name: Build
           run: dotnet build GeoTimeZone.sln -c Release --nologo --no-restore

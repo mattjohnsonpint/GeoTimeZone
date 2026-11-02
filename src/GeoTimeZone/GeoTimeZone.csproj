@@ -9,10 +9,18 @@
     <PackageProjectUrl>https://github.com/mattjohnsonpint/GeoTimeZone</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Version>6.1.0</Version>
+    <TestAssemblyPublicKey>0024000004800000940000000602000000240000525341310004000001000100b1dae8576c79f6aa981231315a688ebf26ae1acd5bf2806c272c21b59dba8a9f6432d4d00e56b3e474a4574bb730126b76a3b8dd4f97ea020df7718f8090bc12cbb24a08dc8ca987b91fd24ce1c24e85e930fd01268405ec64fe08ab52a7de9f1806e1f3c5886422d73780f5a69ff7015701f3d2c31094af1065ef722a86179a</TestAssemblyPublicKey>
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="TZ.dat.gz;TZL.dat.gz" />
+    <InternalsVisibleTo Include="GeoTimeZone.Tests" Key="$(TestAssemblyPublicKey)" />
+    <InternalsVisibleTo Include="GeoTimeZone.DataBuilder.Tests" Key="$(TestAssemblyPublicKey)" />
+    <Compile Include="../Shared/*.cs" Link="Shared/%(Filename)%(Extension)" />
+    <EmbeddedResource Include="TZIndex.dat.gz;TZGeometry.dat.gz" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net462'">
+    <Reference Include="System.Numerics" />
   </ItemGroup>
 
   <PropertyGroup>

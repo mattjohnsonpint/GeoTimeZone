@@ -81,7 +81,7 @@ jobs:
 
       - name: Regenerate time zone data
         if: steps.tzbb.outputs.update == 'true'
-        run: dotnet run --project src/GeoTimeZone.DataBuilder -c Release --nologo --no-restore
+        run: dotnet run --project src/GeoTimeZone.DataBuilder -c Release --no-restore
 
       - name: Create or update pull request
         if: steps.tzbb.outputs.update == 'true'
@@ -92,8 +92,8 @@ jobs:
           base: ${{ github.event.repository.default_branch }}
           add-paths: |
             src/GeoTimeZone.DataBuilder/Program.cs
-            src/GeoTimeZone/TZ.dat.gz
-            src/GeoTimeZone/TZL.dat.gz
+            src/GeoTimeZone/TZIndex.dat.gz
+            src/GeoTimeZone/TZGeometry.dat.gz
           commit-message: Update TZBB data to ${{ steps.tzbb.outputs.version }}
           title: Update TZBB data to ${{ steps.tzbb.outputs.version }}
           body: |
@@ -102,4 +102,4 @@ jobs:
             Release notes: https://github.com/evansiroky/timezone-boundary-builder/releases/tag/${{ steps.tzbb.outputs.version }}
 
             - Updated the DataBuilder's pinned release.
-            - Regenerated `TZ.dat.gz` and `TZL.dat.gz` from `timezones.shapefile.zip`.
+            - Regenerated `TZIndex.dat.gz` and `TZGeometry.dat.gz` from `timezones.shapefile.zip`.

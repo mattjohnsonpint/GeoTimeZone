@@ -1,222 +1,112 @@
-using System.IO.Compression;
+using GeoTimeZone.Internal;
 using NetTopologySuite.Geometries;
+using NetTopologySuite.Geometries.Prepared;
+using NetTopologySuite.Index.Strtree;
 
 namespace GeoTimeZone.DataBuilder;
 
 public static class TimeZoneDataBuilder
 {
-    private static readonly GeohashTree GeohashTree = new();
-    private static readonly TimeZoneTreeNode WorldBoundsTreeNode = new();
-    private static readonly Dictionary<string, TimeZoneMeta> TimeZones = new();
+    public static void CreateData(TimeZoneShapeFileReader inputShapefile, string outputPath) => CreateData(inputShapefile.ReadShapeFile(), outputPath);
 
-    private const string DataFileName = "TZ.dat.gz";
-    private const string LookupFileName = "TZL.dat.gz";
-
-    private static readonly Dictionary<string, string> Overrides = new(StringComparer.Ordinal)
+    public static void CreateData(IEnumerable<TimeZoneFeature> input, string outputPath)
     {
-        ["Europe/Kiev"] = "Europe/Kyiv"
-    };
+        ConsoleOutput.WriteMessage("Loading and validating polygons...");
+        var features = input.SelectMany(feature => Expand(feature.Geometry).Select((polygon, index) =>
+                new TimeZoneFeature(feature.TimeZoneName == "Europe/Kiev" ? "Europe/Kyiv" : feature.TimeZoneName, polygon, index)))
+            .OrderBy(f => f.TimeZoneName, StringComparer.Ordinal).ThenBy(f => f.MultiPolyIndex).ToArray();
+        if (features.Length == 0) throw new ArgumentException("No polygons supplied.", nameof(input));
+        foreach (var feature in features)
+            if (!feature.Geometry.IsValid || feature.Geometry.IsEmpty || feature.Geometry.Area <= 0)
+                throw new InvalidDataException("Invalid source polygon: " + feature.TimeZoneName);
 
-    private static void WriteLookup(string outputPath)
-    {
-
-        var path = Path.Combine(outputPath, LookupFileName);
-
-        using var fileStream = File.Create(path);
-        using var compressedStream = new GZipStream(fileStream, CompressionMode.Compress);
-        using var writer = new StreamWriter(compressedStream) {NewLine = "\n"};
-
-        var timeZones = TimeZones.Values.OrderBy(x => x.LineNumber);
-        foreach (var timeZone in timeZones)
+        var zones = features.Select(f => f.TimeZoneName).Distinct(StringComparer.Ordinal).ToArray();
+        var polygons = features.Select(feature =>
         {
-            var id = timeZone.IanaTimeZoneId;
-            if (Overrides.TryGetValue(id, out var replacement))
+            var polygon = (Polygon)feature.Geometry;
+            var rings = new[] { polygon.ExteriorRing }.Concat(polygon.InteriorRings).Select(ring =>
             {
-                id = replacement;
-            }
+                var coordinates = ring.Coordinates;
+                return new GeometryRing(coordinates.Select(c => c.X).ToArray(), coordinates.Select(c => c.Y).ToArray());
+            }).ToArray();
+            return new GeometryPolygon(Array.BinarySearch(zones, feature.TimeZoneName, StringComparer.Ordinal), rings);
+        }).ToArray();
 
-            writer.WriteLine(id);
-        }
-    }
+        ConsoleOutput.WriteMessage("Encoding shared geometry...");
+        var geometry = GeometryWriter.Serialize(polygons);
+        var prepared = features.Select(f => PreparedGeometryFactory.Prepare(f.Geometry)).ToArray();
+        var tree = new STRtree<int>();
+        for (var i = 0; i < features.Length; i++) tree.Insert(features[i].Geometry.EnvelopeInternal, i);
+        tree.Build();
 
-    private static void WriteGeohashDataFile(string outputPath)
-    {
-        var path = Path.Combine(outputPath, DataFileName);
-
-        using var fileStream = File.Create(path);
-        using var compressedStream = new GZipStream(fileStream, CompressionMode.Compress);
-        using var writer = new StreamWriter(compressedStream) {NewLine = "\n"};
-        WriteTreeNode(writer, WorldBoundsTreeNode);
-    }
-
-    private static void WriteGeohash(TextWriter writer, string tz, string geohash)
-    {
-        var h = geohash.PadRight(GeohashTree.Precision, '-');
-        var p = TimeZones[tz].LineNumber.ToString("D3", System.Globalization.CultureInfo.InvariantCulture);
-        writer.WriteLine(h + p);
-    }
-
-    private static void WriteTreeNode(TextWriter writer, TimeZoneTreeNode node, string geohash = "")
-    {
-        var childNodes = node.ChildNodes
-            .OrderBy(x => x.Key);
-
-        foreach (var (childChar, childNode) in childNodes)
+        ConsoleOutput.WriteMessage("Building refined grid...");
+        var roots = new int[SpatialFormat.Columns * SpatialFormat.Rows];
+        var children = new List<int>();
+        var offsets = new List<int> { 0 };
+        var candidates = new List<int>();
+        var lists = new Dictionary<string, int>(StringComparer.Ordinal);
+        for (var y = 0; y < SpatialFormat.Rows; y++)
+        for (var x = 0; x < SpatialFormat.Columns; x++)
         {
-            var childHash = geohash + childChar;
-            if (childNode.TimeZones.Count > 0)
+            var west = -180 + x * SpatialFormat.CellWidth;
+            var south = -90 + y * SpatialFormat.CellWidth;
+            var cell = Classify(west, south, SpatialFormat.CellWidth);
+            if (cell.Candidates.Length == 0) roots[y * SpatialFormat.Columns + x] = cell.Zone;
+            else
             {
-                var timeZones = childNode.TimeZones.GroupBy(x => x.Feature.TimeZoneName)
-                    .OrderByDescending(x => x.Sum(y => y.PctOfNode))
-                    .Select(x => x.Key);
-
-                foreach (var timeZone in timeZones)
+                roots[y * SpatialFormat.Columns + x] = -(children.Count / SpatialFormat.ChildrenPerCell + 1);
+                for (var cy = 0; cy < SpatialFormat.Refinement; cy++)
+                for (var cx = 0; cx < SpatialFormat.Refinement; cx++)
                 {
-                    WriteGeohash(writer, timeZone, childHash);
+                    var child = Classify(west + cx * SpatialFormat.ChildWidth, south + cy * SpatialFormat.ChildWidth, SpatialFormat.ChildWidth);
+                    if (child.Candidates.Length == 0) children.Add(child.Zone);
+                    else
+                    {
+                        var key = string.Join(",", child.Candidates);
+                        if (!lists.TryGetValue(key, out var list))
+                        {
+                            list = lists.Count;
+                            lists.Add(key, list);
+                            candidates.AddRange(child.Candidates);
+                            offsets.Add(candidates.Count);
+                        }
+
+                        children.Add(-list - 1);
+                    }
                 }
             }
-            else if (childNode.ChildNodes.Count > 0)
-            {
-                WriteTreeNode(writer, childNode, childHash);
-            }
+        }
+
+        var index = new SpatialIndex(zones, SpatialFormat.Hash(geometry), polygons.Length, roots, children.ToArray(), offsets.ToArray(), candidates.ToArray());
+        // Validate the geometry metadata and its pairing before publishing files.
+        var packed = new PackedGeometry(geometry, index.GeometryHash, zones.Length, polygons.Length);
+        packed.ValidateCoordinates(polygons);
+        Directory.CreateDirectory(outputPath);
+        SpatialFormat.WriteCompressed(Path.Combine(outputPath, "TZGeometry.dat.gz"), geometry);
+        SpatialFormat.WriteCompressed(Path.Combine(outputPath, "TZIndex.dat.gz"), index.Serialize());
+        ConsoleOutput.WriteMessage($"Wrote {zones.Length} zones, {polygons.Length} polygons, {children.Count / SpatialFormat.ChildrenPerCell} refined cells, and {lists.Count} candidate lists.");
+        return;
+
+        (int Zone, int[] Candidates) Classify(double west, double south, double width)
+        {
+            var envelope = new Envelope(west, west + width, south, south + width);
+            var rectangle = GeometryFactory.Default.ToGeometry(envelope);
+            var ids = tree.Query(envelope).Where(i => prepared[i].Intersects(rectangle)).Order().ToArray();
+            if (ids.Length == 0) return (0, Array.Empty<int>());
+            var zone = polygons[ids[0]].Zone;
+            // A single candidate is insufficient: partial coastal cells and
+            // holes still require geometry. Never infer coverage from samples.
+            if (ids.All(i => polygons[i].Zone == zone && prepared[i].Covers(rectangle)))
+                return (zone + 1, Array.Empty<int>());
+            return (0, ids);
         }
     }
 
-    private static double CalculatePctOfNode(TimeZoneFeature feature, GeohashTreeNode node)
+    private static IEnumerable<Polygon> Expand(Geometry geometry)
     {
-        var preparedGeometry = feature.PreparedGeometry;
-        var nodeGeometry = node.GetGeometry();
-        if (!preparedGeometry.Intersects(nodeGeometry))
-        {
-            return 0;
-        }
-
-        if (preparedGeometry.Contains(nodeGeometry))
-        {
-            return 1;
-        }
-
-        // Area is too expensive, and we only need an approximation.
-        // Test a set of evenly distributed points within the envelope.
-        var points = GetTestPoints(node.Envelope);
-        var hits = points.Count(p => preparedGeometry.Contains(p));
-        return (double) hits / points.Length;
-
-        // Here's how we can do it with area, but it's very slow.
-        // return feature.Geometry.Intersection(nodeGeometry).Area / node.Envelope.Area;
-    }
-
-    private static Point[] GetTestPoints(Envelope envelope)
-    {
-        const int step = 5;
-        var stepX = envelope.Width / (step - 1);
-        var stepY = envelope.Height / (step - 1);
-
-        var i = 0;
-        var points = new Point[step * step];
-        for (var x = envelope.MinX; x <= envelope.MaxX; x += stepX)
-        {
-            for (var y = envelope.MinY; y <= envelope.MaxY; y += stepY)
-            {
-                points[i] = new Point(x, y);
-                i++;
-            }
-        }
-
-        return points;
-    }
-
-    private static void AddResult(string geohash, TimeZoneFeature feature)
-    {
-        var currentNode = WorldBoundsTreeNode;
-
-        for (var i = 0; i < geohash.Length; i++)
-        {
-            var geohashChar = geohash[i];
-            if (!currentNode.ChildNodes.TryGetValue(geohashChar, out var childNode))
-            {
-                childNode = currentNode.ChildNodes[geohashChar] = new TimeZoneTreeNode();
-            }
-
-            currentNode = childNode;
-
-            if (i == geohash.Length - 1)
-            {
-                var node = GeohashTree.GetTreeNode(geohash)!;
-                var pct = CalculatePctOfNode(feature, node);
-                currentNode.TimeZones.Add((feature, pct));
-            }
-        }
-    }
-
-    public static void CreateGeohashData(TimeZoneShapeFileReader inputShapefile, string outputPath)
-    {
-        ConsoleOutput.WriteMessage("Loading polygons...");
-
-        var features = inputShapefile.ReadShapeFile()
-            .SelectMany(x =>
-            {
-                if (x.Geometry is MultiPolygon mp)
-                {
-                    // Expand MultiPolygons to individual Polygons
-                    return mp.Geometries.Select((geometry, index) =>
-                        new TimeZoneFeature(x.TimeZoneName, geometry, index));
-                }
-
-                return new[] {x};
-            })
-            .Where(x => x.Geometry.Area > 0)
-            .OrderBy(x => x.TimeZoneName).ThenBy(x => x.MultiPolyIndex)
-            .ToList();
-
-        PreLoadTimeZones(features);
-
-        ConsoleOutput.WriteMessage("Polygons loaded.");
-
-        var featuresWithGeohashes = features
-            .AsParallel()
-            .Select(feature =>
-            {
-                var indexString = feature.MultiPolyIndex >= 0 ? $"[{feature.MultiPolyIndex}]" : "";
-                ConsoleOutput.WriteMessage($"Generating geohash for {feature.TimeZoneName}" + indexString);
-                var geohashes = GeohashTree.GetGeohashes(feature.PreparedGeometry);
-                return (Feature: feature, Geohashes: geohashes);
-            })
-            .ToList();
-
-        ConsoleOutput.WriteMessage("Geohashes generated for polygons.  Building tree...");
-        foreach (var (feature, geohashes) in featuresWithGeohashes)
-        {
-            foreach (var geohash in geohashes)
-            {
-                AddResult(geohash, feature);
-            }
-        }
-
-        ConsoleOutput.WriteMessage("Tree built.  Preparing tree for output...");
-
-        WorldBoundsTreeNode.PrepareForOutput();
-        ConsoleOutput.WriteMessage("Tree prepared.  Writing output...");
-
-        WriteGeohashDataFile(outputPath);
-        ConsoleOutput.WriteMessage("Data file written.");
-
-        WriteLookup(outputPath);
-        ConsoleOutput.WriteMessage("Lookup file written.");
-    }
-
-    private static void PreLoadTimeZones(IEnumerable<TimeZoneFeature> features)
-    {
-        var zones = features
-            .GroupBy(x => x.TimeZoneName)
-            .Select(x => x.First())
-            .OrderBy(x => x.TimeZoneName)
-            .Distinct();
-
-        var i = 0;
-        foreach (var zone in zones)
-        {
-            TimeZones.Add(zone.TimeZoneName, new TimeZoneMeta(++i, zone.TimeZoneName));
-        }
+        if (geometry is Polygon polygon) yield return polygon;
+        else if (geometry is MultiPolygon multiPolygon)
+            foreach (var child in multiPolygon.Geometries) yield return (Polygon)child;
+        else throw new InvalidDataException("Expected polygon or multipolygon source data.");
     }
 }

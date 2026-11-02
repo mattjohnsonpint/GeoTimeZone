@@ -1,4 +1,4 @@
-using System.IO.Compression;
+using GeoTimeZone.Internal;
 
 namespace GeoTimeZone;
 
@@ -7,6 +7,9 @@ namespace GeoTimeZone;
 /// </summary>
 public static class TimeZoneLookup
 {
+    private static readonly Lazy<SpatialIndex> Index = new(LoadIndex);
+    private static readonly Lazy<PackedGeometry> Geometry = new(LoadGeometry);
+
     /// <summary>
     /// Determines the IANA time zone for given location coordinates.
     /// </summary>
@@ -15,207 +18,80 @@ public static class TimeZoneLookup
     /// <returns>A <see cref="TimeZoneResult"/> object, which contains the result(s) of the operation.</returns>
     public static TimeZoneResult GetTimeZone(double latitude, double longitude)
     {
-#if NET6_0_OR_GREATER || NETSTANDARD2_1
-        Span<byte> geohash = stackalloc byte[Geohash.Precision];
-#else
-        var geohash = new byte[Geohash.Precision];
-#endif
-        Geohash.Encode(latitude, longitude, geohash);
+        if (!(latitude >= -90 && latitude <= 90)) throw new ArgumentOutOfRangeException(nameof(latitude));
+        if (!(longitude >= -180 && longitude <= 180)) throw new ArgumentOutOfRangeException(nameof(longitude));
+        var index = Index.Value;
+        return Resolve(index, Geometry, latitude, longitude);
+    }
 
-        var lineNumbers = GetTzDataLineNumbers(geohash);
-        if (lineNumbers.Length != 0)
+    // Keep data injection internal: tests exercise the production aggregation
+    // and lazy-loading path without replacing process-wide resource state.
+    internal static TimeZoneResult Resolve(SpatialIndex index, Lazy<PackedGeometry> packedGeometry, double latitude, double longitude)
+    {
+        var cell = index.Find(latitude, longitude);
+        if (cell > 0) return new TimeZoneResult(index.Zones[cell - 1]);
+        if (cell < 0)
         {
-            var timeZones = GetTimeZonesFromData(lineNumbers);
-            return new TimeZoneResult(timeZones);
+            var geometry = packedGeometry.Value;
+            List<string>? matches = null;
+            var matchedZone = -1;
+            for (var i = index.CandidateStart(cell); i < index.CandidateEnd(cell); i++)
+            {
+                var polygon = index.Candidate(i);
+                var zone = geometry.Zone(polygon);
+                if (zone != matchedZone && geometry.Covers(polygon, latitude, longitude))
+                {
+                    // Most boundary queries still have exactly one match.
+                    // Allocate a list only for a genuine second match.
+                    if (matchedZone >= 0)
+                    {
+                        matches ??= new List<string> { index.Zones[matchedZone] };
+                        matches.Add(index.Zones[zone]);
+                    }
+                    matchedZone = zone;
+                }
+            }
+
+            // Candidates are grouped by zone in ordinal name order. Only true
+            // overlaps/shared boundaries produce alternatives; nearby polygons
+            // that do not cover this point are never returned.
+            if (matches != null) return new TimeZoneResult(matches);
+            if (matchedZone >= 0) return new TimeZoneResult(index.Zones[matchedZone]);
         }
 
         var offsetHours = CalculateOffsetHoursFromLongitude(longitude);
         return new TimeZoneResult(GetTimeZoneId(offsetHours));
     }
-    
-#if NET6_0_OR_GREATER || NETSTANDARD2_1
-    private static int[] GetTzDataLineNumbers(ReadOnlySpan<byte> geohash)
-#else
-    private static int[] GetTzDataLineNumbers(byte[] geohash)
-#endif
+
+    private static SpatialIndex LoadIndex()
     {
-        var seeked = SeekTimeZoneFile(geohash);
-        if (seeked == 0)
-        {
-            return Array.Empty<int>();
-        }
-
-        int min = seeked, max = seeked;
-        var seekedGeohash = TimezoneFileReader.GetGeohash(seeked);
-
-        while (true)
-        {
-            var prevGeohash = TimezoneFileReader.GetGeohash(min - 1);
-            if (GeohashEquals(seekedGeohash, prevGeohash))
-            {
-                min--;
-            }
-            else
-            {
-                break;
-            }
-        }
-
-        while (true)
-        {
-            var nextGeohash = TimezoneFileReader.GetGeohash(max + 1);
-            if (GeohashEquals(seekedGeohash, nextGeohash))
-            {
-                max++;
-            }
-            else
-            {
-                break;
-            }
-        }
-
-        var lineNumbers = new int[max - min + 1];
-        for (var i = 0; i < lineNumbers.Length; i++)
-        {
-            lineNumbers[i] = TimezoneFileReader.GetLineNumber(i + min);
-        }
-
-        return lineNumbers;
+        using var stream = typeof(TimeZoneLookup).Assembly.GetManifestResourceStream(SpatialFormat.IndexResource)
+            ?? throw new InvalidOperationException("Time zone index resource is missing.");
+        return SpatialIndex.Read(stream);
     }
 
-#if NET6_0_OR_GREATER || NETSTANDARD2_1
-    private static bool GeohashEquals (ReadOnlySpan<byte> a, ReadOnlySpan<byte> b)
-#else
-    private static bool GeohashEquals (byte[] a, byte[] b)
-#endif
+    private static PackedGeometry LoadGeometry()
     {
-        var equals = true;
-        for (var i = Geohash.Precision - 1; i >= 0; i--)
-        {
-            equals &= a[i] == b[i];
-        }
-
-        return equals;
-    }
-    
-#if NET6_0_OR_GREATER || NETSTANDARD2_1
-    private static int SeekTimeZoneFile(ReadOnlySpan<byte> hash)
-#else
-    private static int SeekTimeZoneFile(byte[] hash)
-#endif
-    {
-        var min = 1;
-        var max = TimezoneFileReader.Count;
-        var converged = false;
-
-        while (true)
-        {
-            var mid = ((max - min) / 2) + min;
-            var midLine = TimezoneFileReader.GetGeohash(mid);
-
-            for (var i = 0; i < hash.Length; i++)
-            {
-                if (midLine[i] == '-')
-                {
-                    return mid;
-                }
-
-                if (midLine[i] > hash[i])
-                {
-                    max = mid == max ? min : mid;
-                    break;
-                }
-
-                if (midLine[i] < hash[i])
-                {
-                    min = mid == min ? max : mid;
-                    break;
-                }
-
-                if (i == 4)
-                {
-                    return mid;
-                }
-
-                if (min == mid)
-                {
-                    min = max;
-                    break;
-                }
-            }
-
-            if (min == max)
-            {
-                if (converged)
-                {
-                    break;
-                }
-
-                converged = true;
-            }
-        }
-
-        return 0;
-    }
-
-    private static readonly Lazy<List<string>> LookupData = new(LoadLookupData);
-
-    private static List<string> LoadLookupData()
-    {
-        var assembly = typeof(TimeZoneLookup).Assembly;
-        using var compressedStream = assembly.GetManifestResourceStream("GeoTimeZone.TZL.dat.gz");
-        using var stream = new GZipStream(compressedStream!, CompressionMode.Decompress);
-        using var reader = new StreamReader(stream);
-
-        var list = new List<string>();
-        while (reader.ReadLine() is { } line)
-        {
-            list.Add(line);
-        }
-
-        return list;
-    }
-
-    private static List<string> GetTimeZonesFromData(int[] lineNumbers)
-    {
-        var lookupData = LookupData.Value;
-        var timezones = new List<string>(lineNumbers.Length);
-        Array.Sort(lineNumbers);
-
-        foreach (var lineNumber in lineNumbers)
-        {
-            timezones.Add(lookupData[lineNumber - 1]);
-        }
-
-        return timezones;
+        var index = Index.Value;
+        using var stream = typeof(TimeZoneLookup).Assembly.GetManifestResourceStream(SpatialFormat.GeometryResource)
+            ?? throw new InvalidOperationException("Time zone geometry resource is missing.");
+        return new PackedGeometry(SpatialFormat.Decompress(stream), index.GeometryHash, index.Zones.Length, index.PolygonCount);
     }
 
     private static int CalculateOffsetHoursFromLongitude(double longitude)
     {
         var dir = longitude < 0 ? -1 : 1;
         var posNo = Math.Abs(longitude);
-        if (posNo <= 7.5)
-        {
-            return 0;
-        }
-
+        if (posNo <= 7.5) return 0;
         posNo -= 7.5;
         var offset = posNo / 15;
-        if (posNo % 15 > 0)
-        {
-            offset++;
-        }
-
-        return dir * (int) Math.Floor(offset);
+        if (posNo % 15 > 0) offset++;
+        return dir * (int)Math.Floor(offset);
     }
 
     private static string GetTimeZoneId(int offsetHours)
     {
-        if (offsetHours == 0)
-        {
-            return "UTC";
-        }
-
+        if (offsetHours == 0) return "UTC";
         var reversed = (offsetHours >= 0 ? "-" : "+") + Math.Abs(offsetHours);
         return "Etc/GMT" + reversed;
     }

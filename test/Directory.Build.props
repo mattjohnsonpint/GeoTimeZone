@@ -6,6 +6,9 @@
     <OutputType>Exe</OutputType>
     <UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
     <IsPackable>false</IsPackable>
+    <!-- Friend access tests the signed production assembly, not copied code. -->
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)..\.assets\mattjohnsonpint.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <!-- Avoid Windows-only RID inference so lockfiles are portable across build hosts. -->
