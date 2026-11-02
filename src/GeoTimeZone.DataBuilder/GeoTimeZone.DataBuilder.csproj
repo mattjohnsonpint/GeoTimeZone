@@ -3,12 +3,13 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <OutputType>Exe</OutputType>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NetTopologySuite" Version="2.6.0" />
-    <PackageReference Include="NetTopologySuite.IO.Esri.ShapeFile" Version="1.2.0" />
+    <PackageReference Include="NetTopologySuite" />
+    <PackageReference Include="NetTopologySuite.IO.Esri.ShapeFile" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,15 @@
+<Project>
+
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" />
+    <PackageVersion Include="NetTopologySuite" Version="2.6.0" />
+    <PackageVersion Include="NetTopologySuite.IO.Esri.ShapeFile" Version="1.2.0" />
+    <PackageVersion Include="Roslynator.Analyzers" Version="5.0.1" />
+    <PackageVersion Include="xunit.v3" Version="4.0.2" />
+  </ItemGroup>
+
+</Project>

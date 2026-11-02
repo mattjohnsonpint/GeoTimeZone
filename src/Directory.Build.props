@@ -1,0 +1,20 @@
+<Project>
+
+  <Import Project="..\Directory.Build.props" />
+
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)..\.assets\mattjohnsonpint.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Analysis rules">
+    <AnalysisLevel>latest-Recommended</AnalysisLevel>
+  </PropertyGroup>
+
+</Project>
