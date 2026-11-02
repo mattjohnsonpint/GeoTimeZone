@@ -1,0 +1,122 @@
+name: update-tzbb
+
+on:
+  schedule:
+    - cron: '30 17 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: update-tzbb
+  cancel-in-progress: false
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  DOTNET_NOLOGO: 1
+  NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout default branch
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+
+      - name: Check latest TZBB release and update version
+        id: tzbb
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const fs = require('node:fs');
+            const { data: release } = await github.rest.repos.getLatestRelease({
+              owner: 'evansiroky',
+              repo: 'timezone-boundary-builder'
+            });
+            const version = release.tag_name;
+            if (!/^\d{4}[a-z]+$/.test(version)) {
+              throw new Error(`Unexpected TZBB release tag: ${version}`);
+            }
+
+            const path = 'src/GeoTimeZone.DataBuilder/Program.cs';
+            const source = fs.readFileSync(path, 'utf8');
+            const pattern = /DownloadDataAsync\("(\d{4}[a-z]+)", tempDir\)/g;
+            const matches = [...source.matchAll(pattern)];
+            if (matches.length !== 1) {
+              throw new Error('Expected exactly one pinned TZBB version in Program.cs');
+            }
+            const currentVersion = matches[0][1];
+            if (version === currentVersion) {
+              core.info(`TZBB ${version} is already pinned.`);
+              return;
+            }
+
+            // Releases may be published before all assets finish uploading.
+            if (!release.assets.some(asset =>
+              asset.name === 'timezones.shapefile.zip' && asset.state === 'uploaded')) {
+              core.info(`TZBB ${version} has no ready shapefile asset; retry on the next run.`);
+              return;
+            }
+
+            fs.writeFileSync(path, source.replace(pattern, `DownloadDataAsync("${version}", tempDir)`));
+            core.setOutput('update', 'true');
+            core.setOutput('version', version);
+            core.setOutput('previous-version', currentVersion);
+
+      - name: Setup .NET
+        if: steps.tzbb.outputs.update == 'true'
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: |
+            8.0.x
+            9.0.x
+            10.0.x
+          cache: true
+          cache-dependency-path: '**/packages.lock.json'
+
+      - name: Restore
+        if: steps.tzbb.outputs.update == 'true'
+        run: dotnet restore GeoTimeZone.sln --nologo --locked-mode
+
+      - name: Regenerate time zone data
+        if: steps.tzbb.outputs.update == 'true'
+        run: dotnet run --project src/GeoTimeZone.DataBuilder -c Release --nologo --no-restore
+
+      - name: Build
+        if: steps.tzbb.outputs.update == 'true'
+        run: dotnet build GeoTimeZone.sln -c Release --nologo --no-restore
+
+      - name: Test
+        if: steps.tzbb.outputs.update == 'true'
+        run: |
+          dotnet test --test-modules "test/**/bin/Release/net10.0/*.Tests.dll" --report-xunit-trx
+          dotnet test --test-modules "test/**/bin/Release/net8.0/*.Tests.dll" --report-xunit-trx
+          dotnet test --test-modules "test/**/bin/Release/net9.0/*.Tests.dll" --report-xunit-trx
+
+      - name: Create or update pull request
+        if: steps.tzbb.outputs.update == 'true'
+        uses: peter-evans/create-pull-request@v8
+        with:
+          branch: automation/update-tzbb
+          base: ${{ github.event.repository.default_branch }}
+          add-paths: |
+            src/GeoTimeZone.DataBuilder/Program.cs
+            src/GeoTimeZone/TZ.dat.gz
+            src/GeoTimeZone/TZL.dat.gz
+          commit-message: Update TZBB data to ${{ steps.tzbb.outputs.version }}
+          title: Update TZBB data to ${{ steps.tzbb.outputs.version }}
+          body: |
+            Updates Timezone Boundary Builder from `${{ steps.tzbb.outputs.previous-version }}` to `${{ steps.tzbb.outputs.version }}`.
+
+            Release notes: https://github.com/evansiroky/timezone-boundary-builder/releases/tag/${{ steps.tzbb.outputs.version }}
+
+            - Updated the DataBuilder's pinned release.
+            - Regenerated `TZ.dat.gz` and `TZL.dat.gz` from `timezones.shapefile.zip`.
+            - Built the solution and passed the .NET 8, 9, and 10 tests on Linux.
+
+            This PR uses `GITHUB_TOKEN`, so GitHub does not automatically trigger the separate pull-request build workflow.
